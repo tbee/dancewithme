@@ -126,7 +126,7 @@
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_of_birth" type="date">
+            <column name="year_of_birth" type="integer">
                 <constraints nullable="false"/>
             </column>
             <column name="city_id" type="bigint"/>
@@ -134,17 +134,12 @@
             <column name="active" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
-            <column name="public_profile" type="boolean" defaultValueBoolean="true">
+            <column name="publicly_findable" type="boolean" defaultValueBoolean="true">
                 <constraints nullable="false"/>
             </column>
+            <column name="privacy_agreement_accepted_at" type="timestamp"/>
             <column name="whoami" type="text"/>
             <column name="whatdoiwant" type="text"/>
-            <column name="partner_age_min" type="integer" defaultValueNumeric="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="partner_age_max" type="integer" defaultValueNumeric="99">
-                <constraints nullable="false"/>
-            </column>
             <column name="week_frequency_min" type="integer" defaultValueNumeric="0">
                 <constraints nullable="false"/>
             </column>
@@ -152,6 +147,9 @@
                 <constraints nullable="false"/>
             </column>
             <column name="distance_to_partner_max" type="integer" defaultValueNumeric="100">
+                <constraints nullable="false"/>
+            </column>
+            <column name="age_distance_to_partner_max" type="integer" defaultValueNumeric="100">
                 <constraints nullable="false"/>
             </column>
         </createTable>

@@ -1,0 +1,109 @@
+package org.tbee.dancewithme.infrastructure.vdn.view;
+
+import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.BeforeEnterObserver;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.StreamResource;
+import jakarta.annotation.security.PermitAll;
+import org.tbee.dancewithme.application.DancerService;
+import org.tbee.dancewithme.domain.Dancer;
+import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
+import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
+import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
+
+import java.io.ByteArrayInputStream;
+import java.time.Year;
+
+@Route("dancer/:dancerId")
+@PermitAll
+public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnterObserver {
+
+    private final transient DancerService dancerService;
+
+    public DancerDetailView(SecurityService securityService, LocaleService localeService, DancerService dancerService) {
+        super("", securityService, localeService);
+        this.dancerService = dancerService;
+        postConstruct();
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        long dancerId = event.getRouteParameters().getLong("dancerId").orElseThrow();
+        Dancer dancer;
+        try {
+            dancer = dancerService.loadWithDetails(dancerId);
+        }
+        catch (Exception e) {
+            setContent(new Paragraph(getTranslation("detail.notFound")));
+            return;
+        }
+        render(dancer);
+    }
+
+    private void render(Dancer dancer) {
+        int age = Year.now().getValue() - dancer.yearOfBirth();
+
+        H2 nameH2 = new H2(dancer.name() + ", " + getTranslation("card.yearsOld", age));
+
+        String cityText = dancer.city() != null ? dancer.city().name() : "";
+        HorizontalLayout cityLayout = new HorizontalLayout(VaadinIcon.MAP_MARKER.create(), new Span(cityText));
+        cityLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
+
+        String styles = dancer.dancestyles().stream()
+                .map(dd -> dd.role().name() + " " + dd.dancestyle().name())
+                .distinct()
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("");
+
+        VerticalLayout content = new VerticalLayout();
+        content.setMaxWidth("900px");
+
+        // mugshot + header
+        HorizontalLayout header = new HorizontalLayout();
+        if (dancer.mugshot() != null) {
+            StreamResource resource = new StreamResource("mugshot" + dancer.id() + ".png", () -> new ByteArrayInputStream(dancer.mugshot()));
+            Image image = new Image(resource, dancer.name());
+            image.setWidth("200px");
+            image.setHeight("200px");
+            image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
+            header.add(image);
+        }
+        header.add(new VerticalLayout(nameH2, cityLayout, new Span(styles),
+                new Span(getTranslation("detail.weekFrequency", dancer.weekFrequencyMin(), dancer.weekFrequencyMax())),
+                new Span(getTranslation("detail.maxDistance", dancer.distanceToPartnerMax()))));
+        content.add(header);
+
+        if (dancer.whoami() != null && !dancer.whoami().isBlank()) {
+            content.add(new H3(getTranslation("form.whoami")), new Paragraph(dancer.whoami()));
+        }
+        if (dancer.whatdoiwant() != null && !dancer.whatdoiwant().isBlank()) {
+            content.add(new H3(getTranslation("form.whatdoiwant")), new Paragraph(dancer.whatdoiwant()));
+        }
+
+        // photo gallery
+        if (!dancer.photos().isEmpty()) {
+            content.add(new H3(getTranslation("form.photos")));
+            HorizontalLayout gallery = new HorizontalLayout();
+            dancer.photos().forEach(photo -> {
+                StreamResource resource = new StreamResource("photo" + photo.id() + ".png", () -> new ByteArrayInputStream(photo.image()));
+                Image image = new Image(resource, dancer.name());
+                image.setWidth("200px");
+                image.setHeight("200px");
+                image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
+                gallery.add(image);
+            });
+            gallery.getStyle().set("flex-wrap", "wrap");
+            content.add(gallery);
+        }
+
+        setContent(content);
+    }
+}

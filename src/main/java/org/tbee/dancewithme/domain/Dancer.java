@@ -10,7 +10,7 @@ import jakarta.persistence.OneToMany;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,8 +41,12 @@ public class Dancer extends BaseEntity<Dancer> {
     @Column(nullable = false)
     private boolean active = true;
 
+    // whether the dancer can be found by anonymous (not logged in) users
     @Column(nullable = false)
-    private boolean publicProfile = true;
+    private boolean publiclyFindable = true;
+
+    // when the dancer accepted the privacy agreement at registration
+    private LocalDateTime privacyAgreementAcceptedAt;
 
     @Column(columnDefinition = "text")
     private String whoami;
@@ -51,10 +55,6 @@ public class Dancer extends BaseEntity<Dancer> {
     private String whatdoiwant;
 
     // search preferences
-    @Column(nullable = false)
-    private int partnerAgeMin = 0;
-    @Column(nullable = false)
-    private int partnerAgeMax = 99;
     @Column(nullable = false)
     private int weekFrequencyMin = 0;
     @Column(nullable = false)
@@ -126,11 +126,19 @@ public class Dancer extends BaseEntity<Dancer> {
         return this;
     }
 
-    public boolean publicProfile() {
-        return publicProfile;
+    public boolean publiclyFindable() {
+        return publiclyFindable;
     }
-    public Dancer publicProfile(boolean publicProfile) {
-        this.publicProfile = publicProfile;
+    public Dancer publiclyFindable(boolean publiclyFindable) {
+        this.publiclyFindable = publiclyFindable;
+        return this;
+    }
+
+    public LocalDateTime privacyAgreementAcceptedAt() {
+        return privacyAgreementAcceptedAt;
+    }
+    public Dancer privacyAgreementAcceptedAt(LocalDateTime privacyAgreementAcceptedAt) {
+        this.privacyAgreementAcceptedAt = privacyAgreementAcceptedAt;
         return this;
     }
 
@@ -147,22 +155,6 @@ public class Dancer extends BaseEntity<Dancer> {
     }
     public Dancer whatdoiwant(String whatdoiwant) {
         this.whatdoiwant = whatdoiwant;
-        return this;
-    }
-
-    public int partnerAgeMin() {
-        return partnerAgeMin;
-    }
-    public Dancer partnerAgeMin(int partnerAgeMin) {
-        this.partnerAgeMin = partnerAgeMin;
-        return this;
-    }
-
-    public int partnerAgeMax() {
-        return partnerAgeMax;
-    }
-    public Dancer partnerAgeMax(int partnerAgeMax) {
-        this.partnerAgeMax = partnerAgeMax;
         return this;
     }
 
