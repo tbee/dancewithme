@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>4.0.5</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>org.tbee.dancewithme</groupId>
+	<artifactId>dancewithme</artifactId>
+	<version>0.0.1</version>
+	<name>Dancewithme</name>
+	<description>Dancewithme</description>
+
+	<properties>
+		<java.version>25</java.version>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<vaadin.version>25.1.1</vaadin.version> <!-- https://vaadin.com/flow -->
+		<springboot.version>4.0.5</springboot.version>
+		<testcontainers.version>1.21.4</testcontainers.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Take manual control of the springboot version instead of via vaadin via the parent pom-->
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- https://vaadin.com/docs/latest/components -->
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-dev</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!-- https://vaadin.com/directory/component/flow-viritin -->
+		<!-- https://github.com/viritin/flow-viritin/ -->
+		<dependency>
+			<groupId>in.virit</groupId>
+			<artifactId>viritin</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+		<!-- Spring Boot 4 modularized auto-configuration: LiquibaseAutoConfiguration lives here now,
+		     not in spring-boot-autoconfigure. Without it Liquibase silently never runs. -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-liquibase</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.tbee</groupId>
+			<artifactId>webstack</artifactId>
+			<version>2.x.x</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+			<version>26.0.1</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>42.7.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>Vaadin Directory</id>
+			<url>https://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<!-- Repository needed for prerelease versions of Vaadin -->
+		<repository>
+			<id>Vaadin prereleases</id>
+			<url>https://maven.vaadin.com/vaadin-prereleases</url>
+		</repository>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>https://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+		<repository>
+			<id>swx</id>
+			<url>http://nexus.softworks.nl/repository/maven-releases/</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mvnsearch</groupId>
+				<artifactId>toolchains-maven-plugin</artifactId>
+				<version>4.5.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>toolchain</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<toolchains>
+						<jdk>
+							<version>${maven.compiler.target}</version>
+						</jdk>
+					</toolchains>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<release>${java.version}</release>
+					<parameters>true</parameters>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.hibernate.orm</groupId>
+				<artifactId>hibernate-maven-plugin</artifactId>
+				<version>${hibernate.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>enhance</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<classifier>boot</classifier>
+					<layout>ZIP</layout> <!-- required to be able to use -Dloader.main -->
+					<attach>false</attach>
+					<excludeDevtools>true</excludeDevtools>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M8</version>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>production</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.vaadin</groupId>
+						<artifactId>vaadin-maven-plugin</artifactId>
+						<version>${vaadin.version}</version>
+						<executions>
+							<execution>
+								<id>frontend</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>prepare-frontend</goal>
+									<goal>build-frontend</goal>
+								</goals>
+								<configuration>
+									<optimizeBundle>false</optimizeBundle>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- we use this profile to take advantage of the java version configured in toolchains -->
+		<profile>
+			<id>run</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.6.1</version>
+						<executions>
+							<execution>
+								<id>run-boot-jar</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>java</executable>
+									<arguments>
+										<argument>-jar</argument>
+										<argument>target/dancewithme-${project.version}-boot.jar</argument>
+										<argument>--logging.level.org.springframework.boot.context.config=TRACE</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run-test-main</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<configuration>
+									<mainClass>org.tbee.dancewithme.DancewithmeTestContainer</mainClass>
+									<classpathScope>test</classpathScope>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>container</id>
+			<properties>
+				<containerImageId>org.tbee.dancewithme/dancewithme</containerImageId>
+			</properties>
+			<build>
+				<plugins>
+					<!--
+					     Shared configuration for building the container image using Jib.
+
+					     - container-local:  jib:dockerBuild @ package -> builds into the local
+					       Docker daemon, no push. Used by mvn_buildContainerPushLocal.cmd.
+					     - container-remote: jib:build @ install -> builds and pushes to the
+					       nexus registry. Used by mvn_buildContainerPushRemote.cmd.
+
+					     Registry credentials are taken from ~/.m2/settings.xml, from the
+					     <server> whose <id> matches the registry host (nexus.softworks.nl).
+					-->
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>3.5.2</version>
+						<configuration>
+							<from>
+								<image>eclipse-temurin:25-jre-alpine</image>
+							</from>
+							<to>
+								<image>nexus.softworks.nl/docker-private/${containerImageId}:${project.version}</image>
+								<tags>
+									<tag>latest</tag>
+								</tags>
+							</to>
+							<container>
+								<mainClass>org.tbee.dancewithme.Dancewithme</mainClass>
+								<jvmFlags>
+									<jvmFlag>-Dlogging.config=file:/data/logback.xml</jvmFlag>
+									<jvmFlag>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</jvmFlag>
+								</jvmFlags>
+								<ports>
+									<port>8080</port>
+									<port>5005</port>
+								</ports>
+								<!-- non-root user (UID/GID 1000) -->
+								<user>1000:1000</user>
+								<workingDirectory>/data</workingDirectory>
+								<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+							</container>
+							<extraDirectories>
+								<paths>
+									<path>
+										<from>${project.basedir}/src/main/container</from>
+										<includes>
+											<include>logback.xml</include>
+										</includes>
+										<into>/data</into>
+									</path>
+								</paths>
+							</extraDirectories>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- See the container profile: binds jib:dockerBuild -> build into the local Docker daemon. -->
+		<profile>
+			<id>container-local</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>build-container-local</id>
+								<phase>package</phase>
+								<goals>
+									<goal>dockerBuild</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- See the container profile: binds jib:build -> build and push to the nexus registry
+		     (no local Docker daemon required). -->
+		<profile>
+			<id>container-remote</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>build-and-push-container</id>
+								<phase>install</phase>
+								<goals>
+									<goal>build</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

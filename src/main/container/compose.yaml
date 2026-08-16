@@ -1,0 +1,34 @@
+name: dancewithme
+
+services:
+  app:
+    image: nexus.softworks.nl/docker-private/org.tbee.dancewithme/dancewithme:${PROJECT_VERSION}
+    container_name: dancewithme
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5005:5005" # java debug
+      - "8080:8080"
+#    volumes:
+#      - ./data-volume:/data
+    environment:
+      BASEURL: http://127.0.0.1:8080
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/dancewithme
+      SPRING_DATASOURCE_USERNAME: dancewithme
+      SPRING_DATASOURCE_PASSWORD: "dancewithme"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.tbee.webstack.postgres.PostgreSQLOnHsqldbCompatibilityDialect
+
+  postgres:
+    image: postgres:18.3
+    container_name: dancewithme-postgres
+    environment:
+      POSTGRES_DB: dancewithme
+      POSTGRES_USER: dancewithme
+      POSTGRES_PASSWORD: "dancewithme"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dancewithme -d dancewithme"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

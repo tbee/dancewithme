@@ -22,3 +22,32 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+### intellij ###
+.idea
+
+### maven ###
+target
+
+### vaadin ###
+frontend/generated
+vite.generated.ts
+logs
+node_modules
+src/main/dev-bundle
+src/main/bundles/prod.bundle
+src/main/frontend/index.html
+generated
+
+pom.xml.versionsBackup
+javaHome.cmd
+/application-default.properties
+package-lock.json
+package.json
+tsconfig.json
+types.d.ts
+vite.config.ts
+data
+databasechangelog.csv
+*.sql
+!src/main/container/init/*.sql
