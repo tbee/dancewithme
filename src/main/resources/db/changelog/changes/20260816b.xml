@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        >
+
+    <changeSet id="20260816b" author="tom">
+        <!-- initial dancestyles -->
+        <insert tableName="dancestyle">
+            <column name="name" value="ballroom"/>
+        </insert>
+        <insert tableName="dancestyle">
+            <column name="name" value="latin"/>
+        </insert>
+        <insert tableName="dancestyle">
+            <column name="name" value="10-dance"/>
+        </insert>
+        <insert tableName="dancestyle">
+            <column name="name" value="social latin"/>
+        </insert>
+        <insert tableName="dancestyle">
+            <column name="name" value="wcs"/>
+        </insert>
+        <insert tableName="dancestyle">
+            <column name="name" value="salsa"/>
+        </insert>
+        <insert tableName="dancestyle">
+            <column name="name" value="tango argentine"/>
+        </insert>
+
+        <!-- initial roles -->
+        <insert tableName="role">
+            <column name="name" value="lead"/>
+        </insert>
+        <insert tableName="role">
+            <column name="name" value="follow"/>
+        </insert>
+
+        <!-- initial countries -->
+        <insert tableName="country">
+            <column name="name" value="Nederland"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
