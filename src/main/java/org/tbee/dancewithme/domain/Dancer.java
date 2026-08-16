@@ -29,7 +29,7 @@ public class Dancer extends BaseEntity<Dancer> {
     private String name;
 
     @Column(nullable = false)
-    private LocalDate dateOfBirth;
+    private int yearOfBirth;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private City city;
@@ -61,6 +61,8 @@ public class Dancer extends BaseEntity<Dancer> {
     private int weekFrequencyMax = 7;
     @Column(nullable = false)
     private int distanceToPartnerMax = 100;
+    @Column(nullable = false)
+    private int ageDistanceToPartnerMax = 100;
 
     @OneToMany(mappedBy = "dancer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DancerDancestyle> dancestyles = new ArrayList<>();
@@ -92,11 +94,11 @@ public class Dancer extends BaseEntity<Dancer> {
         return this;
     }
 
-    public LocalDate dateOfBirth() {
-        return dateOfBirth;
+    public int yearOfBirth() {
+        return yearOfBirth;
     }
-    public Dancer dateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
+    public Dancer yearOfBirth(int yearOfBirth) {
+        this.yearOfBirth = yearOfBirth;
         return this;
     }
 
@@ -185,6 +187,14 @@ public class Dancer extends BaseEntity<Dancer> {
     }
     public Dancer distanceToPartnerMax(int distanceToPartnerMax) {
         this.distanceToPartnerMax = distanceToPartnerMax;
+        return this;
+    }
+
+    public int ageDistanceToPartnerMax() {
+        return ageDistanceToPartnerMax;
+    }
+    public Dancer ageDistanceToPartnerMax(int ageDistanceToPartnerMax) {
+        this.ageDistanceToPartnerMax = ageDistanceToPartnerMax;
         return this;
     }
 
