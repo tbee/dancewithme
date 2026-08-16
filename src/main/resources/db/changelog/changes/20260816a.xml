@@ -9,6 +9,100 @@
     <changeSet id="20260816a" author="tom">
         <validCheckSum>ANY</validCheckSum>
 
+        <!-- country -->
+        <createTable tableName="country">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="country" columnNames="name" constraintName="country__name_UK"/>
+
+        <!-- city -->
+        <createTable tableName="city">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="country_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="geoname_id" type="bigint"/>
+            <column name="lat" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lon" type="double">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="city" columnNames="geoname_id" constraintName="city__geoname_id_UK"/>
+        <addForeignKeyConstraint baseTableName="city" baseColumnNames="country_id"
+                                 referencedTableName="country" referencedColumnNames="id"
+                                 constraintName="city__country_FK"/>
+
+        <!-- role -->
+        <createTable tableName="role">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="role" columnNames="name" constraintName="role__name_UK"/>
+
+        <!-- dancestyle -->
+        <createTable tableName="dancestyle">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(255)"/>
+        </createTable>
+        <addUniqueConstraint tableName="dancestyle" columnNames="name" constraintName="dancestyle__name_UK"/>
+
         <!-- dancer -->
         <createTable tableName="dancer">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
@@ -17,13 +111,113 @@
             <column name="lazylock" type="bigint" defaultValue="0">
                 <constraints nullable="false"/>
             </column>
-            <column name="code" type="varchar(255)">
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="date_of_birth" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city_id" type="bigint"/>
+            <column name="mugshot" type="bytea"/>
+            <column name="active" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="public_profile" type="boolean" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="whoami" type="text"/>
+            <column name="whatdoiwant" type="text"/>
+            <column name="partner_age_min" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="partner_age_max" type="integer" defaultValueNumeric="99">
+                <constraints nullable="false"/>
+            </column>
+            <column name="week_frequency_min" type="integer" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="week_frequency_max" type="integer" defaultValueNumeric="7">
+                <constraints nullable="false"/>
+            </column>
+            <column name="distance_to_partner_max" type="integer" defaultValueNumeric="100">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
-        <addUniqueConstraint tableName="dancer" columnNames="code" constraintName="dancer__code_UK"/>
+        <addUniqueConstraint tableName="dancer" columnNames="email" constraintName="dancer__email_UK"/>
+        <addForeignKeyConstraint baseTableName="dancer" baseColumnNames="city_id"
+                                 referencedTableName="city" referencedColumnNames="id"
+                                 constraintName="dancer__city_FK"/>
+
+        <!-- dancer_dancestyle -->
+        <createTable tableName="dancer_dancestyle">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dancer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dancestyle_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="dancer_dancestyle" columnNames="dancer_id, dancestyle_id" constraintName="dancer_dancestyle__dancer_dancestyle_UK"/>
+        <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="dancer_id"
+                                 referencedTableName="dancer" referencedColumnNames="id"
+                                 constraintName="dancer_dancestyle__dancer_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="dancestyle_id"
+                                 referencedTableName="dancestyle" referencedColumnNames="id"
+                                 constraintName="dancer_dancestyle__dancestyle_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="role_id"
+                                 referencedTableName="role" referencedColumnNames="id"
+                                 constraintName="dancer_dancestyle__role_FK"/>
+
+        <!-- dancer_photo -->
+        <createTable tableName="dancer_photo">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dancer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image" type="bytea">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="dancer_photo" baseColumnNames="dancer_id"
+                                 referencedTableName="dancer" referencedColumnNames="id"
+                                 constraintName="dancer_photo__dancer_FK"/>
     </changeSet>
 </databaseChangeLog>
