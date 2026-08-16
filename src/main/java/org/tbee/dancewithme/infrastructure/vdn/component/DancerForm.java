@@ -19,10 +19,9 @@ import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.UploadHandler;
 import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerDancestyle;
@@ -31,9 +30,10 @@ import org.tbee.dancewithme.domain.Role;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
+import org.tbee.webstack.vdn.component.ImageUpload;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,9 +69,11 @@ public class DancerForm extends VerticalLayout {
     private final Checkbox publiclyFindableCheckbox = new Checkbox();
     private final Checkbox privacyAgreementCheckbox = new Checkbox();
 
-    private final MemoryBuffer mugshotBuffer = new MemoryBuffer();
+    private final ImageUpload mugshotUpload = new ImageUpload()
+            .filetypes(new String[]{"image/jpeg", "image/png", "image/webp"})
+            .imageWidth("150px")
+            .imageHeight("150px");
     private byte[] mugshotBytes;
-    private final VerticalLayout mugshotPreview = new VerticalLayout();
 
     private final VerticalLayout dancestylesLayout = new VerticalLayout();
     private final List<DancestyleRow> dancestyleRows = new ArrayList<>();
@@ -89,10 +91,11 @@ public class DancerForm extends VerticalLayout {
         yearOfBirthField.setMax(Year.now().getValue() - 18);
         cityComboBox.setItems(cityRepository.findAllByOrderByNameAsc());
         cityComboBox.setItemLabelGenerator(City::name);
+        cityComboBox.setWidthFull();
         whoamiField.setWidthFull();
-        whoamiField.setMaxHeight("150px");
+        whoamiField.setHeight("300px");
         whatdoiwantField.setWidthFull();
-        whatdoiwantField.setMaxHeight("150px");
+        whatdoiwantField.setHeight("300px");
 
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
@@ -122,20 +125,7 @@ public class DancerForm extends VerticalLayout {
         }
 
         // == mugshot ==
-        Upload mugshotUpload = new Upload(mugshotBuffer);
-        mugshotUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
-        mugshotUpload.setMaxFiles(1);
-        mugshotUpload.setUploadButton(new Button(getTranslation("form.upload")));
-        mugshotUpload.addSucceededListener(event -> {
-            try {
-                mugshotBytes = mugshotBuffer.getInputStream().readAllBytes();
-                showMugshotPreview();
-            }
-            catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        });
-        add(new H3(getTranslation("form.mugshot")), mugshotUpload, mugshotPreview);
+        add(new H3(getTranslation("form.mugshot")), mugshotUpload);
 
         // == dancestyles ==
         add(new H3(getTranslation("form.dancestyles")), dancestylesLayout);
@@ -145,19 +135,12 @@ public class DancerForm extends VerticalLayout {
 
         // == photos (profile only) ==
         if (mode == Mode.PROFILE) {
-            MemoryBuffer photoBuffer = new MemoryBuffer();
-            Upload photoUpload = new Upload(photoBuffer);
+            Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
+                dancer.addPhoto(bytes);
+                refreshPhotosLayout();
+            }));
             photoUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
             photoUpload.setUploadButton(new Button(getTranslation("form.upload")));
-            photoUpload.addSucceededListener(event -> {
-                try {
-                    dancer.addPhoto(photoBuffer.getInputStream().readAllBytes());
-                    refreshPhotosLayout();
-                }
-                catch (IOException e) {
-                    throw new IllegalStateException(e);
-                }
-            });
             add(new H3(getTranslation("form.photos")), photoUpload, photosLayout);
         }
 
@@ -198,7 +181,10 @@ public class DancerForm extends VerticalLayout {
         this.dancer = dancer;
         binder.setBean(dancer);
         this.mugshotBytes = dancer.mugshot();
-        showMugshotPreview();
+        if (mugshotBytes != null && mugshotBytes.length > 0) {
+            // browsers sniff the actual image type, so a generic mime is fine
+            mugshotUpload.src("data:image/*;base64," + java.util.Base64.getEncoder().encodeToString(mugshotBytes));
+        }
         dancestyleRows.clear();
         dancestylesLayout.removeAll();
         dancer.dancestyles().forEach(dd -> addDancestyleRow(dd.dancestyle(), dd.role()));
@@ -227,6 +213,14 @@ public class DancerForm extends VerticalLayout {
             }
         }
         // apply mugshot and dancestyles
+        if (mugshotUpload.hasUpload()) {
+            try (InputStream inputStream = mugshotUpload.inputStream()) {
+                mugshotBytes = inputStream.readAllBytes();
+            }
+            catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
         dancer.mugshot(mugshotBytes);
         List<DancerDancestyle> dancestyles = dancestyleRows.stream()
                 .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null)
@@ -240,25 +234,12 @@ public class DancerForm extends VerticalLayout {
         return passwordField.getValue();
     }
 
-    private void showMugshotPreview() {
-        mugshotPreview.removeAll();
-        if (mugshotBytes != null && mugshotBytes.length > 0) {
-            StreamResource resource = new StreamResource("mugshot.png", () -> new ByteArrayInputStream(mugshotBytes));
-            Image image = new Image(resource, "");
-            image.setWidth("150px");
-            image.setHeight("150px");
-            image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
-            mugshotPreview.add(image);
-        }
-    }
-
     private void refreshPhotosLayout() {
         photosLayout.removeAll();
         HorizontalLayout row = new HorizontalLayout();
         row.getStyle().set("flex-wrap", "wrap");
         dancer.photos().forEach(photo -> {
-            StreamResource resource = new StreamResource("photo.png", () -> new ByteArrayInputStream(photo.image()));
-            Image image = new Image(resource, "");
+            Image image = new Image(photo.image(), "photo");
             image.setWidth("150px");
             image.setHeight("150px");
             image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");

@@ -11,7 +11,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import jakarta.annotation.security.PermitAll;
 import org.tbee.dancewithme.application.DancerService;
 import org.tbee.dancewithme.domain.Dancer;
@@ -19,7 +18,6 @@ import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
-import java.io.ByteArrayInputStream;
 import java.time.Year;
 
 @Route("dancer/:dancerId")
@@ -69,8 +67,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
         // mugshot + header
         HorizontalLayout header = new HorizontalLayout();
         if (dancer.mugshot() != null) {
-            StreamResource resource = new StreamResource("mugshot" + dancer.id() + ".png", () -> new ByteArrayInputStream(dancer.mugshot()));
-            Image image = new Image(resource, dancer.name());
+            Image image = new Image(dancer.mugshot(), dancer.name());
             image.setWidth("200px");
             image.setHeight("200px");
             image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
@@ -93,8 +90,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
             content.add(new H3(getTranslation("form.photos")));
             HorizontalLayout gallery = new HorizontalLayout();
             dancer.photos().forEach(photo -> {
-                StreamResource resource = new StreamResource("photo" + photo.id() + ".png", () -> new ByteArrayInputStream(photo.image()));
-                Image image = new Image(resource, dancer.name());
+                Image image = new Image(photo.image(), dancer.name());
                 image.setWidth("200px");
                 image.setHeight("200px");
                 image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");

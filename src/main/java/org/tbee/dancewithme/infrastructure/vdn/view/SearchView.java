@@ -18,7 +18,6 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.Dancer;
@@ -30,7 +29,6 @@ import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
-import java.io.ByteArrayInputStream;
 import java.time.Year;
 import java.util.List;
 
@@ -225,8 +223,7 @@ public class SearchView extends DancewithmeAppLayout {
 
         HorizontalLayout card = new HorizontalLayout(middle);
         if (loggedIn && dancer.mugshot() != null) {
-            StreamResource resource = new StreamResource("mugshot" + dancer.id() + ".png", () -> new ByteArrayInputStream(dancer.mugshot()));
-            Image image = new Image(resource, dancer.name());
+            Image image = new Image(dancer.mugshot(), dancer.name());
             image.setWidth("160px");
             image.setHeight("160px");
             image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
