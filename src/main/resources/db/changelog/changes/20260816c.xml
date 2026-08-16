@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        >
+
+    <changeSet id="20260816c" author="tom">
+        <!-- cities in the Netherlands, downloaded from https://download.geonames.org/export/dump/NL.zip,
+             filtered on feature class P (populated places), actual cities only, population >= 5000 -->
+
+        <!-- load into a staging table first, so the country can be resolved before the final insert -->
+        <createTable tableName="city_import">
+            <column name="geoname_id" type="bigint"/>
+            <column name="name" type="varchar(255)"/>
+            <column name="lat" type="double"/>
+            <column name="lon" type="double"/>
+            <column name="country_id" type="bigint"/>
+        </createTable>
+        <loadData tableName="city_import" file="db/changelog/data/cities_nl.csv" relativeToChangelogFile="false">
+            <column name="geoname_id" type="numeric"/>
+            <column name="name" type="string"/>
+            <column name="lat" type="numeric"/>
+            <column name="lon" type="numeric"/>
+        </loadData>
+        <update tableName="city_import">
+            <column name="country_id" valueComputed="(SELECT id FROM country WHERE iso = 'nl')"/>
+            <where>country_id IS NULL</where>
+        </update>
+        <sql>INSERT INTO city (country_id, geoname_id, name, lat, lon)
+             SELECT i.country_id, i.geoname_id, i.name, i.lat, i.lon FROM city_import i</sql>
+        <dropTable tableName="city_import"/>
+    </changeSet>
+</databaseChangeLog>

@@ -41,6 +41,7 @@
         <!-- initial countries -->
         <insert tableName="country">
             <column name="name" value="Nederland"/>
+            <column name="iso" value="nl"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

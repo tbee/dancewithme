@@ -26,8 +26,12 @@
             <column name="name" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="iso" type="varchar(2)">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addUniqueConstraint tableName="country" columnNames="name" constraintName="country__name_UK"/>
+        <addUniqueConstraint tableName="country" columnNames="iso" constraintName="country__iso_UK"/>
 
         <!-- city -->
         <createTable tableName="city">

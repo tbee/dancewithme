@@ -87,7 +87,7 @@ public class DancerForm extends VerticalLayout {
         nameField.setRequiredIndicatorVisible(true);
         yearOfBirthField.setMin(1900);
         yearOfBirthField.setMax(Year.now().getValue() - 18);
-        cityComboBox.setItems(cityRepository.findAll());
+        cityComboBox.setItems(cityRepository.findAllByOrderByNameAsc());
         cityComboBox.setItemLabelGenerator(City::name);
         whoamiField.setWidthFull();
         whoamiField.setMaxHeight("150px");
