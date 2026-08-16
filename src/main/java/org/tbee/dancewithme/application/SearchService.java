@@ -11,15 +11,17 @@ import org.tbee.dancewithme.domain.repository.DancerRepository;
 import java.time.Year;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class SearchService {
 
     public record SearchCriteria(
-            Dancestyle dancestyle,
+            // matched or-ed: any of the selected dancestyles matches
+            Set<Dancestyle> dancestyles,
             Role role,
-            Integer ageMin,
-            Integer ageMax,
+            // only applied for logged in users, relative to their own age
+            Integer ageDistanceMax,
             Integer weekFrequencyMin,
             Integer weekFrequencyMax,
             // only applied for logged in users, measured from their own city
@@ -49,10 +51,11 @@ public class SearchService {
         return candidates.stream()
                 // never include the searching dancer itself
                 .filter(dancer -> !loggedIn || dancer.id() != currentDancer.id())
-                .filter(dancer -> criteria.dancestyle() == null || dancer.dancestyles().stream().anyMatch(dd -> dd.dancestyle().equals(criteria.dancestyle())))
+                .filter(dancer -> criteria.dancestyles() == null || criteria.dancestyles().isEmpty()
+                        || dancer.dancestyles().stream().anyMatch(dd -> criteria.dancestyles().contains(dd.dancestyle())))
                 .filter(dancer -> criteria.role() == null || dancer.dancestyles().stream().anyMatch(dd -> dd.role().equals(criteria.role())))
-                .filter(dancer -> criteria.ageMin() == null || age(dancer, currentYear) >= criteria.ageMin())
-                .filter(dancer -> criteria.ageMax() == null || age(dancer, currentYear) <= criteria.ageMax())
+                .filter(dancer -> !loggedIn || criteria.ageDistanceMax() == null
+                        || Math.abs(age(dancer, currentYear) - age(currentDancer, currentYear)) <= criteria.ageDistanceMax())
                 .filter(dancer -> criteria.weekFrequencyMin() == null || dancer.weekFrequencyMax() >= criteria.weekFrequencyMin())
                 .filter(dancer -> criteria.weekFrequencyMax() == null || dancer.weekFrequencyMin() <= criteria.weekFrequencyMax())
                 .map(dancer -> new SearchResult(dancer, distanceKm(fromCity, dancer.city())))
@@ -63,6 +66,9 @@ public class SearchService {
                     Dancer dancer = result.dancer();
                     dancer.whoami();
                     dancer.mugshot();
+                    if (dancer.city() != null) {
+                        dancer.city().name();
+                    }
                     dancer.dancestyles().forEach(dd -> {
                         dd.dancestyle().name();
                         dd.role().name();

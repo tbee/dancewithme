@@ -4,7 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
@@ -41,10 +41,9 @@ public class SearchView extends DancewithmeAppLayout {
     private final transient SecurityService securityService;
     private final transient SearchService searchService;
 
-    private final ComboBox<Dancestyle> dancestyleComboBox = new ComboBox<>();
+    private final MultiSelectComboBox<Dancestyle> dancestyleComboBox = new MultiSelectComboBox<>();
     private final Select<Role> roleSelect = new Select<>();
-    private final IntegerField ageMinField = new IntegerField();
-    private final IntegerField ageMaxField = new IntegerField();
+    private final IntegerField ageDistanceField = new IntegerField();
     private final IntegerField weekFrequencyMinField = new IntegerField();
     private final IntegerField weekFrequencyMaxField = new IntegerField();
     private final IntegerField distanceMaxField = new IntegerField();
@@ -79,10 +78,8 @@ public class SearchView extends DancewithmeAppLayout {
         roleSelect.setEmptySelectionCaption(getTranslation("search.role.any"));
         roleSelect.setEmptySelectionAllowed(true);
 
-        ageMinField.setPlaceholder(getTranslation("search.age.min"));
-        ageMinField.setMin(0);
-        ageMaxField.setPlaceholder(getTranslation("search.age.max"));
-        ageMaxField.setMin(0);
+        ageDistanceField.setMin(0);
+        ageDistanceField.setVisible(loggedIn); // age distance is relative to the logged in user's age
         weekFrequencyMinField.setPlaceholder(getTranslation("search.age.min"));
         weekFrequencyMinField.setMin(0);
         weekFrequencyMinField.setMax(7);
@@ -96,7 +93,9 @@ public class SearchView extends DancewithmeAppLayout {
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
         formLayout.addFormItem(dancestyleComboBox, getTranslation("search.dancestyle"));
         formLayout.addFormItem(roleSelect, getTranslation("search.role"));
-        formLayout.addFormItem(new HorizontalLayout(ageMinField, ageMaxField), getTranslation("search.age"));
+        if (loggedIn) {
+            formLayout.addFormItem(ageDistanceField, getTranslation("search.ageDistance"));
+        }
         formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), getTranslation("search.weekFrequency"));
         if (loggedIn) {
             formLayout.addFormItem(distanceMaxField, getTranslation("search.distance"));
@@ -114,8 +113,7 @@ public class SearchView extends DancewithmeAppLayout {
         SearchService.SearchCriteria criteria = new SearchService.SearchCriteria(
                 dancestyleComboBox.getValue(),
                 roleSelect.getValue(),
-                ageMinField.getValue(),
-                ageMaxField.getValue(),
+                ageDistanceField.getValue(),
                 weekFrequencyMinField.getValue(),
                 weekFrequencyMaxField.getValue(),
                 distanceMaxField.getValue());
