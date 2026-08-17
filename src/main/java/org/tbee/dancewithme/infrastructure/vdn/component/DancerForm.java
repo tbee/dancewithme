@@ -4,17 +4,16 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.NativeLabel;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -22,6 +21,7 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.server.streams.UploadHandler;
 import org.tbee.dancewithme.domain.City;
@@ -111,10 +111,11 @@ public class DancerForm extends VerticalLayout {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
         formLayout.setWidthFull();
+        add(formLayout);
 
         // ----------------------------
 
-        add(new H3(getTranslation("form.whoami")));
+        formLayout.add(new H3(getTranslation("form.whoami")));
 
         formLayout.addFormItem(nameField, getTranslation("form.name"));
         formLayout.addFormItem(emailField, getTranslation("form.email"));
@@ -160,7 +161,6 @@ public class DancerForm extends VerticalLayout {
         formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), getTranslation("form.weekFrequency"));
         formLayout.addFormItem(distanceToPartnerMaxField, getTranslation("form.distanceToPartnerMax"));
         formLayout.addFormItem(ageDistanceToPartnerMaxField, getTranslation("form.ageDistanceToPartnerMax"));
-        add(formLayout);
 
         // searching for
         formLayout.add(new H5(getTranslation("form.searchingFor")), searchingForLayout);
@@ -172,7 +172,10 @@ public class DancerForm extends VerticalLayout {
 
         // privacy agreement (register only)
         if (mode == Mode.REGISTER) {
-            formLayout.add(new HorizontalLayout(privacyAgreementCheckbox, new H5(getTranslation("privacy.text"))));
+//            formLayout.add(new HorizontalLayout(privacyAgreementCheckbox, new H5(getTranslation("privacy.text"))));
+            privacyAgreementCheckbox.setLabel(getTranslation("privacy.text"));
+            formLayout.add(privacyAgreementCheckbox);
+
         }
 
         // binder
@@ -320,6 +323,15 @@ public class DancerForm extends VerticalLayout {
         ComboBox<Skilllevel> comboBox = new ComboBox<>();
         comboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
         comboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
+        // show the description as a tooltip when hovering over the unfolded options
+        comboBox.setRenderer(new ComponentRenderer<>(sl -> {
+            Span name = new Span(getTranslation("skilllevel." + sl.code()));
+            Tooltip tooltip = Tooltip.forComponent(name)
+                    .withText(getTranslation("skilllevel." + sl.code() + ".description"))
+                    .withHoverDelay(300);
+            tooltip.setPosition(Tooltip.TooltipPosition.END);
+            return name;
+        }));
         comboBox.setValue(skilllevel);
         return comboBox;
     }
