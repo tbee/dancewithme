@@ -32,6 +32,18 @@
             <column name="name" value="follow"/>
         </insert>
 
+        <!-- initial skilllevels -->
+        <insert tableName="skilllevel"><column name="code" value="absolute_beginner"/><column name="level" valueNumeric="1"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="novice"/><column name="level" valueNumeric="2"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="intermediate_social"/><column name="level" valueNumeric="3"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="advanced_social"/><column name="level" valueNumeric="4"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="pre_competitive"/><column name="level" valueNumeric="5"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="regional_competitor"/><column name="level" valueNumeric="6"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="national_competitor"/><column name="level" valueNumeric="7"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="national_finalist"/><column name="level" valueNumeric="8"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="international_class"/><column name="level" valueNumeric="9"/></insert>
+        <insert tableName="skilllevel"><column name="code" value="world_elite"/><column name="level" valueNumeric="10"/></insert>
+
         <!-- initial countries -->
         <insert tableName="country">
             <column name="name" value="Nederland"/>

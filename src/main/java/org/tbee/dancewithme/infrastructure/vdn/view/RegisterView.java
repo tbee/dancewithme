@@ -12,6 +12,7 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
+import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
 import org.tbee.dancewithme.infrastructure.vdn.component.DancerForm;
@@ -22,11 +23,12 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 public class RegisterView extends DancewithmeAppLayout {
 
     public RegisterView(SecurityService securityService, LocaleService localeService, DancerService dancerService,
-                        CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository) {
+                        CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
+                        SkilllevelRepository skilllevelRepository) {
         super("register.title", securityService, localeService);
         postConstruct();
 
-        DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, roleRepository);
+        DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, roleRepository, skilllevelRepository);
         form.setDancer(new Dancer());
 
         Button registerButton = new Button(getTranslation("form.register"), e -> {

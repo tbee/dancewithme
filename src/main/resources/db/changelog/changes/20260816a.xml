@@ -107,6 +107,31 @@
         </createTable>
         <addUniqueConstraint tableName="dancestyle" columnNames="name" constraintName="dancestyle__name_UK"/>
 
+        <!-- skilllevel: the database only holds the code and the integer level,
+             the display name and description come from the translations -->
+        <createTable tableName="skilllevel">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level" type="integer">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="skilllevel" columnNames="code" constraintName="skilllevel__code_UK"/>
+        <addUniqueConstraint tableName="skilllevel" columnNames="level" constraintName="skilllevel__level_UK"/>
+
         <!-- dancer -->
         <createTable tableName="dancer">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
@@ -185,6 +210,9 @@
             <column name="role_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
+            <column name="skilllevel_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addUniqueConstraint tableName="dancer_dancestyle" columnNames="dancer_id, dancestyle_id" constraintName="dancer_dancestyle__dancer_dancestyle_UK"/>
         <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="dancer_id"
@@ -196,6 +224,56 @@
         <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="role_id"
                                  referencedTableName="role" referencedColumnNames="id"
                                  constraintName="dancer_dancestyle__role_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="skilllevel_id"
+                                 referencedTableName="skilllevel" referencedColumnNames="id"
+                                 constraintName="dancer_dancestyle__skilllevel_FK"/>
+
+        <!-- dancer_searching_for: what a dancer is searching for in a partner (dancestyle + role + skill range) -->
+        <createTable tableName="dancer_searching_for">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dancer_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dancestyle_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="skilllevel_min_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="skilllevel_max_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="dancer_searching_for" columnNames="dancer_id, dancestyle_id" constraintName="dancer_searching_for__dancer_dancestyle_UK"/>
+        <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="dancer_id"
+                                 referencedTableName="dancer" referencedColumnNames="id"
+                                 constraintName="dancer_searching_for__dancer_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="dancestyle_id"
+                                 referencedTableName="dancestyle" referencedColumnNames="id"
+                                 constraintName="dancer_searching_for__dancestyle_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="role_id"
+                                 referencedTableName="role" referencedColumnNames="id"
+                                 constraintName="dancer_searching_for__role_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="skilllevel_min_id"
+                                 referencedTableName="skilllevel" referencedColumnNames="id"
+                                 constraintName="dancer_searching_for__skilllevel_min_FK"/>
+        <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="skilllevel_max_id"
+                                 referencedTableName="skilllevel" referencedColumnNames="id"
+                                 constraintName="dancer_searching_for__skilllevel_max_FK"/>
 
         <!-- dancer_photo -->
         <createTable tableName="dancer_photo">

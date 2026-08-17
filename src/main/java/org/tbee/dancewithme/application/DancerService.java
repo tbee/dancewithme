@@ -40,6 +40,8 @@ public class DancerService {
         dancer.searchingFor().forEach(entry -> {
             entry.dancestyle().name();
             entry.role().name();
+            entry.skilllevelMin().code();
+            entry.skilllevelMax().code();
         });
         return dancer.searchingFor();
     }
@@ -53,6 +55,7 @@ public class DancerService {
         dancer.dancestyles().forEach(dancerDancestyle -> {
             dancerDancestyle.dancestyle().name();
             dancerDancestyle.role().name();
+            dancerDancestyle.skilllevel().code();
         });
         dancer.photos().forEach(photo -> photo.image());
         return dancer;

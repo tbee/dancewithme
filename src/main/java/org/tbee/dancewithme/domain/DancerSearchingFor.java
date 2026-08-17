@@ -24,6 +24,13 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Role role;
 
+    // the minimum and maximum skilllevel the searching dancer accepts in a partner
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Skilllevel skilllevelMin;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Skilllevel skilllevelMax;
+
     public Dancer dancer() {
         return dancer;
     }
@@ -45,6 +52,22 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> {
     }
     public DancerSearchingFor role(Role role) {
         this.role = role;
+        return this;
+    }
+
+    public Skilllevel skilllevelMin() {
+        return skilllevelMin;
+    }
+    public DancerSearchingFor skilllevelMin(Skilllevel skilllevelMin) {
+        this.skilllevelMin = skilllevelMin;
+        return this;
+    }
+
+    public Skilllevel skilllevelMax() {
+        return skilllevelMax;
+    }
+    public DancerSearchingFor skilllevelMax(Skilllevel skilllevelMax) {
+        this.skilllevelMax = skilllevelMax;
         return this;
     }
 }

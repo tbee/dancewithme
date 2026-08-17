@@ -19,6 +19,9 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Role role;
 
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Skilllevel skilllevel;
+
     public Dancer dancer() {
         return dancer;
     }
@@ -40,6 +43,14 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
     }
     public DancerDancestyle role(Role role) {
         this.role = role;
+        return this;
+    }
+
+    public Skilllevel skilllevel() {
+        return skilllevel;
+    }
+    public DancerDancestyle skilllevel(Skilllevel skilllevel) {
+        this.skilllevel = skilllevel;
         return this;
     }
 }

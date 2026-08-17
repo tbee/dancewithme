@@ -30,9 +30,11 @@ import org.tbee.dancewithme.domain.DancerDancestyle;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
+import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.webstack.vdn.component.ImageUpload;
 
 import java.io.IOException;
@@ -53,6 +55,7 @@ public class DancerForm extends VerticalLayout {
     private final Mode mode;
     private final DancestyleRepository dancestyleRepository;
     private final RoleRepository roleRepository;
+    private final SkilllevelRepository skilllevelRepository;
 
     private final Binder<Dancer> binder = new Binder<>(Dancer.class);
     private Dancer dancer;
@@ -86,10 +89,12 @@ public class DancerForm extends VerticalLayout {
 
     private final VerticalLayout photosLayout = new VerticalLayout();
 
-    public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository) {
+    public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository,
+                      RoleRepository roleRepository, SkilllevelRepository skilllevelRepository) {
         this.mode = mode;
         this.dancestyleRepository = dancestyleRepository;
         this.roleRepository = roleRepository;
+        this.skilllevelRepository = skilllevelRepository;
 
         // basic fields
         nameField.setRequiredIndicatorVisible(true);
@@ -131,7 +136,7 @@ public class DancerForm extends VerticalLayout {
 
         // dances I can do
         formLayout.add(new H5(getTranslation("form.dancestyles")), dancestylesLayout);
-        Button addDancestyleButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(dancestyleRows, dancestylesLayout, null, null));
+        Button addDancestyleButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null));
         addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         formLayout.add(addDancestyleButton);
 
@@ -159,7 +164,7 @@ public class DancerForm extends VerticalLayout {
 
         // searching for
         formLayout.add(new H5(getTranslation("form.searchingFor")), searchingForLayout);
-        Button addSearchingForButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(searchingForRows, searchingForLayout, null, null));
+        Button addSearchingForButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null));
         addSearchingForButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         formLayout.add(addSearchingForButton);
 
@@ -198,10 +203,10 @@ public class DancerForm extends VerticalLayout {
         }
         dancestyleRows.clear();
         dancestylesLayout.removeAll();
-        dancer.dancestyles().forEach(dd -> addDancestyleRow(dancestyleRows, dancestylesLayout, dd.dancestyle(), dd.role()));
+        dancer.dancestyles().forEach(dd -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, dd.dancestyle(), dd.role(), dd.skilllevel(), null));
         searchingForRows.clear();
         searchingForLayout.removeAll();
-        dancer.searchingFor().forEach(sf -> addDancestyleRow(searchingForRows, searchingForLayout, sf.dancestyle(), sf.role()));
+        dancer.searchingFor().forEach(sf -> addDancestyleRow(searchingForRows, searchingForLayout, false, sf.dancestyle(), sf.role(), sf.skilllevelMin(), sf.skilllevelMax()));
         if (mode == Mode.UPDATE) {
             refreshPhotosLayout();
         }
@@ -237,13 +242,21 @@ public class DancerForm extends VerticalLayout {
         }
         dancer.mugshot(mugshotBytes);
         List<DancerDancestyle> dancestyles = dancestyleRows.stream()
-                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null)
-                .map(row -> new DancerDancestyle().dancestyle(row.styleComboBox.getValue()).role(row.roleSelect.getValue()))
+                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null && row.skilllevelComboBox.getValue() != null)
+                .map(row -> new DancerDancestyle()
+                        .dancestyle(row.styleComboBox.getValue())
+                        .role(row.roleSelect.getValue())
+                        .skilllevel(row.skilllevelComboBox.getValue()))
                 .toList();
         dancer.dancestyles(dancestyles);
         List<DancerSearchingFor> searchingFor = searchingForRows.stream()
-                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null)
-                .map(row -> new DancerSearchingFor().dancestyle(row.styleComboBox.getValue()).role(row.roleSelect.getValue()))
+                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null
+                        && row.skilllevelComboBox.getValue() != null && row.skilllevelMaxComboBox.getValue() != null)
+                .map(row -> new DancerSearchingFor()
+                        .dancestyle(row.styleComboBox.getValue())
+                        .role(row.roleSelect.getValue())
+                        .skilllevelMin(row.skilllevelComboBox.getValue())
+                        .skilllevelMax(row.skilllevelMaxComboBox.getValue()))
                 .toList();
         dancer.searchingFor(searchingFor);
         return dancer;
@@ -275,7 +288,7 @@ public class DancerForm extends VerticalLayout {
         photosLayout.add(row);
     }
 
-    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, Dancestyle dancestyle, Role role) {
+    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean canDo, Dancestyle dancestyle, Role role, Skilllevel skilllevel, Skilllevel skilllevelMax) {
         DancestyleRow row = new DancestyleRow();
         row.styleComboBox.setItems(dancestyleRepository.findAll());
         row.styleComboBox.setItemLabelGenerator(Dancestyle::name);
@@ -283,21 +296,40 @@ public class DancerForm extends VerticalLayout {
         row.roleSelect.setItems(roleRepository.findAll());
         row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
+        row.layout = new HorizontalLayout(row.styleComboBox, row.roleSelect);
+        // what the dancer can do: a single skill; what the dancer searches for: a min/max range
+        row.skilllevelComboBox = createSkilllevelComboBox(skilllevel);
+        row.layout.add(row.skilllevelComboBox);
+        if (!canDo) {
+            row.skilllevelMaxComboBox = createSkilllevelComboBox(skilllevelMax);
+            row.layout.add(row.skilllevelMaxComboBox);
+        }
         Button removeButton = new Button(VaadinIcon.TRASH.create());
         removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         removeButton.addClickListener(e -> {
             rows.remove(row);
             layout.remove(row.layout);
         });
-        row.layout = new HorizontalLayout(row.styleComboBox, row.roleSelect, removeButton);
+        row.layout.add(removeButton);
         row.layout.setAlignItems(Alignment.CENTER);
         rows.add(row);
         layout.add(row.layout);
     }
 
+    private ComboBox<Skilllevel> createSkilllevelComboBox(Skilllevel skilllevel) {
+        ComboBox<Skilllevel> comboBox = new ComboBox<>();
+        comboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
+        comboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
+        comboBox.setValue(skilllevel);
+        return comboBox;
+    }
+
     private class DancestyleRow {
         private final ComboBox<Dancestyle> styleComboBox = new ComboBox<>();
         private final Select<Role> roleSelect = new Select<>();
+        // single skill for can-do rows, min (and max) skill for searching rows
+        private ComboBox<Skilllevel> skilllevelComboBox;
+        private ComboBox<Skilllevel> skilllevelMaxComboBox;
         private HorizontalLayout layout;
     }
 }

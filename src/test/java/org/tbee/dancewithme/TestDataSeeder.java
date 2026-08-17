@@ -12,10 +12,12 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
+import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -43,16 +45,18 @@ public class TestDataSeeder implements ApplicationRunner {
     private final CityRepository cityRepository;
     private final DancestyleRepository dancestyleRepository;
     private final RoleRepository roleRepository;
+    private final SkilllevelRepository skilllevelRepository;
     private final PasswordEncoder passwordEncoder;
     private final Random random = new Random();
 
     public TestDataSeeder(DancerRepository dancerRepository, CityRepository cityRepository,
                           DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
-                          PasswordEncoder passwordEncoder) {
+                          SkilllevelRepository skilllevelRepository, PasswordEncoder passwordEncoder) {
         this.dancerRepository = dancerRepository;
         this.cityRepository = cityRepository;
         this.dancestyleRepository = dancestyleRepository;
         this.roleRepository = roleRepository;
+        this.skilllevelRepository = skilllevelRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -76,6 +80,7 @@ public class TestDataSeeder implements ApplicationRunner {
     }
 
     private void createDancer(String name, int yearOfBirth, String cityName, Dancestyle dancestyle, Role role) {
+        Skilllevel ownSkill = skilllevel();
         Dancer dancer = new Dancer()
                 .email(name.toLowerCase() + "@example.com")
                 .password(passwordEncoder.encode("password"))
@@ -92,14 +97,24 @@ public class TestDataSeeder implements ApplicationRunner {
                 .active(true)
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now());
-        dancer.addDancestyle(dancestyle, role);
-        // searching for a partner with the complementary role in the same style
-        dancer.addSearchingFor(dancestyle, role("lead".equals(role.name()) ? "follow" : "lead"));
+        dancer.addDancestyle(dancestyle, role, ownSkill);
+        // searching for a partner with the complementary role in the same style,
+        // accepting a range around the dancer's own skill level
+        List<Skilllevel> skilllevels = skilllevelRepository.findAllByOrderByLevelAsc();
+        int ownIndex = skilllevels.indexOf(ownSkill);
+        dancer.addSearchingFor(dancestyle, role("lead".equals(role.name()) ? "follow" : "lead"),
+                skilllevels.get(Math.max(0, ownIndex - 2)),
+                skilllevels.get(Math.min(skilllevels.size() - 1, ownIndex + 2)));
         dancerRepository.save(dancer);
     }
 
-    private Role role(String name) {
-        return roleRepository.findAll().stream()
+    private Skilllevel skilllevel() {
+        List<Skilllevel> skilllevels = skilllevelRepository.findAllByOrderByLevelAsc();
+        // a believable skill level: somewhere between novice and advanced social
+        return skilllevels.get(1 + random.nextInt(3));
+    }
+
+    private Role role(String name) {        return roleRepository.findAll().stream()
                 .filter(role -> role.name().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Role not found: " + name));

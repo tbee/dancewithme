@@ -202,11 +202,12 @@ public class Dancer extends BaseEntity<Dancer> {
         dancestyles.forEach(dancerDancestyle -> this.dancestyles.add(dancerDancestyle.dancer(this)));
         return this;
     }
-    public DancerDancestyle addDancestyle(Dancestyle dancestyle, Role role) {
+    public DancerDancestyle addDancestyle(Dancestyle dancestyle, Role role, Skilllevel skilllevel) {
         DancerDancestyle dancerDancestyle = new DancerDancestyle()
                 .dancer(this)
                 .dancestyle(dancestyle)
-                .role(role);
+                .role(role)
+                .skilllevel(skilllevel);
         dancestyles.add(dancerDancestyle);
         return dancerDancestyle;
     }
@@ -219,11 +220,13 @@ public class Dancer extends BaseEntity<Dancer> {
         searchingFor.forEach(entry -> this.searchingFor.add(entry.dancer(this)));
         return this;
     }
-    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, Role role) {
+    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, Role role, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
         DancerSearchingFor entry = new DancerSearchingFor()
                 .dancer(this)
                 .dancestyle(dancestyle)
-                .role(role);
+                .role(role)
+                .skilllevelMin(skilllevelMin)
+                .skilllevelMax(skilllevelMax);
         searchingFor.add(entry);
         return entry;
     }
