@@ -9,25 +9,19 @@
     <changeSet id="20260816b" author="tom">
         <!-- initial dancestyles -->
         <insert tableName="dancestyle">
-            <column name="name" value="ballroom"/>
+            <column name="name" value="Ballroom"/>
         </insert>
         <insert tableName="dancestyle">
-            <column name="name" value="latin"/>
+            <column name="name" value="Latin"/>
         </insert>
         <insert tableName="dancestyle">
-            <column name="name" value="10-dance"/>
+            <column name="name" value="West coast swing"/>
         </insert>
         <insert tableName="dancestyle">
-            <column name="name" value="social latin"/>
+            <column name="name" value="Salsa"/>
         </insert>
         <insert tableName="dancestyle">
-            <column name="name" value="wcs"/>
-        </insert>
-        <insert tableName="dancestyle">
-            <column name="name" value="salsa"/>
-        </insert>
-        <insert tableName="dancestyle">
-            <column name="name" value="tango argentine"/>
+            <column name="name" value="Tango argentine"/>
         </insert>
 
         <!-- initial roles -->

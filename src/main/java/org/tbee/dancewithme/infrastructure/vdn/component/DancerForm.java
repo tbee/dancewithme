@@ -7,7 +7,9 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -25,6 +27,7 @@ import com.vaadin.flow.server.streams.UploadHandler;
 import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerDancestyle;
+import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
 import org.tbee.dancewithme.domain.repository.CityRepository;
@@ -45,7 +48,7 @@ import java.util.List;
  */
 public class DancerForm extends VerticalLayout {
 
-    public enum Mode {REGISTER, PROFILE}
+    public enum Mode {REGISTER, UPDATE}
 
     private final Mode mode;
     private final DancestyleRepository dancestyleRepository;
@@ -78,6 +81,9 @@ public class DancerForm extends VerticalLayout {
     private final VerticalLayout dancestylesLayout = new VerticalLayout();
     private final List<DancestyleRow> dancestyleRows = new ArrayList<>();
 
+    private final VerticalLayout searchingForLayout = new VerticalLayout();
+    private final List<DancestyleRow> searchingForRows = new ArrayList<>();
+
     private final VerticalLayout photosLayout = new VerticalLayout();
 
     public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository) {
@@ -85,10 +91,10 @@ public class DancerForm extends VerticalLayout {
         this.dancestyleRepository = dancestyleRepository;
         this.roleRepository = roleRepository;
 
-        // == basic fields ==
+        // basic fields
         nameField.setRequiredIndicatorVisible(true);
-        yearOfBirthField.setMin(1900);
-        yearOfBirthField.setMax(Year.now().getValue() - 18);
+        yearOfBirthField.setMin(Year.now().getValue() - 100);
+        yearOfBirthField.setMax(Year.now().getValue() - 10);
         cityComboBox.setItems(cityRepository.findAllByOrderByNameAsc());
         cityComboBox.setItemLabelGenerator(City::name);
         cityComboBox.setWidthFull();
@@ -100,6 +106,12 @@ public class DancerForm extends VerticalLayout {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
         formLayout.setWidthFull();
+
+        // ----------------------------
+
+        add(new H3(getTranslation("form.whoami")));
+
+        formLayout.addFormItem(nameField, getTranslation("form.name"));
         formLayout.addFormItem(emailField, getTranslation("form.email"));
         if (mode == Mode.REGISTER) {
             formLayout.addFormItem(passwordField, getTranslation("form.password"));
@@ -107,57 +119,58 @@ public class DancerForm extends VerticalLayout {
         else {
             emailField.setReadOnly(true); // the email is the login name, changing it is not supported yet
         }
-        formLayout.addFormItem(nameField, getTranslation("form.name"));
         formLayout.addFormItem(yearOfBirthField, getTranslation("form.yearOfBirth"));
         formLayout.addFormItem(cityComboBox, getTranslation("form.city"));
         formLayout.addFormItem(whoamiField, getTranslation("form.whoami"));
+
+        // flags
+        activeCheckbox.setLabel(getTranslation("form.active"));
+        formLayout.addFormItem(activeCheckbox, "");
+        publiclyFindableCheckbox.setLabel(getTranslation("form.publiclyFindable"));
+        formLayout.addFormItem(publiclyFindableCheckbox, "");
+
+        // dances I can do
+        formLayout.add(new H5(getTranslation("form.dancestyles")), dancestylesLayout);
+        Button addDancestyleButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(dancestyleRows, dancestylesLayout, null, null));
+        addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        formLayout.add(addDancestyleButton);
+
+        // mugshot
+        formLayout.add(new H5(getTranslation("form.mugshot")), mugshotUpload);
+
+        // extra photos
+        Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
+            dancer.addPhoto(bytes);
+            refreshPhotosLayout();
+        }));
+        photoUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
+        photoUpload.setUploadButton(new Button(getTranslation("form.upload")));
+        formLayout.add(new H5(getTranslation("form.photos")), photoUpload, photosLayout);
+
+        // ----------------------------
+
+        formLayout.add(new H3(getTranslation("form.whatdoiwant")));
+
         formLayout.addFormItem(whatdoiwantField, getTranslation("form.whatdoiwant"));
         formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), getTranslation("form.weekFrequency"));
         formLayout.addFormItem(distanceToPartnerMaxField, getTranslation("form.distanceToPartnerMax"));
         formLayout.addFormItem(ageDistanceToPartnerMaxField, getTranslation("form.ageDistanceToPartnerMax"));
         add(formLayout);
 
-        // == flags ==
-        if (mode == Mode.PROFILE) {
-            activeCheckbox.setLabel(getTranslation("form.active"));
-            publiclyFindableCheckbox.setLabel(getTranslation("form.publiclyFindable"));
-            add(new HorizontalLayout(activeCheckbox, publiclyFindableCheckbox));
-        }
+        // searching for
+        formLayout.add(new H5(getTranslation("form.searchingFor")), searchingForLayout);
+        Button addSearchingForButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(searchingForRows, searchingForLayout, null, null));
+        addSearchingForButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        formLayout.add(addSearchingForButton);
 
-        // == mugshot ==
-        add(new H3(getTranslation("form.mugshot")), mugshotUpload);
+        // ----------------------------
 
-        // == dancestyles ==
-        add(new H3(getTranslation("form.dancestyles")), dancestylesLayout);
-        Button addDancestyleButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(null, null));
-        addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        add(addDancestyleButton);
-
-        // == photos (profile only) ==
-        if (mode == Mode.PROFILE) {
-            Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
-                dancer.addPhoto(bytes);
-                refreshPhotosLayout();
-            }));
-            photoUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
-            photoUpload.setUploadButton(new Button(getTranslation("form.upload")));
-            add(new H3(getTranslation("form.photos")), photoUpload, photosLayout);
-        }
-
-        // == privacy agreement (register only) ==
+        // privacy agreement (register only)
         if (mode == Mode.REGISTER) {
-            Button privacyLink = new Button(getTranslation("privacy.title"));
-            privacyLink.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-            privacyLink.addClickListener(e -> {
-                Dialog dialog = new Dialog(new Paragraph(getTranslation("privacy.placeholder")));
-                dialog.setHeaderTitle(getTranslation("privacy.title"));
-                dialog.open();
-            });
-            privacyAgreementCheckbox.setLabel(getTranslation("form.privacyAgreement"));
-            add(new HorizontalLayout(privacyAgreementCheckbox, privacyLink));
+            formLayout.add(new HorizontalLayout(privacyAgreementCheckbox, new H5(getTranslation("privacy.text"))));
         }
 
-        // == binder ==
+        // binder
         binder.forField(emailField)
                 .asRequired(getTranslation("form.required"))
                 .withValidator(new EmailValidator(getTranslation("form.invalidEmail")))
@@ -171,10 +184,8 @@ public class DancerForm extends VerticalLayout {
         binder.forField(weekFrequencyMaxField).bind(Dancer::weekFrequencyMax, Dancer::weekFrequencyMax);
         binder.forField(distanceToPartnerMaxField).bind(Dancer::distanceToPartnerMax, Dancer::distanceToPartnerMax);
         binder.forField(ageDistanceToPartnerMaxField).bind(Dancer::ageDistanceToPartnerMax, Dancer::ageDistanceToPartnerMax);
-        if (mode == Mode.PROFILE) {
-            binder.forField(activeCheckbox).bind(Dancer::active, Dancer::active);
-            binder.forField(publiclyFindableCheckbox).bind(Dancer::publiclyFindable, Dancer::publiclyFindable);
-        }
+        binder.forField(activeCheckbox).bind(Dancer::active, Dancer::active);
+        binder.forField(publiclyFindableCheckbox).bind(Dancer::publiclyFindable, Dancer::publiclyFindable);
     }
 
     public void setDancer(Dancer dancer) {
@@ -187,8 +198,11 @@ public class DancerForm extends VerticalLayout {
         }
         dancestyleRows.clear();
         dancestylesLayout.removeAll();
-        dancer.dancestyles().forEach(dd -> addDancestyleRow(dd.dancestyle(), dd.role()));
-        if (mode == Mode.PROFILE) {
+        dancer.dancestyles().forEach(dd -> addDancestyleRow(dancestyleRows, dancestylesLayout, dd.dancestyle(), dd.role()));
+        searchingForRows.clear();
+        searchingForLayout.removeAll();
+        dancer.searchingFor().forEach(sf -> addDancestyleRow(searchingForRows, searchingForLayout, sf.dancestyle(), sf.role()));
+        if (mode == Mode.UPDATE) {
             refreshPhotosLayout();
         }
     }
@@ -227,6 +241,11 @@ public class DancerForm extends VerticalLayout {
                 .map(row -> new DancerDancestyle().dancestyle(row.styleComboBox.getValue()).role(row.roleSelect.getValue()))
                 .toList();
         dancer.dancestyles(dancestyles);
+        List<DancerSearchingFor> searchingFor = searchingForRows.stream()
+                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null)
+                .map(row -> new DancerSearchingFor().dancestyle(row.styleComboBox.getValue()).role(row.roleSelect.getValue()))
+                .toList();
+        dancer.searchingFor(searchingFor);
         return dancer;
     }
 
@@ -256,7 +275,7 @@ public class DancerForm extends VerticalLayout {
         photosLayout.add(row);
     }
 
-    private void addDancestyleRow(Dancestyle dancestyle, Role role) {
+    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, Dancestyle dancestyle, Role role) {
         DancestyleRow row = new DancestyleRow();
         row.styleComboBox.setItems(dancestyleRepository.findAll());
         row.styleComboBox.setItemLabelGenerator(Dancestyle::name);
@@ -267,13 +286,13 @@ public class DancerForm extends VerticalLayout {
         Button removeButton = new Button(VaadinIcon.TRASH.create());
         removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         removeButton.addClickListener(e -> {
-            dancestyleRows.remove(row);
-            dancestylesLayout.remove(row.layout);
+            rows.remove(row);
+            layout.remove(row.layout);
         });
         row.layout = new HorizontalLayout(row.styleComboBox, row.roleSelect, removeButton);
         row.layout.setAlignItems(Alignment.CENTER);
-        dancestyleRows.add(row);
-        dancestylesLayout.add(row.layout);
+        rows.add(row);
+        layout.add(row.layout);
     }
 
     private class DancestyleRow {

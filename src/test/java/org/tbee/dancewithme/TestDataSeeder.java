@@ -93,6 +93,8 @@ public class TestDataSeeder implements ApplicationRunner {
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now());
         dancer.addDancestyle(dancestyle, role);
+        // searching for a partner with the complementary role in the same style
+        dancer.addSearchingFor(dancestyle, role("lead".equals(role.name()) ? "follow" : "lead"));
         dancerRepository.save(dancer);
     }
 

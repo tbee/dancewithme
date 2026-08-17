@@ -67,6 +67,10 @@ public class Dancer extends BaseEntity<Dancer> {
     @OneToMany(mappedBy = "dancer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DancerDancestyle> dancestyles = new ArrayList<>();
 
+    // what the dancer is searching for in a partner (dancestyle + role)
+    @OneToMany(mappedBy = "dancer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DancerSearchingFor> searchingFor = new ArrayList<>();
+
     @OneToMany(mappedBy = "dancer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DancerPhoto> photos = new ArrayList<>();
 
@@ -205,6 +209,23 @@ public class Dancer extends BaseEntity<Dancer> {
                 .role(role);
         dancestyles.add(dancerDancestyle);
         return dancerDancestyle;
+    }
+
+    public List<DancerSearchingFor> searchingFor() {
+        return Collections.unmodifiableList(searchingFor);
+    }
+    public Dancer searchingFor(List<DancerSearchingFor> searchingFor) {
+        this.searchingFor.clear();
+        searchingFor.forEach(entry -> this.searchingFor.add(entry.dancer(this)));
+        return this;
+    }
+    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, Role role) {
+        DancerSearchingFor entry = new DancerSearchingFor()
+                .dancer(this)
+                .dancestyle(dancestyle)
+                .role(role);
+        searchingFor.add(entry);
+        return entry;
     }
 
     public List<DancerPhoto> photos() {

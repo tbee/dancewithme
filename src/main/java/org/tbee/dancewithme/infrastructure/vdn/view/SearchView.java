@@ -20,6 +20,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.application.DancerService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
@@ -56,7 +57,7 @@ public class SearchView extends DancewithmeAppLayout {
     private int page = 0;
 
     public SearchView(SecurityService securityService, LocaleService localeService, SearchService searchService,
-                      DancestyleRepository dancestyleRepository, RoleRepository roleRepository) {
+                      DancerService dancerService, DancestyleRepository dancestyleRepository, RoleRepository roleRepository) {
         super("search.title", securityService, localeService);
         this.securityService = securityService;
         this.searchService = searchService;
@@ -71,6 +72,10 @@ public class SearchView extends DancewithmeAppLayout {
         dancestyleComboBox.setItems(dancestyleRepository.findAll());
         dancestyleComboBox.setItemLabelGenerator(Dancestyle::name);
         dancestyleComboBox.setPlaceholder(getTranslation("search.dancestyle.placeholder"));
+        // prefill with what the logged in dancer is searching for (can still be fiddled with)
+        securityService.currentDancer().ifPresent(currentDancer ->
+                dancerService.searchingForOf(currentDancer.id()).forEach(entry ->
+                        dancestyleComboBox.select(entry.dancestyle())));
 
         roleSelect.setItems(roleRepository.findAll());
         // label generator must be null-safe: Vaadin also applies it to the empty-selection item

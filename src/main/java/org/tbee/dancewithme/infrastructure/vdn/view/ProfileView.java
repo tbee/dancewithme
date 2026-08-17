@@ -28,7 +28,7 @@ public class ProfileView extends DancewithmeAppLayout {
         Dancer dancer = securityService.currentDancer().orElseThrow();
         Dancer detailedDancer = dancerService.loadWithDetails(dancer.id());
 
-        DancerForm form = new DancerForm(DancerForm.Mode.PROFILE, cityRepository, dancestyleRepository, roleRepository);
+        DancerForm form = new DancerForm(DancerForm.Mode.UPDATE, cityRepository, dancestyleRepository, roleRepository);
         form.setDancer(detailedDancer);
 
         Button saveButton = new Button(getTranslation("form.save"), e -> {
