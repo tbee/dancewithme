@@ -28,7 +28,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
     private final transient DancerService dancerService;
 
     public DancerDetailView(SecurityService securityService, LocaleService localeService, DancerService dancerService) {
-        super("", securityService, localeService);
+        super("detail.title", securityService, localeService);
         this.dancerService = dancerService;
         postConstruct();
     }

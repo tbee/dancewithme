@@ -96,6 +96,11 @@ public class SearchView extends DancewithmeAppLayout {
         Button addStyleButton = new Button(getTranslation("form.addDancestyle"), e -> addStyleRow(null, null, null, null));
         addStyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
+        styleRowsLayout.setPadding(false);
+        styleRowsLayout.setSpacing(true);
+        VerticalLayout styleRowsWithButton = new VerticalLayout(styleRowsLayout, addStyleButton);
+        styleRowsWithButton.setPadding(false);
+
         ageDistanceField.setMin(0);
         ageDistanceField.setVisible(loggedIn); // age distance is relative to the logged in user's age
         weekFrequencyMinField.setPlaceholder(getTranslation("search.age.min"));
@@ -109,7 +114,7 @@ public class SearchView extends DancewithmeAppLayout {
 
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
-        formLayout.addFormItem(new VerticalLayout(styleRowsLayout, addStyleButton), getTranslation("search.dancestyle"));
+        formLayout.addFormItem(styleRowsWithButton, getTranslation("search.dancestyle"));
         if (loggedIn) {
             formLayout.addFormItem(ageDistanceField, getTranslation("search.ageDistance"));
         }
@@ -135,6 +140,7 @@ public class SearchView extends DancewithmeAppLayout {
         row.roleSelect.setItems(roleRepository.findAll());
         row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
+        row.roleSelect.setWidth("100px");
         row.skilllevelMinComboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
         row.skilllevelMinComboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
         row.skilllevelMinComboBox.setValue(skilllevelMin);
@@ -155,6 +161,8 @@ public class SearchView extends DancewithmeAppLayout {
         row.layout.setWidthFull();
         row.layout.getStyle().set("flex-wrap", "wrap");
         row.layout.getStyle().set("row-gap", "var(--lumo-space-s)");
+        row.layout.setPadding(false);
+        row.layout.setMargin(false);
         styleRows.add(row);
         styleRowsLayout.add(row.layout);
     }
