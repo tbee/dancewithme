@@ -47,8 +47,8 @@ public class RegisterView extends DancewithmeAppLayout {
         });
         registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
-        VerticalLayout content = new VerticalLayout(new H2(getTranslation("register.title")), form, registerButton);
-        content.setMaxWidth("900px");
+        VerticalLayout content = new VerticalLayout(form, registerButton);
+        content.setMaxWidth("1200px");
         setContent(content);
     }
 }

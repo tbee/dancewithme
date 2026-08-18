@@ -225,7 +225,7 @@ public class DancerForm extends VerticalLayout {
 
     private Card createPrivacyCard() {
         FormLayout formLayout = createFormLayout();
-        
+
         privacyAgreementCheckbox.setLabel(getTranslation("privacy.text"));
         formLayout.add(privacyAgreementCheckbox);
 
@@ -354,13 +354,18 @@ public class DancerForm extends VerticalLayout {
         row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel("als"), row.roleSelect);
         // what the dancer can do: a single skill; what the dancer searches for: a min/max range
         row.skilllevelComboBox = createSkilllevelComboBox(skilllevel);
+        // fields grow to fill the available space instead of a fixed 100% width (which overflows the card)
+        row.layout.setFlexGrow(1, row.styleComboBox);
         if (canDo) {
             row.layout.add(new NativeLabel("niveau"), row.skilllevelComboBox);
+            row.layout.setFlexGrow(1, row.skilllevelComboBox);
         }
         else {
             row.layout.add(new NativeLabel("vanaf"), row.skilllevelComboBox);
+            row.layout.setFlexGrow(1, row.skilllevelComboBox);
             row.skilllevelMaxComboBox = createSkilllevelComboBox(skilllevelMax);
             row.layout.add(new NativeLabel("tot"), row.skilllevelMaxComboBox);
+            row.layout.setFlexGrow(1, row.skilllevelMaxComboBox);
         }
         Button removeButton = new Button(VaadinIcon.TRASH.create());
         removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
@@ -374,6 +379,9 @@ public class DancerForm extends VerticalLayout {
         row.layout.setMargin(false);
         row.layout.setSpacing(true);
         row.layout.setPadding(false);
+        // the fields together can be wider than the card; allow them to wrap to a second line
+        row.layout.getStyle().set("flex-wrap", "wrap");
+        row.layout.getStyle().set("row-gap", "var(--lumo-space-s)");
         rows.add(row);
         layout.add(row.layout);
     }
@@ -392,7 +400,6 @@ public class DancerForm extends VerticalLayout {
             return name;
         }));
         comboBox.setValue(skilllevel);
-        comboBox.setWidthFull();
         return comboBox;
     }
 

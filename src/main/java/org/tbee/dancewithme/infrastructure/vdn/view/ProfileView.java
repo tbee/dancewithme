@@ -48,8 +48,8 @@ public class ProfileView extends DancewithmeAppLayout {
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
-        VerticalLayout content = new VerticalLayout(new H2(getTranslation("profile.title")), form, saveButton);
-        content.setMaxWidth("900px");
+        VerticalLayout content = new VerticalLayout(form, saveButton);
+        content.setMaxWidth("1200px");
         setContent(content);
     }
 }

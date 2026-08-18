@@ -66,9 +66,6 @@ public class SearchView extends DancewithmeAppLayout {
         boolean loggedIn = securityService.isLoggedIn();
 
         // == search form ==
-        H2 titleH2 = new H2(getTranslation("search.title"));
-        Paragraph subtitle = new Paragraph(getTranslation("search.subtitle"));
-
         dancestyleComboBox.setItems(dancestyleRepository.findAll());
         dancestyleComboBox.setItemLabelGenerator(Dancestyle::name);
         dancestyleComboBox.setPlaceholder(getTranslation("search.dancestyle.placeholder"));
@@ -109,8 +106,8 @@ public class SearchView extends DancewithmeAppLayout {
         Button searchButton = new Button(getTranslation("search.button"), e -> search());
         searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
-        VerticalLayout content = new VerticalLayout(titleH2, subtitle, formLayout, searchButton, resultsLayout, pagingLayout);
-        content.setMaxWidth("900px");
+        VerticalLayout content = new VerticalLayout(formLayout, searchButton, resultsLayout, pagingLayout);
+        content.setMaxWidth("1200px");
         setContent(content);
     }
 

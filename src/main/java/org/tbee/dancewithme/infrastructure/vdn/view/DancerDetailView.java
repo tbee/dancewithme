@@ -62,7 +62,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
                 .orElse("");
 
         VerticalLayout content = new VerticalLayout();
-        content.setMaxWidth("900px");
+        content.setMaxWidth("1200px");
 
         // mugshot + header
         HorizontalLayout header = new HorizontalLayout();

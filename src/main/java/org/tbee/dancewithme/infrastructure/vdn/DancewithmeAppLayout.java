@@ -1,7 +1,6 @@
 package org.tbee.dancewithme.infrastructure.vdn;
 
 import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Span;
@@ -9,8 +8,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.sidenav.SideNav;
-import com.vaadin.flow.component.sidenav.SideNavItem;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -42,14 +39,30 @@ implements HasDynamicTitle, AfterNavigationObserver {
 	}
 
 	public void postConstruct() {
-		// The drawer toggle icon
-		DrawerToggle drawerToggle = new DrawerToggle();
-		drawerToggle.setId("drawerToggle");
-
-		// Set the title
+		// Set the title, absolutely positioned on the left so the navigation can be truly centered
 		titleH1.text(getTranslation(titleKey))
 				.style("font-size", "var(--lumo-font-size-l)")
-				.style("margin", "0");
+				.style("margin", "0")
+				.style("position", "absolute")
+				.style("left", "var(--vaadin-padding-l)");
+
+		// Navigation is in the middle of the navbar; no drawer needed
+		Button searchButton = new Button(getTranslation("menu.search"), e -> getUI().ifPresent(ui -> ui.navigate(SearchView.class)));
+		searchButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+		HorizontalLayout navigation = new HorizontalLayout(searchButton);
+		if (securityService.isLoggedIn()) {
+			Button profileButton = new Button(getTranslation("menu.profile"), e -> getUI().ifPresent(ui -> ui.navigate(ProfileView.class)));
+			profileButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+			navigation.add(profileButton);
+		}
+		else {
+			Button registerButton = new Button(getTranslation("menu.register"), e -> getUI().ifPresent(ui -> ui.navigate(RegisterView.class)));
+			registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+			navigation.add(registerButton);
+		}
+		navigation.getStyle().set("flex", "1");
+		navigation.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+		navigation.setAlignItems(FlexComponent.Alignment.CENTER);
 
 		// Right side of the navbar: language switcher, username, login/logout
 		Button nlButton = new Button(getTranslation("language.nl"), e -> localeService.switchLocale(Locale.of("nl")));
@@ -59,7 +72,6 @@ implements HasDynamicTitle, AfterNavigationObserver {
 
 		HorizontalLayout rightSide = new HorizontalLayout(nlButton, enButton);
 		rightSide.setAlignItems(FlexComponent.Alignment.CENTER);
-		rightSide.getStyle().set("margin-left", "auto");
 
 		securityService.currentDancer().ifPresentOrElse(dancer -> {
 			Span username = new Span(dancer.name());
@@ -73,18 +85,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		});
 
 		// Navbar
-		addToNavbar(drawerToggle, titleH1, rightSide);
-
-		// Drawer menu
-		SideNav sideNav = new SideNav();
-		sideNav.addItem(new SideNavItem(getTranslation("menu.search"), SearchView.class));
-		if (securityService.isLoggedIn()) {
-			sideNav.addItem(new SideNavItem(getTranslation("menu.profile"), ProfileView.class));
-		}
-		else {
-			sideNav.addItem(new SideNavItem(getTranslation("menu.register"), RegisterView.class));
-		}
-		addToDrawer(sideNav);
+		addToNavbar(titleH1, navigation, rightSide);
 	}
 
 	@Override
