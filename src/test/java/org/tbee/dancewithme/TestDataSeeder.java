@@ -72,6 +72,7 @@ public class TestDataSeeder implements ApplicationRunner {
         Role lead = role("lead");
         Role follow = role("follow");
 
+        createDancer("Tbee", 1970, "Aalten", dancestyles.get(0), lead);
         createDancer("Anna", 1992, "Amsterdam", dancestyles.get(0), follow);
         createDancer("Bram", 1985, "Rotterdam", dancestyles.get(1 % dancestyles.size()), lead);
         createDancer("Carmen", 1998, "Utrecht", dancestyles.get(2 % dancestyles.size()), follow);
@@ -82,7 +83,7 @@ public class TestDataSeeder implements ApplicationRunner {
     private void createDancer(String name, int yearOfBirth, String cityName, Dancestyle dancestyle, Role role) {
         Skilllevel ownSkill = skilllevel();
         Dancer dancer = new Dancer()
-                .email(name.toLowerCase() + "@example.com")
+                .email(name.toLowerCase() + "@tbee.org")
                 .password(passwordEncoder.encode("password"))
                 .name(name)
                 .yearOfBirth(yearOfBirth)
