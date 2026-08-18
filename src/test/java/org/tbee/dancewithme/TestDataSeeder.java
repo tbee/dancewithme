@@ -68,20 +68,35 @@ public class TestDataSeeder implements ApplicationRunner {
         }
         LOGGER.info("Seeding test dancers");
 
-        List<Dancestyle> dancestyles = dancestyleRepository.findAll();
-        Role lead = role("lead");
-        Role follow = role("follow");
-
-        createDancer("Tbee", 1970, "Aalten", dancestyles.get(0), lead);
-        createDancer("Anna", 1992, "Amsterdam", dancestyles.get(0), follow);
-        createDancer("Bram", 1985, "Rotterdam", dancestyles.get(1 % dancestyles.size()), lead);
-        createDancer("Carmen", 1998, "Utrecht", dancestyles.get(2 % dancestyles.size()), follow);
-        createDancer("Daan", 1979, "Haarlem", dancestyles.get(3 % dancestyles.size()), lead);
-        createDancer("Evi", 1990, "Eindhoven", dancestyles.get(4 % dancestyles.size()), follow);
+        createDancer("Tbee", 1970, "Aalten", List.of(
+                canDo("Ballroom", "lead", "advanced_social"),
+                canDo("Latin", "lead", "intermediate_social")));
+        createDancer("Anna", 1992, "Amsterdam", List.of(
+                canDo("Ballroom", "follow", "intermediate_social")));
+        createDancer("Bram", 1985, "Rotterdam", List.of(
+                canDo("Latin", "lead", "novice"),
+                canDo("Salsa", "lead", "advanced_social")));
+        createDancer("Carmen", 1998, "Utrecht", List.of(
+                canDo("Ballroom", "follow", "pre_competitive"),
+                canDo("Latin", "follow", "pre_competitive")));
+        createDancer("Daan", 1979, "Haarlem", List.of(
+                canDo("Tango argentine", "lead", "intermediate_social"),
+                canDo("Ballroom", "lead", "novice")));
+        createDancer("Evi", 1990, "Eindhoven", List.of(
+                canDo("West coast swing", "follow", "novice"),
+                canDo("Salsa", "follow", "intermediate_social"),
+                canDo("Ballroom", "follow", "absolute_beginner")));
     }
 
-    private void createDancer(String name, int yearOfBirth, String cityName, Dancestyle dancestyle, Role role) {
-        Skilllevel ownSkill = skilllevel();
+    /** What a dancer can do: dancestyle, role and skill level. */
+    private record CanDo(Dancestyle dancestyle, Role role, Skilllevel skilllevel) {
+    }
+
+    private CanDo canDo(String dancestyleName, String roleName, String skilllevelCode) {
+        return new CanDo(dancestyle(dancestyleName), role(roleName), skilllevel(skilllevelCode));
+    }
+
+    private void createDancer(String name, int yearOfBirth, String cityName, List<CanDo> canDos) {
         Dancer dancer = new Dancer()
                 .email(name.toLowerCase() + "@tbee.org")
                 .password(passwordEncoder.encode("password"))
@@ -98,21 +113,31 @@ public class TestDataSeeder implements ApplicationRunner {
                 .active(true)
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now());
-        dancer.addDancestyle(dancestyle, role, ownSkill);
-        // searching for a partner with the complementary role in the same style,
-        // accepting a range around the dancer's own skill level
         List<Skilllevel> skilllevels = skilllevelRepository.findAllByOrderByLevelAsc();
-        int ownIndex = skilllevels.indexOf(ownSkill);
-        dancer.addSearchingFor(dancestyle, role("lead".equals(role.name()) ? "follow" : "lead"),
-                skilllevels.get(Math.max(0, ownIndex - 2)),
-                skilllevels.get(Math.min(skilllevels.size() - 1, ownIndex + 2)));
+        for (CanDo canDo : canDos) {
+            dancer.addDancestyle(canDo.dancestyle(), canDo.role(), canDo.skilllevel());
+            // searching for a partner with the complementary role in the same style,
+            // accepting a range around the dancer's own skill level
+            int ownIndex = skilllevels.indexOf(canDo.skilllevel());
+            dancer.addSearchingFor(canDo.dancestyle(), role("lead".equals(canDo.role().name()) ? "follow" : "lead"),
+                    skilllevels.get(Math.max(0, ownIndex - 2)),
+                    skilllevels.get(Math.min(skilllevels.size() - 1, ownIndex + 2)));
+        }
         dancerRepository.save(dancer);
     }
 
-    private Skilllevel skilllevel() {
-        List<Skilllevel> skilllevels = skilllevelRepository.findAllByOrderByLevelAsc();
-        // a believable skill level: somewhere between novice and advanced social
-        return skilllevels.get(1 + random.nextInt(3));
+    private Skilllevel skilllevel(String code) {
+        return skilllevelRepository.findAll().stream()
+                .filter(skilllevel -> skilllevel.code().equals(code))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Skilllevel not found: " + code));
+    }
+
+    private Dancestyle dancestyle(String name) {
+        return dancestyleRepository.findAll().stream()
+                .filter(dancestyle -> dancestyle.name().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Dancestyle not found: " + name));
     }
 
     private Role role(String name) {        return roleRepository.findAll().stream()
