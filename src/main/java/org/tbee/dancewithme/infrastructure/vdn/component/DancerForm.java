@@ -359,20 +359,20 @@ public class DancerForm extends VerticalLayout {
         row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
         row.roleSelect.setWidth("100px");
-        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel("als"), row.roleSelect);
+        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel(getTranslation("form.role")), row.roleSelect);
         // what the dancer can do: a single skill; what the dancer searches for: a min/max range
         row.skilllevelComboBox = createSkilllevelComboBox(skilllevel);
         // fields grow to fill the available space instead of a fixed 100% width (which overflows the card)
         row.layout.setFlexGrow(1, row.styleComboBox);
         if (canDo) {
-            row.layout.add(new NativeLabel("niveau"), row.skilllevelComboBox);
+            row.layout.add(new NativeLabel(getTranslation("form.skill")), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
         }
         else {
-            row.layout.add(new NativeLabel("vanaf"), row.skilllevelComboBox);
+            row.layout.add(new NativeLabel(getTranslation("form.skillFrom")), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
             row.skilllevelMaxComboBox = createSkilllevelComboBox(skilllevelMax);
-            row.layout.add(new NativeLabel("tot"), row.skilllevelMaxComboBox);
+            row.layout.add(new NativeLabel(getTranslation("form.skillTo")), row.skilllevelMaxComboBox);
             row.layout.setFlexGrow(1, row.skilllevelMaxComboBox);
         }
         Button removeButton = new Button(VaadinIcon.TRASH.create());

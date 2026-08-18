@@ -6,20 +6,26 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 
 import java.time.Year;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class SearchService {
 
-    public record SearchCriteria(
-            // matched or-ed: any of the selected dancestyles matches
-            Set<Dancestyle> dancestyles,
+    public record SearchStyleCriteria(
+            Dancestyle dancestyle,
             Role role,
+            Skilllevel skilllevelMin,
+            Skilllevel skilllevelMax) {
+    }
+
+    public record SearchCriteria(
+            // matched or-ed: any of the selected style entries matches
+            List<SearchStyleCriteria> styles,
             // only applied for logged in users, relative to their own age
             Integer ageDistanceMax,
             Integer weekFrequencyMin,
@@ -51,9 +57,12 @@ public class SearchService {
         return candidates.stream()
                 // never include the searching dancer itself
                 .filter(dancer -> !loggedIn || dancer.id() != currentDancer.id())
-                .filter(dancer -> criteria.dancestyles() == null || criteria.dancestyles().isEmpty()
-                        || dancer.dancestyles().stream().anyMatch(dd -> criteria.dancestyles().contains(dd.dancestyle())))
-                .filter(dancer -> criteria.role() == null || dancer.dancestyles().stream().anyMatch(dd -> dd.role().equals(criteria.role())))
+                .filter(dancer -> criteria.styles() == null || criteria.styles().isEmpty()
+                        || dancer.dancestyles().stream().anyMatch(dd -> criteria.styles().stream().anyMatch(style ->
+                                dd.dancestyle().equals(style.dancestyle())
+                                        && (style.role() == null || dd.role().equals(style.role()))
+                                        && (style.skilllevelMin() == null || dd.skilllevel().level() >= style.skilllevelMin().level())
+                                        && (style.skilllevelMax() == null || dd.skilllevel().level() <= style.skilllevelMax().level()))))
                 .filter(dancer -> !loggedIn || criteria.ageDistanceMax() == null
                         || Math.abs(age(dancer, currentYear) - age(currentDancer, currentYear)) <= criteria.ageDistanceMax())
                 .filter(dancer -> criteria.weekFrequencyMin() == null || dancer.weekFrequencyMax() >= criteria.weekFrequencyMin())

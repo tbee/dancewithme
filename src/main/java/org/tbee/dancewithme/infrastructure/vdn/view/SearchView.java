@@ -4,33 +4,37 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.application.DancerService;
+import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.Dancer;
+import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
+import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.time.Year;
+import java.util.ArrayList;
 import java.util.List;
 
 @Route("")
@@ -42,12 +46,16 @@ public class SearchView extends DancewithmeAppLayout {
     private final transient SecurityService securityService;
     private final transient SearchService searchService;
 
-    private final MultiSelectComboBox<Dancestyle> dancestyleComboBox = new MultiSelectComboBox<>();
-    private final Select<Role> roleSelect = new Select<>();
+    private final VerticalLayout styleRowsLayout = new VerticalLayout();
+    private final List<SearchStyleRow> styleRows = new ArrayList<>();
     private final IntegerField ageDistanceField = new IntegerField();
     private final IntegerField weekFrequencyMinField = new IntegerField();
     private final IntegerField weekFrequencyMaxField = new IntegerField();
     private final IntegerField distanceMaxField = new IntegerField();
+
+    private final transient DancestyleRepository dancestyleRepository;
+    private final transient RoleRepository roleRepository;
+    private final transient SkilllevelRepository skilllevelRepository;
 
     private final VerticalLayout resultsLayout = new VerticalLayout();
     private final HorizontalLayout pagingLayout = new HorizontalLayout();
@@ -57,29 +65,32 @@ public class SearchView extends DancewithmeAppLayout {
     private int page = 0;
 
     public SearchView(SecurityService securityService, LocaleService localeService, SearchService searchService,
-                      DancerService dancerService, DancestyleRepository dancestyleRepository, RoleRepository roleRepository) {
+                      DancerService dancerService, DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
+                      SkilllevelRepository skilllevelRepository) {
         super("search.title", securityService, localeService);
         this.securityService = securityService;
         this.searchService = searchService;
+        this.dancestyleRepository = dancestyleRepository;
+        this.roleRepository = roleRepository;
+        this.skilllevelRepository = skilllevelRepository;
         postConstruct();
 
         boolean loggedIn = securityService.isLoggedIn();
 
         // == search form ==
-        dancestyleComboBox.setItems(dancestyleRepository.findAll());
-        dancestyleComboBox.setItemLabelGenerator(Dancestyle::name);
-        dancestyleComboBox.setPlaceholder(getTranslation("search.dancestyle.placeholder"));
-        dancestyleComboBox.setWidthFull();
+        // style rows: dancestyle, role, skill range (same structure as the profile's "searching for")
         // prefill with what the logged in dancer is searching for (can still be fiddled with)
-        securityService.currentDancer().ifPresent(currentDancer ->
-                dancerService.searchingForOf(currentDancer.id()).forEach(entry ->
-                        dancestyleComboBox.select(entry.dancestyle())));
-
-        roleSelect.setItems(roleRepository.findAll());
-        // label generator must be null-safe: Vaadin also applies it to the empty-selection item
-        roleSelect.setItemLabelGenerator(role -> role == null ? "" : role.name());
-        roleSelect.setEmptySelectionCaption(getTranslation("search.role.any"));
-        roleSelect.setEmptySelectionAllowed(true);
+        List<DancerSearchingFor> searchingFor = securityService.currentDancer()
+                .map(currentDancer -> dancerService.searchingForOf(currentDancer.id()))
+                .orElse(List.of());
+        if (searchingFor.isEmpty()) {
+            addStyleRow(null, null, null, null);
+        }
+        else {
+            searchingFor.forEach(entry -> addStyleRow(entry.dancestyle(), entry.role(), entry.skilllevelMin(), entry.skilllevelMax()));
+        }
+        Button addStyleButton = new Button(getTranslation("form.addDancestyle"), e -> addStyleRow(null, null, null, null));
+        addStyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
 
         ageDistanceField.setMin(0);
         ageDistanceField.setVisible(loggedIn); // age distance is relative to the logged in user's age
@@ -94,8 +105,7 @@ public class SearchView extends DancewithmeAppLayout {
 
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
-        formLayout.addFormItem(dancestyleComboBox, getTranslation("search.dancestyle"));
-        formLayout.addFormItem(roleSelect, getTranslation("search.role"));
+        formLayout.addFormItem(new VerticalLayout(styleRowsLayout, addStyleButton), getTranslation("search.dancestyle"));
         if (loggedIn) {
             formLayout.addFormItem(ageDistanceField, getTranslation("search.ageDistance"));
         }
@@ -112,10 +122,58 @@ public class SearchView extends DancewithmeAppLayout {
         setContent(content);
     }
 
+    private void addStyleRow(Dancestyle dancestyle, Role role, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
+        SearchStyleRow row = new SearchStyleRow();
+        row.styleComboBox.setItems(dancestyleRepository.findAll());
+        row.styleComboBox.setItemLabelGenerator(Dancestyle::name);
+        row.styleComboBox.setValue(dancestyle);
+        row.styleComboBox.setPlaceholder(getTranslation("search.dancestyle.placeholder"));
+        row.roleSelect.setItems(roleRepository.findAll());
+        row.roleSelect.setItemLabelGenerator(Role::name);
+        row.roleSelect.setValue(role);
+        row.skilllevelMinComboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
+        row.skilllevelMinComboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
+        row.skilllevelMinComboBox.setValue(skilllevelMin);
+        row.skilllevelMaxComboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
+        row.skilllevelMaxComboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
+        row.skilllevelMaxComboBox.setValue(skilllevelMax);
+
+        Button removeButton = new Button(VaadinIcon.TRASH.create());
+        removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
+        removeButton.addClickListener(e -> {
+            styleRows.remove(row);
+            styleRowsLayout.remove(row.layout);
+        });
+        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel(getTranslation("search.role")),
+                row.roleSelect, new NativeLabel(getTranslation("search.skillFrom")), row.skilllevelMinComboBox,
+                new NativeLabel(getTranslation("search.skillTo")), row.skilllevelMaxComboBox, removeButton);
+        row.layout.setAlignItems(HorizontalLayout.Alignment.CENTER);
+        row.layout.setWidthFull();
+        row.layout.getStyle().set("flex-wrap", "wrap");
+        row.layout.getStyle().set("row-gap", "var(--lumo-space-s)");
+        styleRows.add(row);
+        styleRowsLayout.add(row.layout);
+    }
+
+    private static class SearchStyleRow {
+        private final ComboBox<Dancestyle> styleComboBox = new ComboBox<>();
+        private final ComboBox<Role> roleSelect = new ComboBox<>();
+        private final ComboBox<Skilllevel> skilllevelMinComboBox = new ComboBox<>();
+        private final ComboBox<Skilllevel> skilllevelMaxComboBox = new ComboBox<>();
+        private HorizontalLayout layout;
+    }
+
     private void search() {
+        List<SearchService.SearchStyleCriteria> styles = styleRows.stream()
+                .filter(row -> row.styleComboBox.getValue() != null)
+                .map(row -> new SearchService.SearchStyleCriteria(
+                        row.styleComboBox.getValue(),
+                        row.roleSelect.getValue(),
+                        row.skilllevelMinComboBox.getValue(),
+                        row.skilllevelMaxComboBox.getValue()))
+                .toList();
         SearchService.SearchCriteria criteria = new SearchService.SearchCriteria(
-                dancestyleComboBox.getValue(),
-                roleSelect.getValue(),
+                styles,
                 ageDistanceField.getValue(),
                 weekFrequencyMinField.getValue(),
                 weekFrequencyMaxField.getValue(),
