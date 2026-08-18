@@ -69,6 +69,7 @@ public class SearchView extends DancewithmeAppLayout {
         dancestyleComboBox.setItems(dancestyleRepository.findAll());
         dancestyleComboBox.setItemLabelGenerator(Dancestyle::name);
         dancestyleComboBox.setPlaceholder(getTranslation("search.dancestyle.placeholder"));
+        dancestyleComboBox.setWidthFull();
         // prefill with what the logged in dancer is searching for (can still be fiddled with)
         securityService.currentDancer().ifPresent(currentDancer ->
                 dancerService.searchingForOf(currentDancer.id()).forEach(entry ->
