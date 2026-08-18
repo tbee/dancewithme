@@ -2,6 +2,7 @@ package org.tbee.dancewithme.infrastructure.vdn.view;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.badge.Badge;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -38,6 +39,7 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Route("")
 @AnonymousAllowed
@@ -243,18 +245,12 @@ public class SearchView extends DancewithmeAppLayout {
         Markdown whoamiParagraph = new Markdown(whoami);
 
         // role + style badge
-        String badgeText = dancer.dancestyles().stream()
+        HorizontalLayout badgeBar = new HorizontalLayout();
+        dancer.dancestyles().stream()
                 .map(dd -> dd.role().name() + " " + dd.dancestyle().name())
                 .distinct()
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("");
-        Span badge = new Span(badgeText);
-        badge.getStyle()
-                .set("background", "var(--lumo-primary-color)")
-                .set("color", "var(--lumo-primary-contrast-color)")
-                .set("border-radius", "var(--lumo-border-radius-m)")
-                .set("padding", "var(--lumo-space-xs) var(--lumo-space-s)")
-                .set("font-size", "var(--lumo-font-size-s)");
+                .forEach(s -> badgeBar.add(new Badge(s)));
+        badgeBar.getStyle().set("margin-left", "auto");
 
         Span frequency = new Span(getTranslation("card.perWeek", dancer.weekFrequencyMin(), dancer.weekFrequencyMax()));
 
@@ -264,18 +260,12 @@ public class SearchView extends DancewithmeAppLayout {
                 ? new RouterLink(getTranslation("card.viewProfile"), DancerDetailView.class, new RouteParameters("dancerId", String.valueOf(dancer.id())))
                 : new RouterLink(getTranslation("card.viewProfile"), LoginView.class);
         viewProfileLink.getElement().setAttribute("theme", "button");
-        Button sendMessageButton = new Button(getTranslation("card.sendMessage"), e ->
-                Notification.show(getTranslation("card.comingSoon")));
-        sendMessageButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        HorizontalLayout badgeBar = new HorizontalLayout(badge);
-        badgeBar.getStyle().set("margin-left", "auto");
 
         HorizontalLayout headerLine = new HorizontalLayout(nameAge, badgeBar);
         headerLine.setWidthFull();
 
-        VerticalLayout middle = new VerticalLayout(headerLine, cityLayout, whoamiParagraph, frequency,
-                new HorizontalLayout(sendMessageButton, viewProfileLink));
+        VerticalLayout middle = new VerticalLayout(headerLine, cityLayout, whoamiParagraph, frequency, viewProfileLink);
         middle.setPadding(false);
         middle.setSpacing(false);
 

@@ -75,9 +75,12 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
             image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
             header.add(image);
         }
-        header.add(new VerticalLayout(nameH2, cityLayout, stylesLayout,
-                new Span(getTranslation("detail.weekFrequency", dancer.weekFrequencyMin(), dancer.weekFrequencyMax())),
-                new Span(getTranslation("detail.maxDistance", dancer.distanceToPartnerMax()))));
+        header.add(new VerticalLayout(nameH2,
+                cityLayout,
+                new Span(getTranslation("detail.maxDistance", dancer.distanceToPartnerMax())),
+                stylesLayout,
+                new Span(getTranslation("detail.weekFrequency", dancer.weekFrequencyMin(), dancer.weekFrequencyMax()))
+                ));
         content.add(header);
 
         if (dancer.whoami() != null && !dancer.whoami().isBlank()) {
