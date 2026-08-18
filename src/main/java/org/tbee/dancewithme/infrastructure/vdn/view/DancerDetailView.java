@@ -6,6 +6,7 @@ import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.markdown.Markdown;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -55,11 +56,12 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
         HorizontalLayout cityLayout = new HorizontalLayout(VaadinIcon.MAP_MARKER.create(), new Span(cityText));
         cityLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
 
-        String styles = dancer.dancestyles().stream()
-                .map(dd -> dd.role().name() + " " + dd.dancestyle().name())
-                .distinct()
-                .reduce((a, b) -> a + ", " + b)
-                .orElse("");
+        // dancestyles including role and skill, one per line
+        VerticalLayout stylesLayout = new VerticalLayout();
+        stylesLayout.setPadding(false);
+        stylesLayout.setSpacing(false);
+        dancer.dancestyles().forEach(dd -> stylesLayout.add(new Span(
+                dd.dancestyle().name() + " — " + dd.role().name() + " — " + getTranslation("skilllevel." + dd.skilllevel().code()))));
 
         VerticalLayout content = new VerticalLayout();
         content.setMaxWidth("1200px");
@@ -73,16 +75,16 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
             image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
             header.add(image);
         }
-        header.add(new VerticalLayout(nameH2, cityLayout, new Span(styles),
+        header.add(new VerticalLayout(nameH2, cityLayout, stylesLayout,
                 new Span(getTranslation("detail.weekFrequency", dancer.weekFrequencyMin(), dancer.weekFrequencyMax())),
                 new Span(getTranslation("detail.maxDistance", dancer.distanceToPartnerMax()))));
         content.add(header);
 
         if (dancer.whoami() != null && !dancer.whoami().isBlank()) {
-            content.add(new H3(getTranslation("form.whoami")), new Paragraph(dancer.whoami()));
+            content.add(new H3(getTranslation("form.whoami")), new Markdown(dancer.whoami()));
         }
         if (dancer.whatdoiwant() != null && !dancer.whatdoiwant().isBlank()) {
-            content.add(new H3(getTranslation("form.whatdoiwant")), new Paragraph(dancer.whatdoiwant()));
+            content.add(new H3(getTranslation("form.whatdoiwant")), new Markdown(dancer.whatdoiwant()));
         }
 
         // photo gallery

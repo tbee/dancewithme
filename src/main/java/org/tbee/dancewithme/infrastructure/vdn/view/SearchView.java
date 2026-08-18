@@ -12,12 +12,14 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.markdown.Markdown;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.tbee.dancewithme.application.DancerService;
 import org.tbee.dancewithme.application.SearchService;
@@ -238,7 +240,7 @@ public class SearchView extends DancewithmeAppLayout {
         if (whoami.length() > 200) {
             whoami = whoami.substring(0, 200) + "...";
         }
-        Paragraph whoamiParagraph = new Paragraph(whoami);
+        Markdown whoamiParagraph = new Markdown(whoami);
 
         // role + style badge
         String badgeText = dancer.dancestyles().stream()
@@ -257,14 +259,11 @@ public class SearchView extends DancewithmeAppLayout {
         Span frequency = new Span(getTranslation("card.perWeek", dancer.weekFrequencyMin(), dancer.weekFrequencyMax()));
 
         // buttons
-        Button viewProfileButton = new Button(getTranslation("card.viewProfile"), e -> {
-            if (loggedIn) {
-                UI.getCurrent().navigate(DancerDetailView.class, new RouteParameters("dancerId", String.valueOf(dancer.id())));
-            }
-            else {
-                UI.getCurrent().navigate(LoginView.class);
-            }
-        });
+        // a link (so it can be opened in a new tab), styled as a button
+        RouterLink viewProfileLink = loggedIn
+                ? new RouterLink(getTranslation("card.viewProfile"), DancerDetailView.class, new RouteParameters("dancerId", String.valueOf(dancer.id())))
+                : new RouterLink(getTranslation("card.viewProfile"), LoginView.class);
+        viewProfileLink.getElement().setAttribute("theme", "button");
         Button sendMessageButton = new Button(getTranslation("card.sendMessage"), e ->
                 Notification.show(getTranslation("card.comingSoon")));
         sendMessageButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -276,7 +275,7 @@ public class SearchView extends DancewithmeAppLayout {
         headerLine.setWidthFull();
 
         VerticalLayout middle = new VerticalLayout(headerLine, cityLayout, whoamiParagraph, frequency,
-                new HorizontalLayout(sendMessageButton, viewProfileButton));
+                new HorizontalLayout(sendMessageButton, viewProfileLink));
         middle.setPadding(false);
         middle.setSpacing(false);
 
