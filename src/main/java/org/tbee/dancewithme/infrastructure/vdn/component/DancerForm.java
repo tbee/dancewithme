@@ -174,8 +174,10 @@ public class DancerForm extends VerticalLayout {
         FormLayout formLayout = createFormLayout();
 
         // dances I can do
-        Button addDancestyleButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null));
+        Button addDancestyleButton = new Button(VaadinIcon.PLUS.create());
+        addDancestyleButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        addDancestyleButton.addClickListener(e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null));
         formLayout.add(dancestylesLayout);
         formLayout.add(addDancestyleButton);
 
@@ -215,8 +217,10 @@ public class DancerForm extends VerticalLayout {
         FormLayout formLayout = createFormLayout();
 
         // searching for
-        Button addSearchingForButton = new Button(getTranslation("form.addDancestyle"), e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null));
+        Button addSearchingForButton = new Button(VaadinIcon.PLUS.create());
+        addSearchingForButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addSearchingForButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        addSearchingForButton.addClickListener(e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null));
         formLayout.add(searchingForLayout);
         formLayout.add(addSearchingForButton);
 

@@ -93,8 +93,10 @@ public class SearchView extends DancewithmeAppLayout {
         else {
             searchingFor.forEach(entry -> addStyleRow(entry.dancestyle(), entry.role(), entry.skilllevelMin(), entry.skilllevelMax()));
         }
-        Button addStyleButton = new Button(getTranslation("form.addDancestyle"), e -> addStyleRow(null, null, null, null));
+        Button addStyleButton = new Button(VaadinIcon.PLUS.create());
+        addStyleButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addStyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
+        addStyleButton.addClickListener(e -> addStyleRow(null, null, null, null));
 
         styleRowsLayout.setPadding(false);
         styleRowsLayout.setSpacing(true);
