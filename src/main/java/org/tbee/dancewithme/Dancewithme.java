@@ -1,5 +1,9 @@
 package org.tbee.dancewithme;
 
+import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.theme.aura.Aura;
+import com.vaadin.flow.theme.lumo.Lumo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -16,7 +20,8 @@ import java.util.Locale;
 
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class)
-public class Dancewithme {
+@StyleSheet(Lumo.STYLESHEET)
+public class Dancewithme implements AppShellConfigurator {
     private static final Logger LOG = LoggerFactory.getLogger(Dancewithme.class);
 
     public static void main(String[] args) {

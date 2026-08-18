@@ -50,12 +50,20 @@ public class DancerService {
     public Dancer loadWithDetails(long id) {
         Dancer dancer = dancerRepository.findById(id).orElseThrow();
         // initialize the lazy relations needed by the views (open-in-view is disabled)
-        dancer.city();
+        if (dancer.city() != null) {
+            dancer.city().name();
+        }
         dancer.mugshot();
         dancer.dancestyles().forEach(dancerDancestyle -> {
             dancerDancestyle.dancestyle().name();
             dancerDancestyle.role().name();
             dancerDancestyle.skilllevel().code();
+        });
+        dancer.searchingFor().forEach(entry -> {
+            entry.dancestyle().name();
+            entry.role().name();
+            entry.skilllevelMin().code();
+            entry.skilllevelMax().code();
         });
         dancer.photos().forEach(photo -> photo.image());
         return dancer;

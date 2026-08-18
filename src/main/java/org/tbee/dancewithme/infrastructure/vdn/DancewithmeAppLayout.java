@@ -94,7 +94,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 
 	@Override
 	public String getPageTitle() {
-		return "Dancewithme";
+		return "Dance With Me";
 	}
 
 	public static void showException(Exception e) {
