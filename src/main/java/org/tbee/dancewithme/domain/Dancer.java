@@ -3,6 +3,8 @@ package org.tbee.dancewithme.domain;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
@@ -27,6 +29,10 @@ public class Dancer extends BaseEntity<Dancer> {
 
     @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Sex sex = Sex.UNKNOWN;
 
     @Column(nullable = false)
     private int yearOfBirth;
@@ -95,6 +101,14 @@ public class Dancer extends BaseEntity<Dancer> {
     }
     public Dancer name(String name) {
         this.name = name;
+        return this;
+    }
+
+    public Sex sex() {
+        return sex;
+    }
+    public Dancer sex(Sex sex) {
+        this.sex = sex;
         return this;
     }
 

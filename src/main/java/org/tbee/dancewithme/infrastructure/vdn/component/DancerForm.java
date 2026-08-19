@@ -10,6 +10,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -33,6 +34,8 @@ import org.tbee.dancewithme.domain.DancerDancestyle;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.SearchCriteriaSex;
+import org.tbee.dancewithme.domain.Sex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
@@ -66,6 +69,7 @@ public class DancerForm extends VerticalLayout {
     private final EmailField emailField = new EmailField();
     private final PasswordField passwordField = new PasswordField();
     private final TextField nameField = new TextField();
+    private final ComboBox<Sex> sexComboBox = new ComboBox<>();
     private final IntegerField yearOfBirthField = new IntegerField();
     private final ComboBox<City> cityComboBox = new ComboBox<>();
     private final TextArea whoamiField = new TextArea();
@@ -135,6 +139,7 @@ public class DancerForm extends VerticalLayout {
                 .bind(Dancer::email, Dancer::email);
         binder.forField(nameField).asRequired(getTranslation("form.required")).bind(Dancer::name, Dancer::name);
         binder.forField(yearOfBirthField).asRequired(getTranslation("form.required")).bind(Dancer::yearOfBirth, Dancer::yearOfBirth);
+        binder.forField(sexComboBox).bind(Dancer::sex, Dancer::sex);
         binder.forField(cityComboBox).bind(Dancer::city, Dancer::city);
         binder.forField(whoamiField).bind(Dancer::whoami, Dancer::whoami);
         binder.forField(whatdoiwantField).bind(Dancer::whatdoiwant, Dancer::whatdoiwant);
@@ -159,6 +164,11 @@ public class DancerForm extends VerticalLayout {
         }
         formLayout.addFormItem(yearOfBirthField, getTranslation("form.yearOfBirth"));
         formLayout.addFormItem(cityComboBox, getTranslation("form.city"));
+
+        // sex, with an explanation shown when "unknown" is selected
+        sexComboBox.setItems(Sex.values());
+        sexComboBox.setItemLabelGenerator(sex -> getTranslation("sex." + sex.name().toLowerCase()));
+        formLayout.addFormItem(sexComboBox, getTranslation("form.sex"));
         formLayout.addFormItem(whoamiField, getTranslation("form.whoami"));
 
         // flags
@@ -177,7 +187,7 @@ public class DancerForm extends VerticalLayout {
         Button addDancestyleButton = new Button(VaadinIcon.PLUS.create());
         addDancestyleButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        addDancestyleButton.addClickListener(e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null));
+        addDancestyleButton.addClickListener(e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null, null));
         formLayout.add(dancestylesLayout);
         formLayout.add(addDancestyleButton);
 
@@ -220,7 +230,7 @@ public class DancerForm extends VerticalLayout {
         Button addSearchingForButton = new Button(VaadinIcon.PLUS.create());
         addSearchingForButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addSearchingForButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        addSearchingForButton.addClickListener(e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null));
+        addSearchingForButton.addClickListener(e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null, null));
         formLayout.add(searchingForLayout);
         formLayout.add(addSearchingForButton);
 
@@ -261,10 +271,10 @@ public class DancerForm extends VerticalLayout {
         }
         dancestyleRows.clear();
         dancestylesLayout.removeAll();
-        dancer.dancestyles().forEach(dd -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, dd.dancestyle(), dd.role(), dd.skilllevel(), null));
+        dancer.dancestyles().forEach(dd -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, dd.dancestyle(), dd.role(), null, dd.skilllevel(), null));
         searchingForRows.clear();
         searchingForLayout.removeAll();
-        dancer.searchingFor().forEach(sf -> addDancestyleRow(searchingForRows, searchingForLayout, false, sf.dancestyle(), sf.role(), sf.skilllevelMin(), sf.skilllevelMax()));
+        dancer.searchingFor().forEach(sf -> addDancestyleRow(searchingForRows, searchingForLayout, false, sf.dancestyle(), sf.role(), sf.sex(), sf.skilllevelMin(), sf.skilllevelMax()));
         if (mode == Mode.UPDATE) {
             refreshPhotosLayout();
         }
@@ -313,6 +323,7 @@ public class DancerForm extends VerticalLayout {
         dancer.dancestyles(dancestyles);
         List<DancerSearchingFor> searchingFor = searchingForRows.stream()
                 .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null
+                        && row.sexComboBox.getValue() != null
                         && row.skilllevelComboBox.getValue() != null && row.skilllevelMaxComboBox.getValue() != null)
                 .map(row -> {
                     DancerSearchingFor sf = dancer.searchingFor().stream()
@@ -320,6 +331,7 @@ public class DancerForm extends VerticalLayout {
                             .findFirst()
                             .orElseGet(() -> new DancerSearchingFor().dancestyle(row.styleComboBox.getValue()));
                     return sf.role(row.roleSelect.getValue())
+                            .sex(row.sexComboBox.getValue())
                             .skilllevelMin(row.skilllevelComboBox.getValue())
                             .skilllevelMax(row.skilllevelMaxComboBox.getValue());
                 })
@@ -354,7 +366,7 @@ public class DancerForm extends VerticalLayout {
         photosLayout.add(row);
     }
 
-    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean canDo, Dancestyle dancestyle, Role role, Skilllevel skilllevel, Skilllevel skilllevelMax) {
+    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean canDo, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
         DancestyleRow row = new DancestyleRow();
         row.styleComboBox.setItems(dancestyleRepository.findAll());
         row.styleComboBox.setItemLabelGenerator(Dancestyle::name);
@@ -363,11 +375,16 @@ public class DancerForm extends VerticalLayout {
         row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
         row.roleSelect.setWidth("100px");
-        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel(getTranslation("form.role")), row.roleSelect);
-        // what the dancer can do: a single skill; what the dancer searches for: a min/max range
+        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel("als"), row.roleSelect);
+        // what the dancer can do: a single skill; what the dancer searches for: sex + a min/max range
+        if (!canDo) {
+            row.sexComboBox = new ComboBox<>();
+            row.sexComboBox.setItems(SearchCriteriaSex.values());
+            row.sexComboBox.setItemLabelGenerator(sexOption -> getTranslation("sex." + sexOption.name().toLowerCase()));
+            row.sexComboBox.setValue(sex);
+            row.layout.add(row.sexComboBox);
+        }
         row.skilllevelComboBox = createSkilllevelComboBox(skilllevel);
-        // fields grow to fill the available space instead of a fixed 100% width (which overflows the card)
-        row.layout.setFlexGrow(1, row.styleComboBox);
         if (canDo) {
             row.layout.add(new NativeLabel(getTranslation("form.skill")), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
@@ -418,7 +435,8 @@ public class DancerForm extends VerticalLayout {
     private class DancestyleRow {
         private final ComboBox<Dancestyle> styleComboBox = new ComboBox<>();
         private final Select<Role> roleSelect = new Select<>();
-        // single skill for can-do rows, min (and max) skill for searching rows
+        // sex and a min/max skill for searching rows; a single skill for can-do rows
+        private ComboBox<SearchCriteriaSex> sexComboBox;
         private ComboBox<Skilllevel> skilllevelComboBox;
         private ComboBox<Skilllevel> skilllevelMaxComboBox;
         private HorizontalLayout layout;

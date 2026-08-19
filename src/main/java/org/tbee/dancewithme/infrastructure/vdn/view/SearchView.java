@@ -28,6 +28,7 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
@@ -88,15 +89,15 @@ public class SearchView extends DancewithmeAppLayout {
                 .map(currentDancer -> dancerService.searchingForOf(currentDancer.id()))
                 .orElse(List.of());
         if (searchingFor.isEmpty()) {
-            addStyleRow(null, null, null, null);
+            addStyleRow(null, null, null, null, null);
         }
         else {
-            searchingFor.forEach(entry -> addStyleRow(entry.dancestyle(), entry.role(), entry.skilllevelMin(), entry.skilllevelMax()));
+            searchingFor.forEach(entry -> addStyleRow(entry.dancestyle(), entry.role(), entry.sex(), entry.skilllevelMin(), entry.skilllevelMax()));
         }
         Button addStyleButton = new Button(VaadinIcon.PLUS.create());
         addStyleButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addStyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
-        addStyleButton.addClickListener(e -> addStyleRow(null, null, null, null));
+        addStyleButton.addClickListener(e -> addStyleRow(null, null, null, null, null));
 
         styleRowsLayout.setPadding(false);
         styleRowsLayout.setSpacing(true);
@@ -129,11 +130,11 @@ public class SearchView extends DancewithmeAppLayout {
         searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
         VerticalLayout content = new VerticalLayout(formLayout, searchButton, resultsLayout, pagingLayout);
-        content.setMaxWidth("1200px");
+//        content.setMaxWidth("1200px");
         setContent(content);
     }
 
-    private void addStyleRow(Dancestyle dancestyle, Role role, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
+    private void addStyleRow(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
         SearchStyleRow row = new SearchStyleRow();
         row.styleComboBox.setItems(dancestyleRepository.findAll());
         row.styleComboBox.setItemLabelGenerator(Dancestyle::name);
@@ -143,6 +144,9 @@ public class SearchView extends DancewithmeAppLayout {
         row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
         row.roleSelect.setWidth("100px");
+        row.sexComboBox.setItems(SearchCriteriaSex.values());
+        row.sexComboBox.setItemLabelGenerator(sexOption -> getTranslation("sex." + sexOption.name().toLowerCase()));
+        row.sexComboBox.setValue(sex);
         row.skilllevelMinComboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
         row.skilllevelMinComboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
         row.skilllevelMinComboBox.setValue(skilllevelMin);
@@ -157,10 +161,10 @@ public class SearchView extends DancewithmeAppLayout {
             styleRowsLayout.remove(row.layout);
         });
         row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel(getTranslation("search.role")),
-                row.roleSelect, new NativeLabel(getTranslation("search.skillFrom")), row.skilllevelMinComboBox,
+                row.roleSelect, row.sexComboBox, new NativeLabel(getTranslation("search.skillFrom")), row.skilllevelMinComboBox,
                 new NativeLabel(getTranslation("search.skillTo")), row.skilllevelMaxComboBox, removeButton);
         row.layout.setAlignItems(HorizontalLayout.Alignment.CENTER);
-        row.layout.setWidthFull();
+//        row.layout.setWidthFull();
         row.layout.getStyle().set("flex-wrap", "wrap");
         row.layout.getStyle().set("row-gap", "var(--lumo-space-s)");
         row.layout.setPadding(false);
@@ -172,6 +176,7 @@ public class SearchView extends DancewithmeAppLayout {
     private static class SearchStyleRow {
         private final ComboBox<Dancestyle> styleComboBox = new ComboBox<>();
         private final ComboBox<Role> roleSelect = new ComboBox<>();
+        private final ComboBox<SearchCriteriaSex> sexComboBox = new ComboBox<>();
         private final ComboBox<Skilllevel> skilllevelMinComboBox = new ComboBox<>();
         private final ComboBox<Skilllevel> skilllevelMaxComboBox = new ComboBox<>();
         private HorizontalLayout layout;
@@ -183,6 +188,7 @@ public class SearchView extends DancewithmeAppLayout {
                 .map(row -> new SearchService.SearchStyleCriteria(
                         row.styleComboBox.getValue(),
                         row.roleSelect.getValue(),
+                        row.sexComboBox.getValue(),
                         row.skilllevelMinComboBox.getValue(),
                         row.skilllevelMaxComboBox.getValue()))
                 .toList();

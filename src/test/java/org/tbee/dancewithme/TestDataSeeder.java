@@ -12,6 +12,7 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.Sex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
@@ -68,21 +69,21 @@ public class TestDataSeeder implements ApplicationRunner {
         }
         LOGGER.info("Seeding test dancers");
 
-        createDancer("Tbee", 1970, "Aalten", List.of(
+        createDancer("Tbee", Sex.MALE, 1970, "Aalten", List.of(
                 canDo("Ballroom", "lead", "advanced_social"),
                 canDo("Latin", "lead", "intermediate_social")));
-        createDancer("Anna", 1992, "Amsterdam", List.of(
+        createDancer("Anna", Sex.FEMALE, 1992, "Amsterdam", List.of(
                 canDo("Ballroom", "follow", "intermediate_social")));
-        createDancer("Bram", 1985, "Rotterdam", List.of(
+        createDancer("Bram", Sex.MALE, 1985, "Rotterdam", List.of(
                 canDo("Latin", "lead", "novice"),
                 canDo("Salsa", "lead", "advanced_social")));
-        createDancer("Carmen", 1998, "Utrecht", List.of(
+        createDancer("Carmen", Sex.FEMALE, 1998, "Utrecht", List.of(
                 canDo("Ballroom", "follow", "pre_competitive"),
                 canDo("Latin", "follow", "pre_competitive")));
-        createDancer("Daan", 1979, "Haarlem", List.of(
+        createDancer("Daan", Sex.MALE, 1979, "Haarlem", List.of(
                 canDo("Tango argentine", "lead", "intermediate_social"),
                 canDo("Ballroom", "lead", "novice")));
-        createDancer("Evi", 1990, "Eindhoven", List.of(
+        createDancer("Evi", Sex.FEMALE, 1990, "Eindhoven", List.of(
                 canDo("West coast swing", "follow", "novice"),
                 canDo("Salsa", "follow", "intermediate_social"),
                 canDo("Ballroom", "follow", "absolute_beginner")));
@@ -96,11 +97,12 @@ public class TestDataSeeder implements ApplicationRunner {
         return new CanDo(dancestyle(dancestyleName), role(roleName), skilllevel(skilllevelCode));
     }
 
-    private void createDancer(String name, int yearOfBirth, String cityName, List<CanDo> canDos) {
+    private void createDancer(String name, Sex sex, int yearOfBirth, String cityName, List<CanDo> canDos) {
         Dancer dancer = new Dancer()
                 .email(name.toLowerCase() + "@tbee.org")
                 .password(passwordEncoder.encode("password"))
                 .name(name)
+                .sex(sex)
                 .yearOfBirth(yearOfBirth)
                 .city(city(cityName))
                 .mugshot(generateMugshot(name))

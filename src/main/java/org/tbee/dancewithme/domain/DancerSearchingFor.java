@@ -1,6 +1,8 @@
 package org.tbee.dancewithme.domain;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -23,6 +25,10 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Role role;
+
+    // the required sex of the partner
+    @Enumerated(EnumType.STRING)
+    private SearchCriteriaSex sex = SearchCriteriaSex.EITHER;
 
     // the minimum and maximum skilllevel the searching dancer accepts in a partner
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -52,6 +58,14 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> {
     }
     public DancerSearchingFor role(Role role) {
         this.role = role;
+        return this;
+    }
+
+    public SearchCriteriaSex sex() {
+        return sex;
+    }
+    public DancerSearchingFor sex(SearchCriteriaSex sex) {
+        this.sex = sex;
         return this;
     }
 

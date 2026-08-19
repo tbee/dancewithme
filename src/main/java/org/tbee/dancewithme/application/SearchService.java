@@ -6,6 +6,7 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 
@@ -19,6 +20,7 @@ public class SearchService {
     public record SearchStyleCriteria(
             Dancestyle dancestyle,
             Role role,
+            SearchCriteriaSex sex,
             Skilllevel skilllevelMin,
             Skilllevel skilllevelMax) {
     }
@@ -61,6 +63,7 @@ public class SearchService {
                         || dancer.dancestyles().stream().anyMatch(dd -> criteria.styles().stream().anyMatch(style ->
                                 dd.dancestyle().equals(style.dancestyle())
                                         && (style.role() == null || dd.role().equals(style.role()))
+                                        && (style.sex() == null || style.sex().match(dancer.sex()))
                                         && (style.skilllevelMin() == null || dd.skilllevel().level() >= style.skilllevelMin().level())
                                         && (style.skilllevelMax() == null || dd.skilllevel().level() <= style.skilllevelMax().level()))))
                 .filter(dancer -> !loggedIn || criteria.ageDistanceMax() == null
