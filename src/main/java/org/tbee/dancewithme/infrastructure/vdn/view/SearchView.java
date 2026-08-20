@@ -184,22 +184,22 @@ public class SearchView extends DancewithmeAppLayout {
         SearchService.SearchParameters searchParameters = new SearchService.SearchParameters(){
             @Override
             public int ageDistanceMax() {
-                return ageDistanceField.getValue();
+                return ifNull(ageDistanceField.getValue(), 100);
             }
 
             @Override
             public int weekFrequencyMin() {
-                return weekFrequencyMinField.getValue();
+                return ifNull(weekFrequencyMinField.getValue(), 0);
             }
 
             @Override
             public int weekFrequencyMax() {
-                return weekFrequencyMaxField.getValue();
+                return ifNull(weekFrequencyMaxField.getValue(), 7);
             }
 
             @Override
             public int distanceMax() {
-                return distanceMaxField.getValue();
+                return ifNull(distanceMaxField.getValue(), 1000);
             }
 
             @Override
@@ -244,6 +244,10 @@ public class SearchView extends DancewithmeAppLayout {
         catch (Exception e) {
             showException(e);
         }
+    }
+
+    private int ifNull(Integer v, int d) {
+        return (v == null ? d : v);
     }
 
     private void renderResults() {
@@ -306,12 +310,14 @@ public class SearchView extends DancewithmeAppLayout {
                 .distinct()
                 .forEach(s -> badgeBar.add(new Badge(s)));
         // mutual match badge: does their search match us?
-        boolean match = !searchService.match(dancer, List.of(currentDancer)).isEmpty();
-        Badge matchBadge = match
-                ? new Badge(getTranslation("card.match"))
-                : new Badge(getTranslation("card.noMatch"));
-        matchBadge.addThemeVariants(match ? BadgeVariant.SUCCESS : BadgeVariant.WARNING);
-        badgeBar.add(matchBadge);
+        if (currentDancer != null) {
+            boolean match = !searchService.match(dancer, List.of(currentDancer)).isEmpty();
+            Badge matchBadge = match
+                               ? new Badge(getTranslation("card.match"))
+                               : new Badge(getTranslation("card.noMatch"));
+            matchBadge.addThemeVariants(match ? BadgeVariant.SUCCESS : BadgeVariant.WARNING);
+            badgeBar.add(matchBadge);
+        }
         badgeBar.getStyle().set("margin-left", "auto");
 
         Span frequency = new Span(getTranslation("card.perWeek", dancer.weekFrequencyMin(), dancer.weekFrequencyMax()));
