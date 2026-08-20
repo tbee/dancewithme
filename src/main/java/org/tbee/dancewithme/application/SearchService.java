@@ -6,51 +6,62 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
-import org.tbee.dancewithme.domain.SearchCriteriaSex;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
+import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.time.Year;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SearchService {
 
-    public record SearchStyleCriteria(
-            Dancestyle dancestyle,
-            Role role,
-            SearchCriteriaSex sex,
-            Skilllevel skilllevelMin,
-            Skilllevel skilllevelMax) {
+    public interface SearchParametersStyles {
+            Dancestyle dancestyle();
+            Role role();
+            SearchCriteriaSex sex();
+            Skilllevel skilllevelMin();
+            Skilllevel skilllevelMax();
     }
 
-    public record SearchCriteria(
+    public interface SearchParameters {
             // matched or-ed: any of the selected style entries matches
-            List<SearchStyleCriteria> styles,
+            List<? extends SearchParametersStyles> searchingFor();
             // only applied for logged in users, relative to their own age
-            Integer ageDistanceMax,
-            Integer weekFrequencyMin,
-            Integer weekFrequencyMax,
+            int ageDistanceMax();
+            int weekFrequencyMin();
+            int weekFrequencyMax();
             // only applied for logged in users, measured from their own city
-            Integer distanceMax) {
+            int distanceMax();
     }
 
     public record SearchResult(Dancer dancer, Double distanceKm) {
     }
 
     private final DancerRepository dancerRepository;
+    private final SecurityService securityService;
 
-    public SearchService(DancerRepository dancerRepository) {
+    public SearchService(DancerRepository dancerRepository, SecurityService securityService) {
         this.dancerRepository = dancerRepository;
+        this.securityService = securityService;
     }
 
     @Transactional(readOnly = true)
-    public List<SearchResult> search(SearchCriteria criteria, Dancer currentDancer) {
-        boolean loggedIn = currentDancer != null;
+    public List<SearchResult> search(SearchParameters criteria) {
+        boolean loggedIn = securityService.currentDancer().isPresent();
         List<Dancer> candidates = loggedIn
                 ? dancerRepository.findByActiveTrue()
                 : dancerRepository.findByActiveTrueAndPubliclyFindableTrue();
+        return match(criteria, candidates);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SearchResult> match(SearchParameters criteria, List<Dancer> candidates) {
+        Dancer currentDancer = securityService.currentDancer().orElse(null);
+        boolean loggedIn = (currentDancer != null);
 
         int currentYear = Year.now().getValue();
         // re-attach the current dancer within this transaction, so the lazy city can be loaded
@@ -59,19 +70,19 @@ public class SearchService {
         return candidates.stream()
                 // never include the searching dancer itself
                 .filter(dancer -> !loggedIn || dancer.id() != currentDancer.id())
-                .filter(dancer -> criteria.styles() == null || criteria.styles().isEmpty()
-                        || dancer.dancestyles().stream().anyMatch(dd -> criteria.styles().stream().anyMatch(style ->
-                                dd.dancestyle().equals(style.dancestyle())
-                                        && (style.role() == null || dd.role().equals(style.role()))
-                                        && (style.sex() == null || style.sex().match(dancer.sex()))
-                                        && (style.skilllevelMin() == null || dd.skilllevel().level() >= style.skilllevelMin().level())
-                                        && (style.skilllevelMax() == null || dd.skilllevel().level() <= style.skilllevelMax().level()))))
-                .filter(dancer -> !loggedIn || criteria.ageDistanceMax() == null
+                .filter(dancer -> criteria.searchingFor() == null || criteria.searchingFor().isEmpty()
+                        || dancer.dancestyles().stream().anyMatch(dd -> criteria.searchingFor().stream().anyMatch(style ->
+                        dd.dancestyle().equals(style.dancestyle())
+                                && (style.role() == null || dd.role().equals(style.role()))
+                                && (style.sex() == null || style.sex().match(dancer.sex()))
+                                && (style.skilllevelMin() == null || dd.skilllevel().level() >= style.skilllevelMin().level())
+                                && (style.skilllevelMax() == null || dd.skilllevel().level() <= style.skilllevelMax().level()))))
+                .filter(dancer -> !loggedIn
                         || Math.abs(age(dancer, currentYear) - age(currentDancer, currentYear)) <= criteria.ageDistanceMax())
-                .filter(dancer -> criteria.weekFrequencyMin() == null || dancer.weekFrequencyMax() >= criteria.weekFrequencyMin())
-                .filter(dancer -> criteria.weekFrequencyMax() == null || dancer.weekFrequencyMin() <= criteria.weekFrequencyMax())
+                .filter(dancer -> dancer.weekFrequencyMax() >= criteria.weekFrequencyMin())
+                .filter(dancer -> dancer.weekFrequencyMin() <= criteria.weekFrequencyMax())
                 .map(dancer -> new SearchResult(dancer, distanceKm(fromCity, dancer.city())))
-                .filter(result -> !loggedIn || criteria.distanceMax() == null || result.distanceKm() == null || result.distanceKm() <= criteria.distanceMax())
+                .filter(result -> !loggedIn || result.distanceKm() == null || result.distanceKm() <= criteria.distanceMax())
                 .sorted(Comparator.comparing(SearchResult::distanceKm, Comparator.nullsLast(Comparator.naturalOrder())))
                 // initialize the lazy relations needed by the views (open-in-view is disabled)
                 .peek(result -> {

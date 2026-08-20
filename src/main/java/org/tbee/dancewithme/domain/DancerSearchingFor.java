@@ -7,6 +7,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 
 /**
  * A dancestyle + role the dancer is searching for in a partner.
@@ -15,7 +17,7 @@ import jakarta.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "dancer_searching_for", uniqueConstraints = @UniqueConstraint(name = "dancer_searching_for__dancer_dancestyle_UK", columnNames = {"dancer_id", "dancestyle_id"}))
-public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> {
+public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implements SearchService.SearchParametersStyles {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Dancer dancer;

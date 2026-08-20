@@ -12,7 +12,7 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
-import org.tbee.dancewithme.domain.Sex;
+import org.tbee.dancewithme.domain.valueobject.Sex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
@@ -110,8 +110,8 @@ public class TestDataSeeder implements ApplicationRunner {
                 .whatdoiwant("Looking for a dance partner in the " + cityName + " area.")
                 .weekFrequencyMin(1)
                 .weekFrequencyMax(3)
-                .distanceToPartnerMax(50)
-                .ageDistanceToPartnerMax(15)
+                .distanceMax(50)
+                .ageDistanceMax(15)
                 .active(true)
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now());

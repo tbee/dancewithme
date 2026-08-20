@@ -11,6 +11,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.domain.valueobject.Sex;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-public class Dancer extends BaseEntity<Dancer> {
+public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchParameters {
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -66,9 +68,9 @@ public class Dancer extends BaseEntity<Dancer> {
     @Column(nullable = false)
     private int weekFrequencyMax = 7;
     @Column(nullable = false)
-    private int distanceToPartnerMax = 100;
+    private int distanceMax = 100;
     @Column(nullable = false)
-    private int ageDistanceToPartnerMax = 100;
+    private int ageDistanceMax = 100;
 
     @OneToMany(mappedBy = "dancer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DancerDancestyle> dancestyles = new ArrayList<>();
@@ -192,19 +194,19 @@ public class Dancer extends BaseEntity<Dancer> {
         return this;
     }
 
-    public int distanceToPartnerMax() {
-        return distanceToPartnerMax;
+    public int distanceMax() {
+        return distanceMax;
     }
-    public Dancer distanceToPartnerMax(int distanceToPartnerMax) {
-        this.distanceToPartnerMax = distanceToPartnerMax;
+    public Dancer distanceMax(int distanceMax) {
+        this.distanceMax = distanceMax;
         return this;
     }
 
-    public int ageDistanceToPartnerMax() {
-        return ageDistanceToPartnerMax;
+    public int ageDistanceMax() {
+        return ageDistanceMax;
     }
-    public Dancer ageDistanceToPartnerMax(int ageDistanceToPartnerMax) {
-        this.ageDistanceToPartnerMax = ageDistanceToPartnerMax;
+    public Dancer ageDistanceMax(int ageDistanceMax) {
+        this.ageDistanceMax = ageDistanceMax;
         return this;
     }
 

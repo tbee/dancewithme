@@ -5,6 +5,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import org.tbee.dancewithme.application.SearchService;
 
 @Entity
 @Table(name = "dancer_dancestyle", uniqueConstraints = @UniqueConstraint(name = "dancer_dancestyle__dancer_dancestyle_UK", columnNames = {"dancer_id", "dancestyle_id"}))

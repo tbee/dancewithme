@@ -178,10 +178,10 @@
             <column name="week_frequency_max" type="integer" defaultValueNumeric="7">
                 <constraints nullable="false"/>
             </column>
-            <column name="distance_to_partner_max" type="integer" defaultValueNumeric="100">
+            <column name="distance_max" type="integer" defaultValueNumeric="100">
                 <constraints nullable="false"/>
             </column>
-            <column name="age_distance_to_partner_max" type="integer" defaultValueNumeric="100">
+            <column name="age_distance_max" type="integer" defaultValueNumeric="100">
                 <constraints nullable="false"/>
             </column>
         </createTable>

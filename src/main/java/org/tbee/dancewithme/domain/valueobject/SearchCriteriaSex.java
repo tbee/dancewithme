@@ -1,4 +1,4 @@
-package org.tbee.dancewithme.domain;
+package org.tbee.dancewithme.domain.valueobject;
 
 public enum SearchCriteriaSex { MALE, FEMALE, EITHER;
 

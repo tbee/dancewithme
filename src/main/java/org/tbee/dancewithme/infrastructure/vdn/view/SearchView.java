@@ -1,8 +1,8 @@
 package org.tbee.dancewithme.infrastructure.vdn.view;
 
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.badge.Badge;
+import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -14,7 +14,6 @@ import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.markdown.Markdown;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -28,7 +27,7 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
-import org.tbee.dancewithme.domain.SearchCriteriaSex;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
@@ -40,7 +39,6 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Route("")
 @AnonymousAllowed
@@ -48,8 +46,8 @@ public class SearchView extends DancewithmeAppLayout {
 
     private static final int PAGE_SIZE = 10;
 
-    private final transient SecurityService securityService;
-    private final transient SearchService searchService;
+    private final SecurityService securityService;
+    private final SearchService searchService;
 
     private final VerticalLayout styleRowsLayout = new VerticalLayout();
     private final List<SearchStyleRow> styleRows = new ArrayList<>();
@@ -58,9 +56,9 @@ public class SearchView extends DancewithmeAppLayout {
     private final IntegerField weekFrequencyMaxField = new IntegerField();
     private final IntegerField distanceMaxField = new IntegerField();
 
-    private final transient DancestyleRepository dancestyleRepository;
-    private final transient RoleRepository roleRepository;
-    private final transient SkilllevelRepository skilllevelRepository;
+    private final DancestyleRepository dancestyleRepository;
+    private final RoleRepository roleRepository;
+    private final SkilllevelRepository skilllevelRepository;
 
     private final VerticalLayout resultsLayout = new VerticalLayout();
     private final HorizontalLayout pagingLayout = new HorizontalLayout();
@@ -183,23 +181,63 @@ public class SearchView extends DancewithmeAppLayout {
     }
 
     private void search() {
-        List<SearchService.SearchStyleCriteria> styles = styleRows.stream()
-                .filter(row -> row.styleComboBox.getValue() != null)
-                .map(row -> new SearchService.SearchStyleCriteria(
-                        row.styleComboBox.getValue(),
-                        row.roleSelect.getValue(),
-                        row.sexComboBox.getValue(),
-                        row.skilllevelMinComboBox.getValue(),
-                        row.skilllevelMaxComboBox.getValue()))
-                .toList();
-        SearchService.SearchCriteria criteria = new SearchService.SearchCriteria(
-                styles,
-                ageDistanceField.getValue(),
-                weekFrequencyMinField.getValue(),
-                weekFrequencyMaxField.getValue(),
-                distanceMaxField.getValue());
+        SearchService.SearchParameters searchParameters = new SearchService.SearchParameters(){
+            @Override
+            public int ageDistanceMax() {
+                return ageDistanceField.getValue();
+            }
+
+            @Override
+            public int weekFrequencyMin() {
+                return weekFrequencyMinField.getValue();
+            }
+
+            @Override
+            public int weekFrequencyMax() {
+                return weekFrequencyMaxField.getValue();
+            }
+
+            @Override
+            public int distanceMax() {
+                return distanceMaxField.getValue();
+            }
+
+            @Override
+            public List<? extends SearchService.SearchParametersStyles> searchingFor() {
+                return styleRows.stream()
+                        .filter(row -> row.styleComboBox.getValue() != null)
+                        .map(row -> new SearchService.SearchParametersStyles(){
+
+                            @Override
+                            public Dancestyle dancestyle() {
+                                return row.styleComboBox.getValue();
+                            }
+
+                            @Override
+                            public Role role() {
+                                return row.roleSelect.getValue();
+                            }
+
+                            @Override
+                            public SearchCriteriaSex sex() {
+                                return row.sexComboBox.getValue();
+                            }
+
+                            @Override
+                            public Skilllevel skilllevelMin() {
+                                return row.skilllevelMinComboBox.getValue();
+                            }
+
+                            @Override
+                            public Skilllevel skilllevelMax() {
+                                return row.skilllevelMaxComboBox.getValue();
+                            }
+                        })
+                        .toList();
+            }
+        };
         try {
-            results = searchService.search(criteria, securityService.currentDancer().orElse(null));
+            results = searchService.search(searchParameters);
             page = 0;
             renderResults();
         }
@@ -236,6 +274,7 @@ public class SearchView extends DancewithmeAppLayout {
     }
 
     private HorizontalLayout createCard(SearchService.SearchResult result) {
+        Dancer currentDancer = securityService.currentDancer().orElseGet(() -> null);
         Dancer dancer = result.dancer();
         boolean loggedIn = securityService.isLoggedIn();
 
@@ -260,12 +299,19 @@ public class SearchView extends DancewithmeAppLayout {
         }
         Markdown whoamiParagraph = new Markdown(whoami);
 
-        // role + style badge
+        // role + style badges
         HorizontalLayout badgeBar = new HorizontalLayout();
         dancer.dancestyles().stream()
                 .map(dd -> dd.role().name() + " " + dd.dancestyle().name())
                 .distinct()
                 .forEach(s -> badgeBar.add(new Badge(s)));
+        // mutual match badge: does their search match us?
+        boolean match = !searchService.match(dancer, List.of(currentDancer)).isEmpty();
+        Badge matchBadge = match
+                ? new Badge(getTranslation("card.match"))
+                : new Badge(getTranslation("card.noMatch"));
+        matchBadge.addThemeVariants(match ? BadgeVariant.SUCCESS : BadgeVariant.WARNING);
+        badgeBar.add(matchBadge);
         badgeBar.getStyle().set("margin-left", "auto");
 
         Span frequency = new Span(getTranslation("card.perWeek", dancer.weekFrequencyMin(), dancer.weekFrequencyMax()));
