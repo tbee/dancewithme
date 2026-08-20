@@ -373,7 +373,7 @@ public class DancerForm extends VerticalLayout {
         row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
         row.roleSelect.setWidth("100px");
-        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel("als"), row.roleSelect);
+        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel("als"));
         // what the dancer can do: a single skill; what the dancer searches for: sex + a min/max range
         if (!canDo) {
             row.sexComboBox = new ComboBox<>();
@@ -382,6 +382,7 @@ public class DancerForm extends VerticalLayout {
             row.sexComboBox.setValue(sex);
             row.layout.add(row.sexComboBox);
         }
+        row.layout.add(row.roleSelect);
         row.skilllevelComboBox = createSkilllevelComboBox(skilllevel);
         if (canDo) {
             row.layout.add(new NativeLabel(getTranslation("form.skill")), row.skilllevelComboBox);

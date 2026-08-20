@@ -39,6 +39,7 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Route("")
 @AnonymousAllowed
@@ -83,8 +84,9 @@ public class SearchView extends DancewithmeAppLayout {
         // == search form ==
         // style rows: dancestyle, role, skill range (same structure as the profile's "searching for")
         // prefill with what the logged in dancer is searching for (can still be fiddled with)
+        Dancer currentDancer = securityService.currentDancer().orElse(null);
         List<DancerSearchingFor> searchingFor = securityService.currentDancer()
-                .map(currentDancer -> dancerService.searchingForOf(currentDancer.id()))
+                .map(cd -> dancerService.searchingForOf(cd.id()))
                 .orElse(List.of());
         if (searchingFor.isEmpty()) {
             addStyleRow(null, null, null, null, null);
@@ -103,13 +105,17 @@ public class SearchView extends DancewithmeAppLayout {
         styleRowsWithButton.setPadding(false);
 
         ageDistanceField.setMin(0);
+        ageDistanceField.setValue(currentDancer == null ? 0 : currentDancer.ageDistanceMax());
         ageDistanceField.setVisible(loggedIn); // age distance is relative to the logged in user's age
+        weekFrequencyMinField.setValue(currentDancer == null ? 0 : currentDancer.weekFrequencyMin());
         weekFrequencyMinField.setPlaceholder(getTranslation("search.age.min"));
         weekFrequencyMinField.setMin(0);
         weekFrequencyMinField.setMax(7);
+        weekFrequencyMaxField.setValue(currentDancer == null ? 7 : currentDancer.weekFrequencyMax());
         weekFrequencyMaxField.setPlaceholder(getTranslation("search.age.max"));
         weekFrequencyMaxField.setMin(0);
         weekFrequencyMaxField.setMax(7);
+        distanceMaxField.setValue(currentDancer == null ? 0 : currentDancer.distanceMax());
         distanceMaxField.setMin(0);
         distanceMaxField.setVisible(loggedIn); // distance search is only available for logged in users
 
@@ -159,7 +165,7 @@ public class SearchView extends DancewithmeAppLayout {
             styleRowsLayout.remove(row.layout);
         });
         row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel(getTranslation("search.role")),
-                row.roleSelect, row.sexComboBox, new NativeLabel(getTranslation("search.skillFrom")), row.skilllevelMinComboBox,
+                row.sexComboBox, row.roleSelect, new NativeLabel(getTranslation("search.skillFrom")), row.skilllevelMinComboBox,
                 new NativeLabel(getTranslation("search.skillTo")), row.skilllevelMaxComboBox, removeButton);
         row.layout.setAlignItems(HorizontalLayout.Alignment.CENTER);
 //        row.layout.setWidthFull();
