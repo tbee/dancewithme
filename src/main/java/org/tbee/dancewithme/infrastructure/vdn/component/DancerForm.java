@@ -369,9 +369,11 @@ public class DancerForm extends VerticalLayout {
         row.roleSelect.setValue(role);
         row.layout.add(row.styleComboBox);
         if (!aboutDancer) {
-            row.layout.add(label("form.role"));
             row.searchCriteriaSexComboBox.setValue(sex);
             row.layout.add(row.searchCriteriaSexComboBox);
+        }
+        else {
+            row.layout.add(label("form.role"));
         }
         row.layout.add(row.roleSelect);
         row.skilllevelComboBox.setValue(skilllevel);
@@ -415,7 +417,7 @@ public class DancerForm extends VerticalLayout {
     }
 
     private NativeLabel label(String key) {
-        return new NativeLabel(t("form.skill"));
+        return new NativeLabel(t(key));
     }
 
     private String t(String key, Object... params) {
