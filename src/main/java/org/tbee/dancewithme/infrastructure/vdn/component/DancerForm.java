@@ -67,9 +67,9 @@ public class DancerForm extends VerticalLayout {
     private final EmailField emailField = new EmailField();
     private final PasswordField passwordField = new PasswordField();
     private final TextField nameField = new TextField();
-    private final ComboBox<Sex> sexComboBox = new ComboBox<>();
+    private final SexComboBox sexComboBox = new SexComboBox();
     private final IntegerField yearOfBirthField = new IntegerField();
-    private final ComboBox<City> cityComboBox = new ComboBox<>();
+    private final ComboBox<City> cityComboBox;
     private final TextArea whoamiField = new TextArea();
     private final TextArea whatdoiwantField = new TextArea();
     private final IntegerField weekFrequencyMinField = new IntegerField();
@@ -100,6 +100,7 @@ public class DancerForm extends VerticalLayout {
         this.dancestyleRepository = dancestyleRepository;
         this.roleRepository = roleRepository;
         this.skilllevelRepository = skilllevelRepository;
+        this.cityComboBox = new CityComboBox(cityRepository);
 
         setWidthFull();
 
@@ -109,8 +110,6 @@ public class DancerForm extends VerticalLayout {
         emailField.setWidthFull();
         yearOfBirthField.setMin(Year.now().getValue() - 100);
         yearOfBirthField.setMax(Year.now().getValue() - 10);
-        cityComboBox.setItems(cityRepository.findAllByOrderByNameAsc());
-        cityComboBox.setItemLabelGenerator(City::name);
         cityComboBox.setWidthFull();
         whoamiField.setWidthFull();
         whoamiField.setHeight("300px");
@@ -132,11 +131,11 @@ public class DancerForm extends VerticalLayout {
 
         // binder
         binder.forField(emailField)
-                .asRequired(getTranslation("form.required"))
-                .withValidator(new EmailValidator(getTranslation("form.invalidEmail")))
+                .asRequired(t("form.required"))
+                .withValidator(new EmailValidator(t("form.invalidEmail")))
                 .bind(Dancer::email, Dancer::email);
-        binder.forField(nameField).asRequired(getTranslation("form.required")).bind(Dancer::name, Dancer::name);
-        binder.forField(yearOfBirthField).asRequired(getTranslation("form.required")).bind(Dancer::yearOfBirth, Dancer::yearOfBirth);
+        binder.forField(nameField).asRequired(t("form.required")).bind(Dancer::name, Dancer::name);
+        binder.forField(yearOfBirthField).asRequired(t("form.required")).bind(Dancer::yearOfBirth, Dancer::yearOfBirth);
         binder.forField(sexComboBox).bind(Dancer::sex, Dancer::sex);
         binder.forField(cityComboBox).bind(Dancer::city, Dancer::city);
         binder.forField(whoamiField).bind(Dancer::whoami, Dancer::whoami);
@@ -152,30 +151,28 @@ public class DancerForm extends VerticalLayout {
     private Card createAboutMeCard() {
         FormLayout formLayout = createFormLayout();
 
-        formLayout.addFormItem(nameField, getTranslation("form.name"));
-        formLayout.addFormItem(emailField, getTranslation("form.email"));
+        formLayout.addFormItem(nameField, t("form.name"));
+        formLayout.addFormItem(emailField, t("form.email"));
         if (mode == Mode.REGISTER) {
-            formLayout.addFormItem(passwordField, getTranslation("form.password"));
+            formLayout.addFormItem(passwordField, t("form.password"));
         }
         else {
             emailField.setReadOnly(true); // the email is the login name, changing it is not supported yet
         }
-        formLayout.addFormItem(yearOfBirthField, getTranslation("form.yearOfBirth"));
-        formLayout.addFormItem(cityComboBox, getTranslation("form.city"));
+        formLayout.addFormItem(yearOfBirthField, t("form.yearOfBirth"));
+        formLayout.addFormItem(cityComboBox, t("form.city"));
 
         // sex, with an explanation shown when "unknown" is selected
-        sexComboBox.setItems(Sex.values());
-        sexComboBox.setItemLabelGenerator(sex -> getTranslation("sex." + sex.name().toLowerCase()));
-        formLayout.addFormItem(sexComboBox, getTranslation("form.sex"));
-        formLayout.addFormItem(whoamiField, getTranslation("form.whoami"));
+        formLayout.addFormItem(sexComboBox, t("form.sex"));
+        formLayout.addFormItem(whoamiField, t("form.whoami"));
 
         // flags
-        activeCheckbox.setLabel(getTranslation("form.active"));
+        activeCheckbox.setLabel(t("form.active"));
         formLayout.addFormItem(activeCheckbox, "");
-        publiclyFindableCheckbox.setLabel(getTranslation("form.publiclyFindable"));
+        publiclyFindableCheckbox.setLabel(t("form.publiclyFindable"));
         formLayout.addFormItem(publiclyFindableCheckbox, "");
 
-        return createCard(getTranslation("form.whoami"), formLayout);
+        return createCard(t("form.whoami"), formLayout);
     }
 
     private Card createMyDancingCard() {
@@ -183,20 +180,20 @@ public class DancerForm extends VerticalLayout {
 
         // dances I can do
         Button addDancestyleButton = new Button(VaadinIcon.PLUS.create());
-        addDancestyleButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
+        addDancestyleButton.getElement().setAttribute("aria-label", t("form.addDancestyle"));
         addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         addDancestyleButton.addClickListener(e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null, null));
         formLayout.add(dancestylesLayout);
         formLayout.add(addDancestyleButton);
 
-        return createCard(getTranslation("form.dancestyles"), formLayout);
+        return createCard(t("form.dancestyles"), formLayout);
     }
 
     private Card createPhotosCard() {
         FormLayout formLayout = createFormLayout();
 
         // mugshot
-        formLayout.add(new H5(getTranslation("form.mugshot")), mugshotUpload);
+        formLayout.add(new H5(t("form.mugshot")), mugshotUpload);
 
         // extra photos
         Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
@@ -204,21 +201,21 @@ public class DancerForm extends VerticalLayout {
             refreshPhotosLayout();
         }));
         photoUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
-        photoUpload.setUploadButton(new Button(getTranslation("form.upload")));
-        formLayout.add(new H5(getTranslation("form.photos")), photoUpload, photosLayout);
+        photoUpload.setUploadButton(new Button(t("form.upload")));
+        formLayout.add(new H5(t("form.photos")), photoUpload, photosLayout);
 
-        return createCard(getTranslation("form.photos"), formLayout);
+        return createCard(t("form.photos"), formLayout);
     }
 
     private Card createSearchFieldCard() {
         FormLayout formLayout = createFormLayout();
 
-        formLayout.addFormItem(whatdoiwantField, getTranslation("form.whatdoiwant"));
-        formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), getTranslation("form.weekFrequency"));
-        formLayout.addFormItem(distanceToPartnerMaxField, getTranslation("form.distanceToPartnerMax"));
-        formLayout.addFormItem(ageDistanceToPartnerMaxField, getTranslation("form.ageDistanceToPartnerMax"));
+        formLayout.addFormItem(whatdoiwantField, t("form.whatdoiwant"));
+        formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), t("form.weekFrequency"));
+        formLayout.addFormItem(distanceToPartnerMaxField, t("form.distanceMax"));
+        formLayout.addFormItem(ageDistanceToPartnerMaxField, t("form.ageDistanceMax"));
 
-        return createCard(getTranslation("form.whatdoiwant"), formLayout);
+        return createCard(t("form.whatdoiwant"), formLayout);
     }
 
     private Card createSearchDancesCard() {
@@ -226,22 +223,22 @@ public class DancerForm extends VerticalLayout {
 
         // searching for
         Button addSearchingForButton = new Button(VaadinIcon.PLUS.create());
-        addSearchingForButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
+        addSearchingForButton.getElement().setAttribute("aria-label", t("form.addDancestyle"));
         addSearchingForButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         addSearchingForButton.addClickListener(e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null, null));
         formLayout.add(searchingForLayout);
         formLayout.add(addSearchingForButton);
 
-        return createCard(getTranslation("form.searchingFor"), formLayout);
+        return createCard(t("form.searchingFor"), formLayout);
     }
 
     private Card createPrivacyCard() {
         FormLayout formLayout = createFormLayout();
 
-        privacyAgreementCheckbox.setLabel(getTranslation("privacy.text"));
+        privacyAgreementCheckbox.setLabel(t("privacy.text"));
         formLayout.add(privacyAgreementCheckbox);
 
-        return createCard(getTranslation("form.searchingFor"), formLayout);
+        return createCard(t("form.searchingFor"), formLayout);
     }
 
     private @NonNull Card createCard(String title, FormLayout formLayout) {
@@ -288,12 +285,12 @@ public class DancerForm extends VerticalLayout {
         if (mode == Mode.REGISTER) {
             if (passwordField.getValue().length() < 8) {
                 passwordField.setInvalid(true);
-                passwordField.setErrorMessage(getTranslation("form.passwordTooShort"));
+                passwordField.setErrorMessage(t("form.passwordTooShort"));
                 return null;
             }
             if (!privacyAgreementCheckbox.getValue()) {
                 privacyAgreementCheckbox.setInvalid(true);
-                privacyAgreementCheckbox.setErrorMessage(getTranslation("form.privacyAgreement.required"));
+                privacyAgreementCheckbox.setErrorMessage(t("form.privacyAgreement.required"));
                 return null;
             }
         }
@@ -321,7 +318,7 @@ public class DancerForm extends VerticalLayout {
         dancer.dancestyles(dancestyles);
         List<DancerSearchingFor> searchingFor = searchingForRows.stream()
                 .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null
-                        && row.sexComboBox.getValue() != null
+                        && row.searchCriteriaSexComboBox.getValue() != null
                         && row.skilllevelComboBox.getValue() != null && row.skilllevelMaxComboBox.getValue() != null)
                 .map(row -> {
                     DancerSearchingFor sf = dancer.searchingFor().stream()
@@ -329,7 +326,7 @@ public class DancerForm extends VerticalLayout {
                             .findFirst()
                             .orElseGet(() -> new DancerSearchingFor().dancestyle(row.styleComboBox.getValue()));
                     return sf.role(row.roleSelect.getValue())
-                            .sex(row.sexComboBox.getValue())
+                            .sex(row.searchCriteriaSexComboBox.getValue())
                             .skilllevelMin(row.skilllevelComboBox.getValue())
                             .skilllevelMax(row.skilllevelMaxComboBox.getValue());
                 })
@@ -364,35 +361,27 @@ public class DancerForm extends VerticalLayout {
         photosLayout.add(row);
     }
 
-    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean canDo, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
+    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
         DancestyleRow row = new DancestyleRow();
-        row.styleComboBox.setItems(dancestyleRepository.findAll());
-        row.styleComboBox.setItemLabelGenerator(Dancestyle::name);
         row.styleComboBox.setValue(dancestyle);
-        row.roleSelect.setItems(roleRepository.findAll());
-        row.roleSelect.setItemLabelGenerator(Role::name);
         row.roleSelect.setValue(role);
-        row.roleSelect.setWidth("100px");
-        row.layout = new HorizontalLayout(row.styleComboBox, new NativeLabel("als"));
-        // what the dancer can do: a single skill; what the dancer searches for: sex + a min/max range
-        if (!canDo) {
-            row.sexComboBox = new ComboBox<>();
-            row.sexComboBox.setItems(SearchCriteriaSex.values());
-            row.sexComboBox.setItemLabelGenerator(sexOption -> getTranslation("sex." + sexOption.name().toLowerCase()));
-            row.sexComboBox.setValue(sex);
-            row.layout.add(row.sexComboBox);
+        row.layout.add(row.styleComboBox));
+        if (!aboutDancer) {
+            row.layout.add(new NativeLabel(t("form.role")));
+            row.searchCriteriaSexComboBox.setValue(sex);
+            row.layout.add(row.searchCriteriaSexComboBox);
         }
         row.layout.add(row.roleSelect);
-        row.skilllevelComboBox = createSkilllevelComboBox(skilllevel);
-        if (canDo) {
-            row.layout.add(new NativeLabel(getTranslation("form.skill")), row.skilllevelComboBox);
+        row.skilllevelComboBox.setValue(skilllevel);
+        if (aboutDancer) {
+            row.layout.add(new NativeLabel(t("form.skill")), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
         }
         else {
-            row.layout.add(new NativeLabel(getTranslation("form.skillFrom")), row.skilllevelComboBox);
+            row.layout.add(new NativeLabel(t("form.skillFrom")), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
-            row.skilllevelMaxComboBox = createSkilllevelComboBox(skilllevelMax);
-            row.layout.add(new NativeLabel(getTranslation("form.skillTo")), row.skilllevelMaxComboBox);
+            row.skilllevelMaxComboBox.setValue(skilllevelMax);
+            row.layout.add(new NativeLabel(t("form.skillTo")), row.skilllevelMaxComboBox);
             row.layout.setFlexGrow(1, row.skilllevelMaxComboBox);
         }
         Button removeButton = new Button(VaadinIcon.TRASH.create());
@@ -414,30 +403,16 @@ public class DancerForm extends VerticalLayout {
         layout.add(row.layout);
     }
 
-    private ComboBox<Skilllevel> createSkilllevelComboBox(Skilllevel skilllevel) {
-        ComboBox<Skilllevel> comboBox = new ComboBox<>();
-        comboBox.setItems(skilllevelRepository.findAllByOrderByLevelAsc());
-        comboBox.setItemLabelGenerator(sl -> getTranslation("skilllevel." + sl.code()));
-        // show the description as a tooltip when hovering over the unfolded options
-        comboBox.setRenderer(new ComponentRenderer<>(sl -> {
-            Span name = new Span(getTranslation("skilllevel." + sl.code()));
-            Tooltip tooltip = Tooltip.forComponent(name)
-                    .withText(getTranslation("skilllevel." + sl.code() + ".description"))
-                    .withHoverDelay(300);
-            tooltip.setPosition(Tooltip.TooltipPosition.END);
-            return name;
-        }));
-        comboBox.setValue(skilllevel);
-        return comboBox;
+    private class DancestyleRow {
+        private final DancestyleComboBox styleComboBox = new DancestyleComboBox(dancestyleRepository);
+        private final RoleSelect roleSelect = new RoleSelect(roleRepository);
+        private final SearchCriteriaSexComboBox searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
+        private final SkilllevelComboBox skilllevelComboBox = new SkilllevelComboBox(skilllevelRepository);
+        private final SkilllevelComboBox skilllevelMaxComboBox = new SkilllevelComboBox(skilllevelRepository);
+        private final HorizontalLayout layout = new HorizontalLayout();
     }
 
-    private class DancestyleRow {
-        private final ComboBox<Dancestyle> styleComboBox = new ComboBox<>();
-        private final Select<Role> roleSelect = new Select<>();
-        // sex and a min/max skill for searching rows; a single skill for can-do rows
-        private ComboBox<SearchCriteriaSex> sexComboBox;
-        private ComboBox<Skilllevel> skilllevelComboBox;
-        private ComboBox<Skilllevel> skilllevelMaxComboBox;
-        private HorizontalLayout layout;
+    private String t(String key, Object... params) {
+        return getTranslation(key, params);
     }
 }
