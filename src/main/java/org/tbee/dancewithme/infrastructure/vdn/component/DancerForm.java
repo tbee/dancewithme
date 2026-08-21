@@ -238,7 +238,7 @@ public class DancerForm extends VerticalLayout {
         privacyAgreementCheckbox.setLabel(t("privacy.text"));
         formLayout.add(privacyAgreementCheckbox);
 
-        return createCard(t("form.searchingFor"), formLayout);
+        return createCard(t("form.privacyAgreement.required"), formLayout);
     }
 
     private @NonNull Card createCard(String title, FormLayout formLayout) {
@@ -363,25 +363,27 @@ public class DancerForm extends VerticalLayout {
 
     private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
         DancestyleRow row = new DancestyleRow();
+        row.layout.setMargin(false);
+        row.layout.setPadding(false);
         row.styleComboBox.setValue(dancestyle);
         row.roleSelect.setValue(role);
-        row.layout.add(row.styleComboBox));
+        row.layout.add(row.styleComboBox);
         if (!aboutDancer) {
-            row.layout.add(new NativeLabel(t("form.role")));
+            row.layout.add(label("form.role"));
             row.searchCriteriaSexComboBox.setValue(sex);
             row.layout.add(row.searchCriteriaSexComboBox);
         }
         row.layout.add(row.roleSelect);
         row.skilllevelComboBox.setValue(skilllevel);
         if (aboutDancer) {
-            row.layout.add(new NativeLabel(t("form.skill")), row.skilllevelComboBox);
+            row.layout.add(label("form.skill"), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
         }
         else {
-            row.layout.add(new NativeLabel(t("form.skillFrom")), row.skilllevelComboBox);
+            row.layout.add(label("form.skillFrom"), row.skilllevelComboBox);
             row.layout.setFlexGrow(1, row.skilllevelComboBox);
             row.skilllevelMaxComboBox.setValue(skilllevelMax);
-            row.layout.add(new NativeLabel(t("form.skillTo")), row.skilllevelMaxComboBox);
+            row.layout.add(label("form.skillTo"), row.skilllevelMaxComboBox);
             row.layout.setFlexGrow(1, row.skilllevelMaxComboBox);
         }
         Button removeButton = new Button(VaadinIcon.TRASH.create());
@@ -410,6 +412,10 @@ public class DancerForm extends VerticalLayout {
         private final SkilllevelComboBox skilllevelComboBox = new SkilllevelComboBox(skilllevelRepository);
         private final SkilllevelComboBox skilllevelMaxComboBox = new SkilllevelComboBox(skilllevelRepository);
         private final HorizontalLayout layout = new HorizontalLayout();
+    }
+
+    private NativeLabel label(String key) {
+        return new NativeLabel(t("form.skill"));
     }
 
     private String t(String key, Object... params) {
