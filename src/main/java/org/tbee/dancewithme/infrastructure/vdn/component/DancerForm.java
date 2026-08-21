@@ -86,13 +86,13 @@ public class DancerForm extends VerticalLayout {
             .imageHeight("150px");
     private byte[] mugshotBytes;
 
-    private final VerticalLayout dancestylesLayout = new VerticalLayout();
+    private final VerticalLayout dancestylesLayout = noPaddingVerticalLayout();
     private final List<DancestyleRow> dancestyleRows = new ArrayList<>();
 
-    private final VerticalLayout searchingForLayout = new VerticalLayout();
+    private final VerticalLayout searchingForLayout = noPaddingVerticalLayout();
     private final List<DancestyleRow> searchingForRows = new ArrayList<>();
 
-    private final VerticalLayout photosLayout = new VerticalLayout();
+    private final VerticalLayout photosLayout = noPaddingVerticalLayout();
 
     public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository,
                       RoleRepository roleRepository, SkilllevelRepository skilllevelRepository) {
@@ -363,8 +363,6 @@ public class DancerForm extends VerticalLayout {
 
     private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
         DancestyleRow row = new DancestyleRow();
-        row.layout.setMargin(false);
-        row.layout.setPadding(false);
         row.styleComboBox.setValue(dancestyle);
         row.roleSelect.setValue(role);
         row.layout.add(row.styleComboBox);
@@ -397,9 +395,6 @@ public class DancerForm extends VerticalLayout {
         row.layout.add(removeButton);
         row.layout.setAlignItems(Alignment.CENTER);
         row.layout.setWidthFull();
-        row.layout.setMargin(false);
-        row.layout.setSpacing(true);
-        row.layout.setPadding(false);
         // the fields together can be wider than the card; allow them to wrap to a second line
         row.layout.getStyle().set("flex-wrap", "wrap");
         row.layout.getStyle().set("row-gap", "var(--lumo-space-s)");
@@ -413,7 +408,21 @@ public class DancerForm extends VerticalLayout {
         private final SearchCriteriaSexComboBox searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
         private final SkilllevelComboBox skilllevelComboBox = new SkilllevelComboBox(skilllevelRepository);
         private final SkilllevelComboBox skilllevelMaxComboBox = new SkilllevelComboBox(skilllevelRepository);
-        private final HorizontalLayout layout = new HorizontalLayout();
+        private final HorizontalLayout layout = noPaddingHorizontalLayout();
+    }
+
+    private static @NonNull VerticalLayout noPaddingVerticalLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+        layout.setMargin(false);
+        return layout;
+    }
+
+    private static @NonNull HorizontalLayout noPaddingHorizontalLayout() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setPadding(false);
+        layout.setMargin(false);
+        return layout;
     }
 
     private NativeLabel label(String key) {
