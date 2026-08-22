@@ -9,4 +9,8 @@ public enum SearchCriteriaSex { MALE, FEMALE, EITHER;
             case EITHER -> true;
         };
     }
+
+    public String translationKey() {
+        return "sex." + name().toLowerCase();
+    }
 }

@@ -18,7 +18,7 @@ public class SkilllevelComboBox extends ComboBox<Skilllevel> {
         setRenderer(new ComponentRenderer<>(sl -> {
             Span name = new Span(label(sl));
             Tooltip tooltip = Tooltip.forComponent(name)
-                    .withText(getTranslation("skilllevel." + sl.code() + ".description"))
+                    .withText(getTranslation(sl.translationKeyDescription()))
                     .withHoverDelay(300);
             tooltip.setPosition(Tooltip.TooltipPosition.END);
             return name;
@@ -26,7 +26,7 @@ public class SkilllevelComboBox extends ComboBox<Skilllevel> {
     }
 
     private @NonNull String label(Skilllevel sl) {
-        return sl.level() + " - " + getTranslation("skilllevel." + sl.code());
+        return sl.level() + " - " + getTranslation(sl.translationKey());
     }
 
     public SkilllevelComboBox withValue(Skilllevel v) {

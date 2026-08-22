@@ -35,6 +35,14 @@ public class Skilllevel extends BaseEntity<Skilllevel> {
         return this;
     }
 
+    public String translationKey() {
+        return  "skilllevel." + code();
+    }
+
+    public String translationKeyDescription() {
+        return  "skilllevel." + code() + ".description";
+    }
+
     @Override
     public String toString() {
         return super.toString() + ", code=" + code;

@@ -18,6 +18,10 @@ public class Role extends BaseEntity<Role> {
         return this;
     }
 
+    public String translationKey() {
+        return "role." + name().toLowerCase();
+    }
+
     @Override
     public String toString() {
         return super.toString() + ", name=" + name;

@@ -8,7 +8,7 @@ public class SexComboBox extends ComboBox<Sex> {
 
     public SexComboBox() {
         setItems(Sex.values());
-        setItemLabelGenerator(sex -> getTranslation("sex." + sex.name().toLowerCase()));
+        setItemLabelGenerator(sex -> getTranslation(sex.translationKey()));
     }
 
     public SexComboBox withValue(Sex v) {

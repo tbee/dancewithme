@@ -8,7 +8,7 @@ public class RoleSelect extends Select<Role> {
 
     public RoleSelect(RoleRepository roleRepository) {
         setItems(roleRepository.findAll());
-        setItemLabelGenerator(role -> getTranslation("role." + role.name().toLowerCase()));
+        setItemLabelGenerator(role -> getTranslation(role.translationKey()));
         setWidth("100px");
     }
 

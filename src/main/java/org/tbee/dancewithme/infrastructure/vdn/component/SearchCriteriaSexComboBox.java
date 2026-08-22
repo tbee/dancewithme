@@ -7,7 +7,7 @@ public class SearchCriteriaSexComboBox extends ComboBox<SearchCriteriaSex> {
 
     public SearchCriteriaSexComboBox() {
         setItems(SearchCriteriaSex.values());
-        setItemLabelGenerator(sexOption -> getTranslation("sex." + sexOption.name().toLowerCase()));
+        setItemLabelGenerator(sexOption -> getTranslation(sexOption.translationKey()));
         setWidth("150px");
     }
 
