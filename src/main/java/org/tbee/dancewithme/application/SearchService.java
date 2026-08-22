@@ -1,7 +1,6 @@
 package org.tbee.dancewithme.application;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
@@ -49,7 +48,6 @@ public class SearchService {
         this.securityService = securityService;
     }
 
-    @Transactional(readOnly = true)
     public List<SearchResult> search(SearchParameters criteria) {
         boolean loggedIn = securityService.currentDancer().isPresent();
         List<Dancer> candidates = loggedIn
@@ -58,14 +56,12 @@ public class SearchService {
         return match(criteria, candidates);
     }
 
-    @Transactional(readOnly = true)
     public List<SearchResult> match(SearchParameters criteria, List<Dancer> candidates) {
         Dancer currentDancer = securityService.currentDancer().orElse(null);
         boolean loggedIn = (currentDancer != null);
 
         int currentYear = Year.now().getValue();
-        // re-attach the current dancer within this transaction, so the lazy city can be loaded
-        City fromCity = loggedIn ? dancerRepository.findById(currentDancer.id()).orElseThrow().city() : null;
+        City fromCity = loggedIn ? currentDancer.city() : null;
 
         return candidates.stream()
                 // never include the searching dancer itself
@@ -84,19 +80,6 @@ public class SearchService {
                 .map(dancer -> new SearchResult(dancer, distanceKm(fromCity, dancer.city())))
                 .filter(result -> !loggedIn || result.distanceKm() == null || result.distanceKm() <= criteria.distanceMax())
                 .sorted(Comparator.comparing(SearchResult::distanceKm, Comparator.nullsLast(Comparator.naturalOrder())))
-                // initialize the lazy relations needed by the views (open-in-view is disabled)
-                .peek(result -> {
-                    Dancer dancer = result.dancer();
-                    dancer.whoami();
-                    dancer.mugshot();
-                    if (dancer.city() != null) {
-                        dancer.city().name();
-                    }
-                    dancer.dancestyles().forEach(dd -> {
-                        dd.dancestyle().name();
-                        dd.role().name();
-                    });
-                })
                 .toList();
     }
 

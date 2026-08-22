@@ -33,39 +33,12 @@ public class DancerService {
         return dancerRepository.save(dancer);
     }
 
-    @Transactional(readOnly = true)
     public List<DancerSearchingFor> searchingForOf(long dancerId) {
         Dancer dancer = dancerRepository.findById(dancerId).orElseThrow();
-        // initialize the lazy relations needed by the views (open-in-view is disabled)
-        dancer.searchingFor().forEach(entry -> {
-            entry.dancestyle().name();
-            entry.role().name();
-            entry.skilllevelMin().code();
-            entry.skilllevelMax().code();
-        });
         return dancer.searchingFor();
     }
 
-    @Transactional(readOnly = true)
     public Dancer loadWithDetails(long id) {
-        Dancer dancer = dancerRepository.findById(id).orElseThrow();
-        // initialize the lazy relations needed by the views (open-in-view is disabled)
-        if (dancer.city() != null) {
-            dancer.city().name();
-        }
-        dancer.mugshot();
-        dancer.dancestyles().forEach(dancerDancestyle -> {
-            dancerDancestyle.dancestyle().name();
-            dancerDancestyle.role().name();
-            dancerDancestyle.skilllevel().code();
-        });
-        dancer.searchingFor().forEach(entry -> {
-            entry.dancestyle().name();
-            entry.role().name();
-            entry.skilllevelMin().code();
-            entry.skilllevelMax().code();
-        });
-        dancer.photos().forEach(photo -> photo.image());
-        return dancer;
+        return dancerRepository.findById(id).orElseThrow();
     }
 }

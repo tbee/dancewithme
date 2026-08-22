@@ -83,9 +83,7 @@ public class SearchView extends DancewithmeAppLayout {
         // style rows: dancestyle, role, skill range (same structure as the profile's "searching for")
         // prefill with what the logged in dancer is searching for (can still be fiddled with)
         Dancer currentDancer = securityService.currentDancer().orElse(null);
-        List<DancerSearchingFor> searchingFor = securityService.currentDancer()
-                .map(cd -> dancerService.searchingForOf(cd.id()))
-                .orElse(List.of());
+        List<DancerSearchingFor> searchingFor = (currentDancer == null ? List.of() : currentDancer.searchingFor());
         if (searchingFor.isEmpty()) {
             addStyleRow(null, null, null, null, null);
         }

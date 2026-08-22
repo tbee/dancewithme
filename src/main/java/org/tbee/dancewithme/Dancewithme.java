@@ -19,7 +19,7 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 @SpringBootApplication
-@EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class)
+@EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class, enableDefaultTransactions = false)
 @StyleSheet(Lumo.STYLESHEET)
 public class Dancewithme implements AppShellConfigurator {
     private static final Logger LOG = LoggerFactory.getLogger(Dancewithme.class);
