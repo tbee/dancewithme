@@ -279,6 +279,7 @@ public class DancerForm extends VerticalLayout {
      */
     public Dancer validateAndGetDancer() {
         if (!binder.validate().isOk()) {
+            DancewithmeAppLayout.showErrorNotification(t("form.validationFailed"));
             return null;
         }
 
@@ -363,10 +364,11 @@ public class DancerForm extends VerticalLayout {
                 case DUPLICATE_SEARCHING_FOR -> markDuplicateDancestyles(searchingForRows, "form.searchingFor.duplicate");
             }
         }
+        DancewithmeAppLayout.showErrorNotification(t("form.validationFailed"));
     }
 
     /**
-     * Marks the duplicate dancestyle rows invalid and shows a toast. The detection itself is
+     * Marks the duplicate dancestyle rows invalid. The detection itself is
      * done in {@link ValidateDancer}; this method only renders the outcome on the UI.
      */
     private void markDuplicateDancestyles(List<SearchingForRow> rows, String errorKey) {
@@ -378,7 +380,6 @@ public class DancerForm extends VerticalLayout {
                 row.styleComboBox.setErrorMessage(t(errorKey));
             }
         }
-        DancewithmeAppLayout.showErrorNotification(t(errorKey));
     }
 
     public String rawPassword() {
