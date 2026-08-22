@@ -33,13 +33,16 @@ import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
+import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.webstack.vdn.component.ImageUpload;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Year;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Form used by both the registration view and the profile view.
@@ -289,6 +292,12 @@ public class DancerForm extends VerticalLayout {
             }
         }
 
+        // reject duplicate dancestyles; each dancestyle can only be listed once
+        if (hasDuplicateDancestyle(dancestyleRows, "form.dancestyles.duplicate")
+                || hasDuplicateDancestyle(searchingForRows, "form.searchingFor.duplicate")) {
+            return null;
+        }
+
         // apply mugshot
         if (mugshotUpload.hasUpload()) {
             try (InputStream inputStream = mugshotUpload.inputStream()) {
@@ -342,6 +351,27 @@ public class DancerForm extends VerticalLayout {
                 .toList();
         dancer.searchingFor(searchingFor);
         return dancer;
+    }
+
+    /**
+     * Checks the given rows for duplicate dancestyles. Each dancestyle may only be listed once;
+     * duplicates would otherwise hit a database unique constraint. Marks the offending rows invalid.
+     */
+    private boolean hasDuplicateDancestyle(List<SearchingForRow> rows, String errorKey) {
+        Set<Dancestyle> seen = new HashSet<>();
+        boolean duplicate = false;
+        for (SearchingForRow row : rows) {
+            Dancestyle style = row.style();
+            if (style != null && !seen.add(style)) {
+                row.styleComboBox.setInvalid(true);
+                row.styleComboBox.setErrorMessage(t(errorKey));
+                duplicate = true;
+            }
+        }
+        if (duplicate) {
+            DancewithmeAppLayout.showErrorNotification(t(errorKey));
+        }
+        return duplicate;
     }
 
     public String rawPassword() {

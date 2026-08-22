@@ -103,7 +103,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		showErrorNotification(e.getMessage());
 	}
 
-	private static void showErrorNotification(String message) {
+	public static void showErrorNotification(String message) {
 		Notification notification = Notification.show(message, 5000, Notification.Position.BOTTOM_CENTER);
 		notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
 	}
