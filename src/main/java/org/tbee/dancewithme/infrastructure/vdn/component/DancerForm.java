@@ -9,12 +9,9 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.NativeLabel;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -22,7 +19,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.server.streams.UploadHandler;
 import org.jspecify.annotations.NonNull;
@@ -33,7 +29,6 @@ import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
-import org.tbee.dancewithme.domain.valueobject.Sex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
@@ -87,10 +82,10 @@ public class DancerForm extends VerticalLayout {
     private byte[] mugshotBytes;
 
     private final VerticalLayout dancestylesLayout = noPaddingVerticalLayout();
-    private final List<DancestyleRow> dancestyleRows = new ArrayList<>();
+    private final List<SearchingForDancestyleRow> dancestyleRows = new ArrayList<>();
 
     private final VerticalLayout searchingForLayout = noPaddingVerticalLayout();
-    private final List<DancestyleRow> searchingForRows = new ArrayList<>();
+    private final List<SearchingForDancestyleRow> searchingForRows = new ArrayList<>();
 
     private final VerticalLayout photosLayout = noPaddingVerticalLayout();
 
@@ -306,20 +301,20 @@ public class DancerForm extends VerticalLayout {
         dancer.mugshot(mugshotBytes);
         // reuse existing entries (matched by dancestyle) so a merge does not insert duplicates of existing rows
         List<DancerDancestyle> dancestyles = dancestyleRows.stream()
-                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null && row.skilllevelComboBox.getValue() != null)
+                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null && row.skilllevelMinComboBox.getValue() != null)
                 .map(row -> {
                     DancerDancestyle dd = dancer.dancestyles().stream()
                             .filter(existing -> existing.dancestyle().equals(row.styleComboBox.getValue()))
                             .findFirst()
                             .orElseGet(() -> new DancerDancestyle().dancestyle(row.styleComboBox.getValue()));
-                    return dd.role(row.roleSelect.getValue()).skilllevel(row.skilllevelComboBox.getValue());
+                    return dd.role(row.roleSelect.getValue()).skilllevel(row.skilllevelMinComboBox.getValue());
                 })
                 .toList();
         dancer.dancestyles(dancestyles);
         List<DancerSearchingFor> searchingFor = searchingForRows.stream()
                 .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null
                         && row.searchCriteriaSexComboBox.getValue() != null
-                        && row.skilllevelComboBox.getValue() != null && row.skilllevelMaxComboBox.getValue() != null)
+                        && row.skilllevelMinComboBox.getValue() != null && row.skilllevelMaxComboBox.getValue() != null)
                 .map(row -> {
                     DancerSearchingFor sf = dancer.searchingFor().stream()
                             .filter(existing -> existing.dancestyle().equals(row.styleComboBox.getValue()))
@@ -327,7 +322,7 @@ public class DancerForm extends VerticalLayout {
                             .orElseGet(() -> new DancerSearchingFor().dancestyle(row.styleComboBox.getValue()));
                     return sf.role(row.roleSelect.getValue())
                             .sex(row.searchCriteriaSexComboBox.getValue())
-                            .skilllevelMin(row.skilllevelComboBox.getValue())
+                            .skilllevelMin(row.skilllevelMinComboBox.getValue())
                             .skilllevelMax(row.skilllevelMaxComboBox.getValue());
                 })
                 .toList();
@@ -361,54 +356,28 @@ public class DancerForm extends VerticalLayout {
         photosLayout.add(row);
     }
 
-    private void addDancestyleRow(List<DancestyleRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
-        DancestyleRow row = new DancestyleRow();
+    private void addDancestyleRow(List<SearchingForDancestyleRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
+        SearchingForDancestyleRow row;
+        if (aboutDancer) {
+            row = new DancerDancestyleRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
+                rows.remove(r);
+                layout.remove(r);
+            });
+            layout.add(row);
+        }
+        else {
+            row = new SearchingForDancestyleRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
+                rows.remove(r);
+                layout.remove(r);
+            });
+            layout.add(row);
+            rows.add(row);
+        }
+        row.searchCriteriaSexComboBox.setValue(sex);
+        row.skilllevelMaxComboBox.setValue(skilllevelMax);
         row.styleComboBox.setValue(dancestyle);
         row.roleSelect.setValue(role);
-        row.layout.add(row.styleComboBox);
-        if (!aboutDancer) {
-            row.searchCriteriaSexComboBox.setValue(sex);
-            row.layout.add(row.searchCriteriaSexComboBox);
-        }
-        else {
-            row.layout.add(label("form.role"));
-        }
-        row.layout.add(row.roleSelect);
-        row.skilllevelComboBox.setValue(skilllevel);
-        if (aboutDancer) {
-            row.layout.add(label("form.skill"), row.skilllevelComboBox);
-            row.layout.setFlexGrow(1, row.skilllevelComboBox);
-        }
-        else {
-            row.layout.add(label("form.skillFrom"), row.skilllevelComboBox);
-            row.layout.setFlexGrow(1, row.skilllevelComboBox);
-            row.skilllevelMaxComboBox.setValue(skilllevelMax);
-            row.layout.add(label("form.skillTo"), row.skilllevelMaxComboBox);
-            row.layout.setFlexGrow(1, row.skilllevelMaxComboBox);
-        }
-        Button removeButton = new Button(VaadinIcon.TRASH.create());
-        removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-        removeButton.addClickListener(e -> {
-            rows.remove(row);
-            layout.remove(row.layout);
-        });
-        row.layout.add(removeButton);
-        row.layout.setAlignItems(Alignment.CENTER);
-        row.layout.setWidthFull();
-        // the fields together can be wider than the card; allow them to wrap to a second line
-        row.layout.getStyle().set("flex-wrap", "wrap");
-        row.layout.getStyle().set("row-gap", "var(--lumo-space-s)");
-        rows.add(row);
-        layout.add(row.layout);
-    }
-
-    private class DancestyleRow {
-        private final DancestyleComboBox styleComboBox = new DancestyleComboBox(dancestyleRepository);
-        private final RoleSelect roleSelect = new RoleSelect(roleRepository);
-        private final SearchCriteriaSexComboBox searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
-        private final SkilllevelComboBox skilllevelComboBox = new SkilllevelComboBox(skilllevelRepository);
-        private final SkilllevelComboBox skilllevelMaxComboBox = new SkilllevelComboBox(skilllevelRepository);
-        private final HorizontalLayout layout = noPaddingHorizontalLayout();
+        row.skilllevelMinComboBox.setValue(skilllevel);
     }
 
     private static @NonNull VerticalLayout noPaddingVerticalLayout() {
@@ -416,17 +385,6 @@ public class DancerForm extends VerticalLayout {
         layout.setPadding(false);
         layout.setMargin(false);
         return layout;
-    }
-
-    private static @NonNull HorizontalLayout noPaddingHorizontalLayout() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setPadding(false);
-        layout.setMargin(false);
-        return layout;
-    }
-
-    private NativeLabel label(String key) {
-        return new NativeLabel(t(key));
     }
 
     private String t(String key, Object... params) {

@@ -10,6 +10,7 @@ public class DancestyleComboBox extends ComboBox<Dancestyle> {
     public DancestyleComboBox(DancestyleRepository dancestyleRepository) {
         setItems(dancestyleRepository.findAll());
         setItemLabelGenerator(Dancestyle::name);
+        setPlaceholder(getTranslation("search.dancestyle.placeholder"));
     }
 
     public DancestyleComboBox withValue(Dancestyle v) {
