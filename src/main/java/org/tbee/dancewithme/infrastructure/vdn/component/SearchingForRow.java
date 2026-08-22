@@ -17,7 +17,7 @@ import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 
 import java.util.function.Consumer;
 
-public class SearchingForDancestyleRow extends HorizontalLayout {
+public class SearchingForRow extends HorizontalLayout {
     protected final DancestyleComboBox styleComboBox;
     protected final RoleSelect roleSelect;
     protected final SearchCriteriaSexComboBox searchCriteriaSexComboBox;
@@ -25,7 +25,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
     protected final SkilllevelComboBox skilllevelMaxComboBox;
     protected final Button removeButton;
 
-    public SearchingForDancestyleRow(DancestyleRepository dancestyleRepository, RoleRepository roleRepository, SkilllevelRepository skilllevelRepository, Consumer<SearchingForDancestyleRow> removeButtonConsumer) {
+    public SearchingForRow(DancestyleRepository dancestyleRepository, RoleRepository roleRepository, SkilllevelRepository skilllevelRepository, Consumer<SearchingForRow> removeButtonConsumer) {
         styleComboBox = new DancestyleComboBox(dancestyleRepository);
         roleSelect = new RoleSelect(roleRepository);
         searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
@@ -58,7 +58,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
         getStyle().set("row-gap", "var(--lumo-space-s)");
     }
 
-    private @NonNull Button removeButton(Consumer<SearchingForDancestyleRow> consumer) {
+    private @NonNull Button removeButton(Consumer<SearchingForRow> consumer) {
         Button removeButton = new Button(VaadinIcon.TRASH.create());
         removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         removeButton.addClickListener(t -> consumer.accept(this));
@@ -68,7 +68,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
     public Dancestyle style() {
         return styleComboBox.getValue();
     }
-    public SearchingForDancestyleRow style(Dancestyle v) {
+    public SearchingForRow style(Dancestyle v) {
         styleComboBox.setValue(v);
         return this;
     }
@@ -76,7 +76,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
     public Role role() {
         return roleSelect.getValue();
     }
-    public SearchingForDancestyleRow role(Role v) {
+    public SearchingForRow role(Role v) {
         roleSelect.setValue(v);
         return this;
     }
@@ -84,7 +84,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
     public SearchCriteriaSex sex() {
         return searchCriteriaSexComboBox.getValue();
     }
-    public SearchingForDancestyleRow sex(SearchCriteriaSex v) {
+    public SearchingForRow sex(SearchCriteriaSex v) {
         searchCriteriaSexComboBox.setValue(v);
         return this;
     }
@@ -92,7 +92,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
     public Skilllevel skilllevelMin() {
         return skilllevelMinComboBox.getValue();
     }
-    public SearchingForDancestyleRow skilllevelMin(Skilllevel v) {
+    public SearchingForRow skilllevelMin(Skilllevel v) {
         skilllevelMinComboBox.setValue(v);
         return this;
     }
@@ -100,7 +100,7 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
     public Skilllevel skilllevelMax() {
         return skilllevelMaxComboBox.getValue();
     }
-    public SearchingForDancestyleRow skilllevelMax(Skilllevel v) {
+    public SearchingForRow skilllevelMax(Skilllevel v) {
         skilllevelMaxComboBox.setValue(v);
         return this;
     }

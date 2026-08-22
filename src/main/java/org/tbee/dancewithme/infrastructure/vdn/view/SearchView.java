@@ -8,7 +8,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -33,11 +32,7 @@ import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
-import org.tbee.dancewithme.infrastructure.vdn.component.DancestyleComboBox;
-import org.tbee.dancewithme.infrastructure.vdn.component.RoleSelect;
-import org.tbee.dancewithme.infrastructure.vdn.component.SearchCriteriaSexComboBox;
-import org.tbee.dancewithme.infrastructure.vdn.component.SearchingForDancestyleRow;
-import org.tbee.dancewithme.infrastructure.vdn.component.SkilllevelComboBox;
+import org.tbee.dancewithme.infrastructure.vdn.component.SearchingForRow;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.time.Year;
@@ -54,7 +49,7 @@ public class SearchView extends DancewithmeAppLayout {
     private final SearchService searchService;
 
     private final VerticalLayout styleRowsLayout = new VerticalLayout();
-    private final List<SearchingForDancestyleRow> styleRows = new ArrayList<>();
+    private final List<SearchingForRow> styleRows = new ArrayList<>();
     private final IntegerField ageDistanceField = new IntegerField();
     private final IntegerField weekFrequencyMinField = new IntegerField();
     private final IntegerField weekFrequencyMaxField = new IntegerField();
@@ -142,7 +137,7 @@ public class SearchView extends DancewithmeAppLayout {
     }
 
     private void addStyleRow(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
-        SearchingForDancestyleRow row = new SearchingForDancestyleRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
+        SearchingForRow row = new SearchingForRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
             styleRows.remove(r);
             styleRowsLayout.remove(r);
         });

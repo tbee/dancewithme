@@ -8,7 +8,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H5;
 import com.vaadin.flow.component.html.Image;
-import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -82,10 +81,10 @@ public class DancerForm extends VerticalLayout {
     private byte[] mugshotBytes;
 
     private final VerticalLayout dancestylesLayout = noPaddingVerticalLayout();
-    private final List<SearchingForDancestyleRow> dancestyleRows = new ArrayList<>();
+    private final List<SearchingForRow> dancestyleRows = new ArrayList<>();
 
     private final VerticalLayout searchingForLayout = noPaddingVerticalLayout();
-    private final List<SearchingForDancestyleRow> searchingForRows = new ArrayList<>();
+    private final List<SearchingForRow> searchingForRows = new ArrayList<>();
 
     private final VerticalLayout photosLayout = noPaddingVerticalLayout();
 
@@ -289,7 +288,8 @@ public class DancerForm extends VerticalLayout {
                 return null;
             }
         }
-        // apply mugshot and dancestyles
+
+        // apply mugshot
         if (mugshotUpload.hasUpload()) {
             try (InputStream inputStream = mugshotUpload.inputStream()) {
                 mugshotBytes = inputStream.readAllBytes();
@@ -299,6 +299,8 @@ public class DancerForm extends VerticalLayout {
             }
         }
         dancer.mugshot(mugshotBytes);
+
+        // dancestyles
         // reuse existing entries (matched by dancestyle) so a merge does not insert duplicates of existing rows
         List<DancerDancestyle> dancestyles = dancestyleRows.stream()
                 .filter(row -> row.style() != null
@@ -316,6 +318,9 @@ public class DancerForm extends VerticalLayout {
                 })
                 .toList();
         dancer.dancestyles(dancestyles);
+
+        // searchingFor
+        // reuse existing entries (matched by dancestyle) so a merge does not insert duplicates of existing rows
         List<DancerSearchingFor> searchingFor = searchingForRows.stream()
                 .filter(row -> row.style() != null
                         && row.role() != null
@@ -365,16 +370,16 @@ public class DancerForm extends VerticalLayout {
         photosLayout.add(row);
     }
 
-    private void addDancestyleRow(List<SearchingForDancestyleRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
-        SearchingForDancestyleRow row;
+    private void addDancestyleRow(List<SearchingForRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
+        SearchingForRow row;
         if (aboutDancer) {
-            row = new DancerDancestyleRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
+            row = new DancestyleRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
                 rows.remove(r);
                 layout.remove(r);
             });
         }
         else {
-            row = new SearchingForDancestyleRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
+            row = new SearchingForRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
                 rows.remove(r);
                 layout.remove(r);
             });
