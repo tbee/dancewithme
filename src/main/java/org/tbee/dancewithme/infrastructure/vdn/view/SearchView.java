@@ -146,11 +146,11 @@ public class SearchView extends DancewithmeAppLayout {
             styleRows.remove(r);
             styleRowsLayout.remove(r);
         });
-        row.styleComboBox.setValue(dancestyle);
-        row.searchCriteriaSexComboBox.setValue(sex);
-        row.roleSelect.setValue(role);
-        row.skilllevelMinComboBox.setValue(skilllevelMin);
-        row.skilllevelMaxComboBox.setValue(skilllevelMax);
+        row.style(dancestyle);
+        row.sex(sex);
+        row.role(role);
+        row.skilllevelMin(skilllevelMin);
+        row.skilllevelMax(skilllevelMax);
 
         styleRows.add(row);
         styleRowsLayout.add(row);
@@ -181,32 +181,32 @@ public class SearchView extends DancewithmeAppLayout {
             @Override
             public List<? extends SearchService.SearchParametersStyles> searchingFor() {
                 return styleRows.stream()
-                        .filter(row -> row.styleComboBox.getValue() != null)
+                        .filter(row -> row.style() != null)
                         .map(row -> new SearchService.SearchParametersStyles(){
 
                             @Override
                             public Dancestyle dancestyle() {
-                                return row.styleComboBox.getValue();
+                                return row.style();
                             }
 
                             @Override
                             public Role role() {
-                                return row.roleSelect.getValue();
+                                return row.role();
                             }
 
                             @Override
                             public SearchCriteriaSex sex() {
-                                return row.searchCriteriaSexComboBox.getValue();
+                                return row.sex();
                             }
 
                             @Override
                             public Skilllevel skilllevelMin() {
-                                return row.skilllevelMinComboBox.getValue();
+                                return row.skilllevelMin();
                             }
 
                             @Override
                             public Skilllevel skilllevelMax() {
-                                return row.skilllevelMaxComboBox.getValue();
+                                return row.skilllevelMax();
                             }
                         })
                         .toList();

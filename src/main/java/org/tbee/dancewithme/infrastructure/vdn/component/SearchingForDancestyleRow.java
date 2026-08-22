@@ -1,6 +1,5 @@
 package org.tbee.dancewithme.infrastructure.vdn.component;
 
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -8,19 +7,23 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.jspecify.annotations.NonNull;
+import org.tbee.dancewithme.domain.Dancestyle;
+import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 
 import java.util.function.Consumer;
 
 public class SearchingForDancestyleRow extends HorizontalLayout {
-    public final DancestyleComboBox styleComboBox;
-    public final RoleSelect roleSelect;
-    public final SearchCriteriaSexComboBox searchCriteriaSexComboBox;
-    public final SkilllevelComboBox skilllevelMinComboBox;
-    public final SkilllevelComboBox skilllevelMaxComboBox;
-    public final Button removeButton;
+    protected final DancestyleComboBox styleComboBox;
+    protected final RoleSelect roleSelect;
+    protected final SearchCriteriaSexComboBox searchCriteriaSexComboBox;
+    protected final SkilllevelComboBox skilllevelMinComboBox;
+    protected final SkilllevelComboBox skilllevelMaxComboBox;
+    protected final Button removeButton;
 
     public SearchingForDancestyleRow(DancestyleRepository dancestyleRepository, RoleRepository roleRepository, SkilllevelRepository skilllevelRepository, Consumer<SearchingForDancestyleRow> removeButtonConsumer) {
         styleComboBox = new DancestyleComboBox(dancestyleRepository);
@@ -60,5 +63,45 @@ public class SearchingForDancestyleRow extends HorizontalLayout {
         removeButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
         removeButton.addClickListener(t -> consumer.accept(this));
         return removeButton;
+    }
+
+    public Dancestyle style() {
+        return styleComboBox.getValue();
+    }
+    public SearchingForDancestyleRow style(Dancestyle v) {
+        styleComboBox.setValue(v);
+        return this;
+    }
+
+    public Role role() {
+        return roleSelect.getValue();
+    }
+    public SearchingForDancestyleRow role(Role v) {
+        roleSelect.setValue(v);
+        return this;
+    }
+
+    public SearchCriteriaSex sex() {
+        return searchCriteriaSexComboBox.getValue();
+    }
+    public SearchingForDancestyleRow sex(SearchCriteriaSex v) {
+        searchCriteriaSexComboBox.setValue(v);
+        return this;
+    }
+
+    public Skilllevel skilllevelMin() {
+        return skilllevelMinComboBox.getValue();
+    }
+    public SearchingForDancestyleRow skilllevelMin(Skilllevel v) {
+        skilllevelMinComboBox.setValue(v);
+        return this;
+    }
+
+    public Skilllevel skilllevelMax() {
+        return skilllevelMaxComboBox.getValue();
+    }
+    public SearchingForDancestyleRow skilllevelMax(Skilllevel v) {
+        skilllevelMaxComboBox.setValue(v);
+        return this;
     }
 }
