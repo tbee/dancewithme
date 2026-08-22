@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.jetbrains.annotations.NotNull;
@@ -63,6 +64,7 @@ public class BaseEntity<T> implements Comparable<BaseEntity<T>> {
 
     @Override
     public int hashCode() {
+        long id = id();
         if (id == 0) {
             return System.identityHashCode(this);
         }
@@ -73,12 +75,14 @@ public class BaseEntity<T> implements Comparable<BaseEntity<T>> {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
-        BaseEntity other = (BaseEntity) obj;
-        if (id == 0) {
-            return System.identityHashCode(this) == System.identityHashCode(obj);
+        if (Hibernate.getClass(this) != Hibernate.getClass(obj)) return false;
+        BaseEntity<T> other = (BaseEntity<T>) obj;
+        long thisId = id();
+        long otherId = other.id();
+        if (thisId == 0 || otherId == 0) {
+            return false;
         }
-        return id == other.id;
+        return thisId == otherId;
     }
 
     @Override
