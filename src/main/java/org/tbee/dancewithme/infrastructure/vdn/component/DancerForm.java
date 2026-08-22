@@ -33,6 +33,7 @@ import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
+import org.tbee.dancewithme.domain.service.ValidateDancer;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.webstack.vdn.component.ImageUpload;
 
@@ -57,6 +58,7 @@ public class DancerForm extends VerticalLayout {
     private final DancestyleRepository dancestyleRepository;
     private final RoleRepository roleRepository;
     private final SkilllevelRepository skilllevelRepository;
+    private final ValidateDancer validateDancer = new ValidateDancer();
 
     private final Binder<Dancer> binder = new Binder<>(Dancer.class);
     private Dancer dancer;
@@ -279,24 +281,6 @@ public class DancerForm extends VerticalLayout {
         if (!binder.validate().isOk()) {
             return null;
         }
-        if (mode == Mode.REGISTER) {
-            if (passwordField.getValue().length() < 8) {
-                passwordField.setInvalid(true);
-                passwordField.setErrorMessage(t("form.passwordTooShort"));
-                return null;
-            }
-            if (!privacyAgreementCheckbox.getValue()) {
-                privacyAgreementCheckbox.setInvalid(true);
-                privacyAgreementCheckbox.setErrorMessage(t("form.privacyAgreement.required"));
-                return null;
-            }
-        }
-
-        // reject duplicate dancestyles; each dancestyle can only be listed once
-        if (hasDuplicateDancestyle(dancestyleRows, "form.dancestyles.duplicate")
-                || hasDuplicateDancestyle(searchingForRows, "form.searchingFor.duplicate")) {
-            return null;
-        }
 
         // apply mugshot
         if (mugshotUpload.hasUpload()) {
@@ -350,28 +334,51 @@ public class DancerForm extends VerticalLayout {
                 })
                 .toList();
         dancer.searchingFor(searchingFor);
+
+        // domain validation
+        String rawPassword = (mode == Mode.REGISTER) ? passwordField.getValue() : null;
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, rawPassword, privacyAgreementCheckbox.getValue());
+        if (!problems.isEmpty()) {
+            showValidationProblems(problems);
+            return null;
+        }
         return dancer;
     }
 
     /**
-     * Checks the given rows for duplicate dancestyles. Each dancestyle may only be listed once;
-     * duplicates would otherwise hit a database unique constraint. Marks the offending rows invalid.
+     * Translates the domain validation problems to UI feedback (field errors and a toast).
      */
-    private boolean hasDuplicateDancestyle(List<SearchingForRow> rows, String errorKey) {
+    private void showValidationProblems(List<ValidateDancer.Problem> problems) {
+        for (ValidateDancer.Problem problem : problems) {
+            switch (problem) {
+                case PASSWORD_TOO_SHORT -> {
+                    passwordField.setInvalid(true);
+                    passwordField.setErrorMessage(t("form.passwordTooShort"));
+                }
+                case PRIVACY_AGREEMENT_REQUIRED -> {
+                    privacyAgreementCheckbox.setInvalid(true);
+                    privacyAgreementCheckbox.setErrorMessage(t("form.privacyAgreement.required"));
+                }
+                case DUPLICATE_DANCESTYLE -> markDuplicateDancestyles(dancestyleRows, "form.dancestyles.duplicate");
+                case DUPLICATE_SEARCHING_FOR -> markDuplicateDancestyles(searchingForRows, "form.searchingFor.duplicate");
+            }
+        }
+    }
+
+    /**
+     * Marks the duplicate dancestyle rows invalid and shows a toast. The detection itself is
+     * done in {@link ValidateDancer}; this method only renders the outcome on the UI.
+     */
+    private void markDuplicateDancestyles(List<SearchingForRow> rows, String errorKey) {
         Set<Dancestyle> seen = new HashSet<>();
-        boolean duplicate = false;
         for (SearchingForRow row : rows) {
             Dancestyle style = row.style();
             if (style != null && !seen.add(style)) {
                 row.styleComboBox.setInvalid(true);
                 row.styleComboBox.setErrorMessage(t(errorKey));
-                duplicate = true;
             }
         }
-        if (duplicate) {
-            DancewithmeAppLayout.showErrorNotification(t(errorKey));
-        }
-        return duplicate;
+        DancewithmeAppLayout.showErrorNotification(t(errorKey));
     }
 
     public String rawPassword() {
