@@ -28,4 +28,9 @@ public class Country extends BaseEntity<Country> {
         this.iso = iso;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", iso=" + iso;
+    }
 }

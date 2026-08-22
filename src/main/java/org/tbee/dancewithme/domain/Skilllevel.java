@@ -34,4 +34,9 @@ public class Skilllevel extends BaseEntity<Skilllevel> {
         this.level = level;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", code=" + code;
+    }
 }

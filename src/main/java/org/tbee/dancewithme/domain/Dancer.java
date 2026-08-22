@@ -262,4 +262,9 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
         photos.add(photo);
         return photo;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", email=" + email;
+    }
 }

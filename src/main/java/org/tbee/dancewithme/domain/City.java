@@ -63,4 +63,9 @@ public class City extends BaseEntity<City> {
         this.lon = lon;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", name=" + name;
+    }
 }

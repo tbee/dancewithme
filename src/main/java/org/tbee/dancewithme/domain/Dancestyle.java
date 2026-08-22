@@ -27,4 +27,9 @@ public class Dancestyle extends BaseEntity<Dancestyle> {
         this.description = description;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", name=" + name;
+    }
 }

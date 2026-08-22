@@ -301,25 +301,34 @@ public class DancerForm extends VerticalLayout {
         dancer.mugshot(mugshotBytes);
         // reuse existing entries (matched by dancestyle) so a merge does not insert duplicates of existing rows
         List<DancerDancestyle> dancestyles = dancestyleRows.stream()
-                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null && row.skilllevelMinComboBox.getValue() != null)
+                .filter(row -> row.styleComboBox.getValue() != null
+                        && row.roleSelect.getValue() != null
+                        && row.skilllevelMinComboBox.getValue() != null)
                 .map(row -> {
+                    // Search for a row matching on dancestyle, if not found create a new one
                     DancerDancestyle dd = dancer.dancestyles().stream()
                             .filter(existing -> existing.dancestyle().equals(row.styleComboBox.getValue()))
                             .findFirst()
                             .orElseGet(() -> new DancerDancestyle().dancestyle(row.styleComboBox.getValue()));
-                    return dd.role(row.roleSelect.getValue()).skilllevel(row.skilllevelMinComboBox.getValue());
+                    // Populate the found or new
+                    return dd.role(row.roleSelect.getValue())
+                            .skilllevel(row.skilllevelMinComboBox.getValue());
                 })
                 .toList();
         dancer.dancestyles(dancestyles);
         List<DancerSearchingFor> searchingFor = searchingForRows.stream()
-                .filter(row -> row.styleComboBox.getValue() != null && row.roleSelect.getValue() != null
+                .filter(row -> row.styleComboBox.getValue() != null
+                        && row.roleSelect.getValue() != null
                         && row.searchCriteriaSexComboBox.getValue() != null
-                        && row.skilllevelMinComboBox.getValue() != null && row.skilllevelMaxComboBox.getValue() != null)
+                        && row.skilllevelMinComboBox.getValue() != null
+                        && row.skilllevelMaxComboBox.getValue() != null)
                 .map(row -> {
+                    // Search for a row matching on dancestyle, if not found create a new one
                     DancerSearchingFor sf = dancer.searchingFor().stream()
                             .filter(existing -> existing.dancestyle().equals(row.styleComboBox.getValue()))
                             .findFirst()
                             .orElseGet(() -> new DancerSearchingFor().dancestyle(row.styleComboBox.getValue()));
+                    // Populate the found or new
                     return sf.role(row.roleSelect.getValue())
                             .sex(row.searchCriteriaSexComboBox.getValue())
                             .skilllevelMin(row.skilllevelMinComboBox.getValue())
