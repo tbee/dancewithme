@@ -112,6 +112,9 @@ public class DancerForm extends VerticalLayout {
         emailField.setWidthFull();
         yearOfBirthField.setMin(Year.now().getValue() - 100);
         yearOfBirthField.setMax(Year.now().getValue() - 10);
+        yearOfBirthField.setI18n(new IntegerField.IntegerFieldI18n()
+                .setMinErrorMessage(t("form.yearOfBirth.min", Year.now().getValue() - 100))
+                .setMaxErrorMessage(t("form.yearOfBirth.max", Year.now().getValue() - 10)));
         cityComboBox.setWidthFull();
         whoamiField.setWidthFull();
         whoamiField.setHeight("300px");
