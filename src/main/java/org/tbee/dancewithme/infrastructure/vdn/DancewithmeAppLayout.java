@@ -8,6 +8,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.HasDynamicTitle;
@@ -20,6 +21,7 @@ import org.tbee.dancewithme.infrastructure.vdn.view.RegisterView;
 import org.tbee.dancewithme.infrastructure.vdn.view.SearchView;
 import org.tbee.webstack.vdn.component.html.H1;
 
+import java.util.List;
 import java.util.Locale;
 
 abstract public class DancewithmeAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
@@ -106,6 +108,18 @@ implements HasDynamicTitle, AfterNavigationObserver {
 	public static void showErrorNotification(String message) {
 		Notification notification = Notification.show(message, 5000, Notification.Position.BOTTOM_CENTER);
 		notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+	}
+
+	public static void showErrorNotifications(List<String> messages) {
+		VerticalLayout content = new VerticalLayout();
+		content.setPadding(false);
+		content.setSpacing(false);
+		messages.forEach(message -> content.add(new Span(message)));
+		Notification notification = new Notification(content);
+		notification.setDuration(5000);
+		notification.setPosition(Notification.Position.BOTTOM_CENTER);
+		notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+		notification.open();
 	}
 
 	public static void showSuccessNotification(String message) {

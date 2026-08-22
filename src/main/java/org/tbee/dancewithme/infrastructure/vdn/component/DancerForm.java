@@ -1,5 +1,6 @@
 package org.tbee.dancewithme.infrastructure.vdn.component;
 
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.card.Card;
@@ -18,6 +19,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.BinderValidationStatus;
+import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.server.streams.UploadHandler;
 import org.jspecify.annotations.NonNull;
@@ -278,9 +281,14 @@ public class DancerForm extends VerticalLayout {
      * Validates the form. If valid, returns the dancer with all values applied.
      */
     public Dancer validateAndGetDancer() {
-        if (!binder.validate().isOk()) {
-            DancewithmeAppLayout.showErrorNotification(t("form.validationFailed"));
-            return null;
+        List<String> errors = new ArrayList<>();
+
+        // binder validation; field errors are rendered by the binder itself
+        BinderValidationStatus<Dancer> binderStatus = binder.validate();
+        if (!binderStatus.isOk()) {
+            for (BindingValidationStatus<?> status : binderStatus.getFieldValidationErrors()) {
+                errors.add(fieldLabel(status.getField()) + ": " + status.getMessage().orElse(""));
+            }
         }
 
         // apply mugshot
@@ -340,38 +348,46 @@ public class DancerForm extends VerticalLayout {
         String rawPassword = (mode == Mode.REGISTER) ? passwordField.getValue() : null;
         List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, rawPassword, privacyAgreementCheckbox.getValue());
         if (!problems.isEmpty()) {
-            showValidationProblems(problems);
+            errors.addAll(showValidationProblems(problems));
+        }
+
+        if (!errors.isEmpty()) {
+            DancewithmeAppLayout.showErrorNotifications(errors);
             return null;
         }
         return dancer;
     }
 
     /**
-     * Translates the domain validation problems to UI feedback (field errors and a toast).
+     * Translates the domain validation problems to UI feedback (field errors) and
+     * returns the corresponding messages for the toast, prefixed with the field label.
      */
-    private void showValidationProblems(List<ValidateDancer.Problem> problems) {
+    private List<String> showValidationProblems(List<ValidateDancer.Problem> problems) {
+        List<String> messages = new ArrayList<>();
         for (ValidateDancer.Problem problem : problems) {
             switch (problem) {
                 case PASSWORD_TOO_SHORT -> {
                     passwordField.setInvalid(true);
                     passwordField.setErrorMessage(t("form.passwordTooShort"));
+                    messages.add(t("form.password") + ": " + t("form.passwordTooShort"));
                 }
                 case PRIVACY_AGREEMENT_REQUIRED -> {
                     privacyAgreementCheckbox.setInvalid(true);
                     privacyAgreementCheckbox.setErrorMessage(t("form.privacyAgreement.required"));
+                    messages.add(t("form.privacyAgreement") + ": " + t("form.privacyAgreement.required"));
                 }
-                case DUPLICATE_DANCESTYLE -> markDuplicateDancestyles(dancestyleRows, "form.dancestyles.duplicate");
-                case DUPLICATE_SEARCHING_FOR -> markDuplicateDancestyles(searchingForRows, "form.searchingFor.duplicate");
+                case DUPLICATE_DANCESTYLE -> messages.add(markDuplicateDancestyles(dancestyleRows, "form.dancestyles.duplicate", "form.dancestyles"));
+                case DUPLICATE_SEARCHING_FOR -> messages.add(markDuplicateDancestyles(searchingForRows, "form.searchingFor.duplicate", "form.searchingFor"));
             }
         }
-        DancewithmeAppLayout.showErrorNotification(t("form.validationFailed"));
+        return messages;
     }
 
     /**
-     * Marks the duplicate dancestyle rows invalid. The detection itself is
-     * done in {@link ValidateDancer}; this method only renders the outcome on the UI.
+     * Marks the duplicate dancestyle rows invalid and returns the message for the toast.
+     * The detection itself is done in {@link ValidateDancer}; this method only renders the outcome on the UI.
      */
-    private void markDuplicateDancestyles(List<SearchingForRow> rows, String errorKey) {
+    private String markDuplicateDancestyles(List<SearchingForRow> rows, String errorKey, String labelKey) {
         Set<Dancestyle> seen = new HashSet<>();
         for (SearchingForRow row : rows) {
             Dancestyle style = row.style();
@@ -380,6 +396,25 @@ public class DancerForm extends VerticalLayout {
                 row.styleComboBox.setErrorMessage(t(errorKey));
             }
         }
+        return t(labelKey) + ": " + t(errorKey);
+    }
+
+    private String fieldLabel(HasValue<?, ?> field) {
+        if (field == nameField) return t("form.name");
+        if (field == emailField) return t("form.email");
+        if (field == yearOfBirthField) return t("form.yearOfBirth");
+        if (field == sexComboBox) return t("form.sex");
+        if (field == cityComboBox) return t("form.city");
+        if (field == whoamiField) return t("form.whoami");
+        if (field == whatdoiwantField) return t("form.whatdoiwant");
+        if (field == weekFrequencyMinField || field == weekFrequencyMaxField) return t("form.weekFrequency");
+        if (field == distanceToPartnerMaxField) return t("form.distanceMax");
+        if (field == ageDistanceToPartnerMaxField) return t("form.ageDistanceMax");
+        if (field == activeCheckbox) return t("form.active");
+        if (field == publiclyFindableCheckbox) return t("form.publiclyFindable");
+        if (field == passwordField) return t("form.password");
+        if (field == privacyAgreementCheckbox) return t("form.privacyAgreement");
+        return "";
     }
 
     public String rawPassword() {
