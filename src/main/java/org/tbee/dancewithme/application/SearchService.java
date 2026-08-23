@@ -81,8 +81,8 @@ public class SearchService {
                 )
                 // Convert to result (so distance in km is calculated and snapshotted)
                 .map(dancer -> new SearchResult(dancer, distanceKm(fromCity, dancer.city())))
-                // dancer should be in maximum distance
-                .filter(result -> !loggedIn || result.distanceKm() <= criteria.distanceMax())
+                // dancer should be in maximum distance (unknown distance is kept, sorted last)
+                .filter(result -> !loggedIn || result.distanceKm() == null || result.distanceKm() <= criteria.distanceMax())
                 .sorted(Comparator.comparing(SearchResult::distanceKm, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
     }
