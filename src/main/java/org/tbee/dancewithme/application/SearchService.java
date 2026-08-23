@@ -13,28 +13,26 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 import java.time.Year;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class SearchService {
 
     public interface SearchParametersStyles {
-            Dancestyle dancestyle();
-            Role role();
-            SearchCriteriaSex sex();
-            Skilllevel skilllevelMin();
-            Skilllevel skilllevelMax();
+        Dancestyle dancestyle();
+        SearchCriteriaSex sex();
+        Role role();
+        Skilllevel skilllevelMin();
+        Skilllevel skilllevelMax();
     }
 
     public interface SearchParameters {
-            // matched or-ed: any of the selected style entries matches
-            List<? extends SearchParametersStyles> searchingFor();
-            // only applied for logged in users, relative to their own age
-            int ageDistanceMax();
-            int weekFrequencyMin();
-            int weekFrequencyMax();
-            // only applied for logged in users, measured from their own city
-            int distanceMax();
+        int weekFrequencyMax();
+        List<? extends SearchParametersStyles> searchingFor();
+
+        // only applied for logged in users
+        int distanceMax();
+        int ageDistanceMax();
+        int weekFrequencyMin();
     }
 
     public record SearchResult(Dancer dancer, Double distanceKm) {
@@ -49,42 +47,48 @@ public class SearchService {
     }
 
     public List<SearchResult> search(SearchParameters criteria) {
-        boolean loggedIn = securityService.currentDancer().isPresent();
+        boolean loggedIn = securityService.loggedInDancer().isPresent();
         List<Dancer> candidates = loggedIn
                 ? dancerRepository.findByActiveTrue()
                 : dancerRepository.findByActiveTrueAndPubliclyFindableTrue();
-        return match(criteria, candidates);
+        return match(criteria, candidates, securityService.loggedInDancer().orElse(null));
     }
 
-    public List<SearchResult> match(SearchParameters criteria, List<Dancer> candidates) {
-        Dancer currentDancer = securityService.currentDancer().orElse(null);
-        boolean loggedIn = (currentDancer != null);
-
-        int currentYear = Year.now().getValue();
-        City fromCity = loggedIn ? currentDancer.city() : null;
+    public List<SearchResult> match(SearchParameters criteria, List<Dancer> candidates, Dancer loggedInDancer) {
+        boolean loggedIn = (loggedInDancer != null);
+        City fromCity = (loggedIn ? loggedInDancer.city() : null);
+        int loggedInDancerAge = (loggedIn ? age(loggedInDancer) : 0);
 
         return candidates.stream()
                 // never include the searching dancer itself
-                .filter(dancer -> !loggedIn || dancer.id() != currentDancer.id())
-                .filter(dancer -> criteria.searchingFor() == null || criteria.searchingFor().isEmpty()
-                        || dancer.dancestyles().stream().anyMatch(dd -> criteria.searchingFor().stream().anyMatch(style ->
-                        dd.dancestyle().equals(style.dancestyle())
-                                && (style.role() == null || dd.role().equals(style.role()))
-                                && (style.sex() == null || style.sex().match(dancer.sex()))
-                                && (style.skilllevelMin() == null || dd.skilllevel().level() >= style.skilllevelMin().level())
-                                && (style.skilllevelMax() == null || dd.skilllevel().level() <= style.skilllevelMax().level()))))
-                .filter(dancer -> !loggedIn
-                        || Math.abs(age(dancer, currentYear) - age(currentDancer, currentYear)) <= criteria.ageDistanceMax())
+                .filter(dancer -> !loggedIn || dancer.id() != loggedInDancer.id())
+                // age distance must match
+                .filter(dancer -> !loggedIn || Math.abs(age(dancer) - loggedInDancerAge) <= criteria.ageDistanceMax())
+                // dance frequency should match
                 .filter(dancer -> dancer.weekFrequencyMax() >= criteria.weekFrequencyMin())
                 .filter(dancer -> dancer.weekFrequencyMin() <= criteria.weekFrequencyMax())
+                // dancestyle should match
+                .filter(dancer -> criteria.searchingFor() == null || criteria.searchingFor().isEmpty() || // no criteria is always match
+                        criteria.searchingFor().stream().anyMatch(searchingFor -> // all criteria
+                                dancer.dancestyles().stream().anyMatch(dancerDancestyle -> // match again all dancestyles
+                                        (searchingFor.dancestyle() == null || searchingFor.dancestyle().equals(dancerDancestyle.dancestyle())) &&
+                                        (searchingFor.role() == null || searchingFor.role().equals(dancerDancestyle.role())) &&
+                                        (searchingFor.sex() == null || searchingFor.sex().match(dancer.sex())) &&
+                                        (searchingFor.skilllevelMin() == null || searchingFor.skilllevelMin().level() <= dancerDancestyle.skilllevel().level()) &&
+                                        (searchingFor.skilllevelMax() == null || searchingFor.skilllevelMax().level() >= dancerDancestyle.skilllevel().level())
+                                )
+                        )
+                )
+                // Convert to result (so distance in km is calculated and snapshotted)
                 .map(dancer -> new SearchResult(dancer, distanceKm(fromCity, dancer.city())))
-                .filter(result -> !loggedIn || result.distanceKm() == null || result.distanceKm() <= criteria.distanceMax())
+                // dancer should be in maximum distance
+                .filter(result -> !loggedIn || result.distanceKm() <= criteria.distanceMax())
                 .sorted(Comparator.comparing(SearchResult::distanceKm, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
     }
 
-    private static int age(Dancer dancer, int currentYear) {
-        return currentYear - dancer.yearOfBirth();
+    private static int age(Dancer dancer) {
+        return Year.now().getValue() - dancer.yearOfBirth();
     }
 
     private static Double distanceKm(City from, City to) {

@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
 
 import java.time.LocalDateTime;
@@ -236,10 +237,11 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
         searchingFor.forEach(entry -> this.searchingFor.add(entry.dancer(this)));
         return this;
     }
-    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, Role role, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
+    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, SearchCriteriaSex sex, Role role, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
         DancerSearchingFor entry = new DancerSearchingFor()
                 .dancer(this)
                 .dancestyle(dancestyle)
+                .sex(sex)
                 .role(role)
                 .skilllevelMin(skilllevelMin)
                 .skilllevelMax(skilllevelMax);

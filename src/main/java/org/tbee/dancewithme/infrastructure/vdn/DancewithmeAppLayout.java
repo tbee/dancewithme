@@ -75,7 +75,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		HorizontalLayout rightSide = new HorizontalLayout(nlButton, enButton);
 		rightSide.setAlignItems(FlexComponent.Alignment.CENTER);
 
-		securityService.currentDancer().ifPresentOrElse(dancer -> {
+		securityService.loggedInDancer().ifPresentOrElse(dancer -> {
 			Span username = new Span(dancer.name());
 			Button logoutButton = new Button(getTranslation("menu.logout"), e -> securityService.logout());
 			logoutButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);

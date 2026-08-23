@@ -21,7 +21,7 @@ public class SecurityService {
         this.dancerRepository = dancerRepository;
     }
 
-    public Optional<Dancer> currentDancer() {
+    public Optional<Dancer> loggedInDancer() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
             return Optional.empty();
@@ -30,7 +30,7 @@ public class SecurityService {
     }
 
     public boolean isLoggedIn() {
-        return currentDancer().isPresent();
+        return loggedInDancer().isPresent();
     }
 
     public void logout() {

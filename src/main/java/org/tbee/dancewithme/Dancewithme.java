@@ -18,6 +18,11 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 
 import java.util.Locale;
 
+// TODO:
+// Profile en logout in menu
+// Email confirmation process
+// Chat
+
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class, enableDefaultTransactions = false)
 @StyleSheet(Lumo.STYLESHEET)

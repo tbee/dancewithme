@@ -1,5 +1,6 @@
 package org.tbee.dancewithme.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -30,6 +31,7 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implement
 
     // the required sex of the partner
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private SearchCriteriaSex sex = SearchCriteriaSex.EITHER;
 
     // the minimum and maximum skilllevel the searching dancer accepts in a partner

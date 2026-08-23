@@ -24,7 +24,6 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.time.Year;
 import java.util.List;
-import java.util.Optional;
 
 @Route("dancer/:dancerId")
 @PermitAll
@@ -73,8 +72,8 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
                 dd.dancestyle().name() + " — " + dd.role().name() + " — " + getTranslation("skilllevel." + dd.skilllevel().code()))));
 
         // mutual match badge: we know the dancer matches our search parameters, but do wo also match the search of the `viewed` dancer? Are we a match?
-        Dancer currentDancer = securityService.currentDancer().orElseThrow();
-        boolean matched = !searchService.match(dancer, List.of(currentDancer)).isEmpty();
+        Dancer loggedInDancer = securityService.loggedInDancer().orElseThrow();
+        boolean matched = !searchService.match(dancer, List.of(loggedInDancer), dancer).isEmpty();
         HorizontalLayout nameBadges = new HorizontalLayout(nameH2);
         Badge matchBadge = matched ? new Badge(getTranslation("card.match")) : new Badge(getTranslation("card.noMatch"));
         matchBadge.addThemeVariants(matched ? BadgeVariant.SUCCESS : BadgeVariant.WARNING);

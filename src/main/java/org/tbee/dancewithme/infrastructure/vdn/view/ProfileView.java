@@ -2,7 +2,6 @@ package org.tbee.dancewithme.infrastructure.vdn.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
@@ -27,7 +26,7 @@ public class ProfileView extends DancewithmeAppLayout {
         super("profile.title", securityService, localeService);
         postConstruct();
 
-        Dancer dancer = securityService.currentDancer().orElseThrow();
+        Dancer dancer = securityService.loggedInDancer().orElseThrow();
         Dancer detailedDancer = dancerService.loadWithDetails(dancer.id());
 
         DancerForm form = new DancerForm(DancerForm.Mode.UPDATE, cityRepository, dancestyleRepository, roleRepository, skilllevelRepository);

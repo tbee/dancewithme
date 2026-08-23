@@ -6,6 +6,8 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
 import org.tbee.dancewithme.domain.Skilllevel;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
+import org.tbee.dancewithme.domain.valueobject.Sex;
 
 import java.util.List;
 
@@ -77,8 +79,8 @@ class ValidateDancerTest {
     @Test
     void duplicateSearchingForIsReported() {
         Dancer dancer = new Dancer();
-        dancer.addSearchingFor(latin, follow, beginner, intermediate);
-        dancer.addSearchingFor(latin, lead, beginner, intermediate);
+        dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, follow, beginner, intermediate);
+        dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, lead, beginner, intermediate);
 
         List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, false);
 

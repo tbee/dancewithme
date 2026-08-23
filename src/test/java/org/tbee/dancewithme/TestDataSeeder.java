@@ -12,6 +12,7 @@ import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
@@ -110,8 +111,8 @@ public class TestDataSeeder implements ApplicationRunner {
                 .whatdoiwant("Looking for a dance partner in the " + cityName + " area.")
                 .weekFrequencyMin(1)
                 .weekFrequencyMax(3)
-                .distanceMax(50)
-                .ageDistanceMax(15)
+                .distanceMax(125)
+                .ageDistanceMax(50)
                 .active(true)
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now());
@@ -121,7 +122,9 @@ public class TestDataSeeder implements ApplicationRunner {
             // searching for a partner with the complementary role in the same style,
             // accepting a range around the dancer's own skill level
             int ownIndex = skilllevels.indexOf(canDo.skilllevel());
-            dancer.addSearchingFor(canDo.dancestyle(), role("lead".equals(canDo.role().name()) ? "follow" : "lead"),
+            dancer.addSearchingFor(canDo.dancestyle(),
+                    sex == Sex.MALE ? SearchCriteriaSex.FEMALE : SearchCriteriaSex.MALE,
+                    role("lead".equals(canDo.role().name()) ? "follow" : "lead"),
                     skilllevels.get(Math.max(0, ownIndex - 2)),
                     skilllevels.get(Math.min(skilllevels.size() - 1, ownIndex + 2)));
         }

@@ -1,23 +1,16 @@
 package org.tbee.dancewithme.infrastructure.vdn.view;
 
-import com.vaadin.flow.component.avatar.Avatar;
-import com.vaadin.flow.component.badge.Badge;
-import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.markdown.Markdown;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteParameters;
-import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.tbee.dancewithme.application.DancerService;
 import org.tbee.dancewithme.application.SearchService;
@@ -32,10 +25,10 @@ import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
+import org.tbee.dancewithme.infrastructure.vdn.component.SearchResultCard;
 import org.tbee.dancewithme.infrastructure.vdn.component.SearchingForRow;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +36,7 @@ import java.util.List;
 @AnonymousAllowed
 public class SearchView extends DancewithmeAppLayout {
 
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 3;
 
     private final SecurityService securityService;
     private final SearchService searchService;
@@ -82,7 +75,7 @@ public class SearchView extends DancewithmeAppLayout {
         // == search form ==
         // style rows: dancestyle, role, skill range (same structure as the profile's "searching for")
         // prefill with what the logged in dancer is searching for (can still be fiddled with)
-        Dancer currentDancer = securityService.currentDancer().orElse(null);
+        Dancer currentDancer = securityService.loggedInDancer().orElse(null);
         List<DancerSearchingFor> searchingFor = (currentDancer == null ? List.of() : currentDancer.searchingFor());
         if (searchingFor.isEmpty()) {
             addStyleRow(null, null, null, null, null);
@@ -129,7 +122,23 @@ public class SearchView extends DancewithmeAppLayout {
         Button searchButton = new Button(getTranslation("search.button"), e -> search());
         searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
-        VerticalLayout content = new VerticalLayout(formLayout, searchButton, resultsLayout, pagingLayout);
+        VerticalLayout searchContent = new VerticalLayout(formLayout, searchButton);
+        searchContent.setWidthFull();
+        searchContent.setMaxWidth("1200px");
+        Card searchCard = new Card();
+//        searchCard.setWidthFull();
+//        searchCard.setMaxWidth("1200px");
+        searchCard.add(searchContent);
+
+        VerticalLayout resultContent = new VerticalLayout(resultsLayout, pagingLayout);
+//        resultContent.setWidthFull();
+        resultContent.setMaxWidth("1200px");
+        Card resultCard = new Card();
+//        resultCard.setWidthFull();
+//        resultCard.setMaxWidth("1200px");
+        resultCard.add(resultContent);
+
+        VerticalLayout content = new VerticalLayout(searchCard, resultContent);
 //        content.setMaxWidth("1200px");
         setContent(content);
     }
@@ -220,10 +229,10 @@ public class SearchView extends DancewithmeAppLayout {
     }
 
     private void renderResults() {
+        Dancer loggedInDancer = securityService.loggedInDancer().orElse(null);
         resultsLayout.removeAll();
         pagingLayout.removeAll();
 
-        resultsLayout.add(new H2(getTranslation("search.results")));
         if (results.isEmpty()) {
             resultsLayout.add(new Paragraph(getTranslation("search.noResults")));
             return;
@@ -234,7 +243,7 @@ public class SearchView extends DancewithmeAppLayout {
 
         int from = page * PAGE_SIZE;
         int to = Math.min(from + PAGE_SIZE, results.size());
-        results.subList(from, to).forEach(result -> resultsLayout.add(createCard(result)));
+        results.subList(from, to).forEach(result -> resultsLayout.add(new SearchResultCard(result, loggedInDancer, searchService)));
 
         // paging
         Button previousButton = new Button(getTranslation("paging.previous"), e -> { page--; renderResults(); });
@@ -244,88 +253,5 @@ public class SearchView extends DancewithmeAppLayout {
         pageLabel.setText((page + 1) + " / " + ((results.size() + PAGE_SIZE - 1) / PAGE_SIZE));
         pagingLayout.add(previousButton, pageLabel, nextButton);
         pagingLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
-    }
-
-    private HorizontalLayout createCard(SearchService.SearchResult result) {
-        Dancer currentDancer = securityService.currentDancer().orElseGet(() -> null);
-        Dancer dancer = result.dancer();
-        boolean loggedIn = securityService.isLoggedIn();
-
-        // name, age
-        int age = Year.now().getValue() - dancer.yearOfBirth();
-        Span nameAge = new Span(dancer.name() + ", " + getTranslation("card.yearsOld", age));
-        nameAge.getStyle().set("font-weight", "bold").set("font-size", "var(--lumo-font-size-l)");
-
-        // city + distance
-        String cityText = dancer.city() != null ? dancer.city().name() : "";
-        if (result.distanceKm() != null) {
-            cityText += ", " + getTranslation("card.km", Math.round(result.distanceKm()));
-        }
-        HorizontalLayout cityLayout = new HorizontalLayout(VaadinIcon.MAP_MARKER.create(), new Span(cityText));
-        cityLayout.setAlignItems(HorizontalLayout.Alignment.CENTER);
-        cityLayout.setSpacing(false);
-
-        // whoami excerpt
-        String whoami = dancer.whoami() == null ? "" : dancer.whoami();
-        if (whoami.length() > 200) {
-            whoami = whoami.substring(0, 200) + "...";
-        }
-        Markdown whoamiParagraph = new Markdown(whoami);
-
-        // role + style badges
-        HorizontalLayout badgeBar = new HorizontalLayout();
-        dancer.dancestyles().stream()
-                .map(dd -> dd.role().name() + " " + dd.dancestyle().name())
-                .distinct()
-                .forEach(s -> badgeBar.add(new Badge(s)));
-        // mutual match badge: does their search match us?
-        if (currentDancer != null) {
-            boolean match = !searchService.match(dancer, List.of(currentDancer)).isEmpty();
-            Badge matchBadge = match
-                               ? new Badge(getTranslation("card.match"))
-                               : new Badge(getTranslation("card.noMatch"));
-            matchBadge.addThemeVariants(match ? BadgeVariant.SUCCESS : BadgeVariant.WARNING);
-            badgeBar.add(matchBadge);
-        }
-        badgeBar.getStyle().set("margin-left", "auto");
-
-        Span frequency = new Span(getTranslation("card.perWeek", dancer.weekFrequencyMin(), dancer.weekFrequencyMax()));
-
-        // buttons
-        // a link (so it can be opened in a new tab), styled as a button
-        RouterLink viewProfileLink = loggedIn
-                ? new RouterLink(getTranslation("card.viewProfile"), DancerDetailView.class, new RouteParameters("dancerId", String.valueOf(dancer.id())))
-                : new RouterLink(getTranslation("card.viewProfile"), LoginView.class);
-        viewProfileLink.getElement().setAttribute("theme", "button");
-
-
-        HorizontalLayout headerLine = new HorizontalLayout(nameAge, badgeBar);
-        headerLine.setWidthFull();
-
-        VerticalLayout middle = new VerticalLayout(headerLine, cityLayout, whoamiParagraph, frequency, viewProfileLink);
-        middle.setPadding(false);
-        middle.setSpacing(false);
-
-        HorizontalLayout card = new HorizontalLayout(middle);
-        if (loggedIn && dancer.mugshot() != null) {
-            Image image = new Image(dancer.mugshot(), dancer.name());
-            image.setWidth("160px");
-            image.setHeight("160px");
-            image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
-            card.addComponentAsFirst(image);
-        }
-        else if (!loggedIn) {
-            Avatar avatar = new Avatar(dancer.name());
-            avatar.setWidth("80px");
-            avatar.setHeight("80px");
-            card.addComponentAsFirst(avatar);
-        }
-        card.getStyle()
-                .set("border", "1px solid var(--lumo-contrast-10pct)")
-                .set("border-radius", "var(--lumo-border-radius-l)")
-                .set("padding", "var(--lumo-space-m)")
-                .set("box-shadow", "var(--lumo-box-shadow-xs)");
-        card.setWidthFull();
-        return card;
     }
 }
