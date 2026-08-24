@@ -3,7 +3,11 @@ package org.tbee.dancewithme.infrastructure.vdn;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -20,6 +24,8 @@ import org.tbee.dancewithme.infrastructure.vdn.view.ProfileView;
 import org.tbee.dancewithme.infrastructure.vdn.view.RegisterView;
 import org.tbee.dancewithme.infrastructure.vdn.view.SearchView;
 import org.tbee.webstack.vdn.component.html.H1;
+import org.tbee.webstack.vdn.component.icon.Icon;
+import org.tbee.webstack.vdn.component.menubar.MenuBar;
 
 import java.util.List;
 import java.util.Locale;
@@ -52,12 +58,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		Button searchButton = new Button(getTranslation("menu.search"), e -> getUI().ifPresent(ui -> ui.navigate(SearchView.class)));
 		searchButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 		HorizontalLayout navigation = new HorizontalLayout(searchButton);
-		if (securityService.isLoggedIn()) {
-			Button profileButton = new Button(getTranslation("menu.profile"), e -> getUI().ifPresent(ui -> ui.navigate(ProfileView.class)));
-			profileButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-			navigation.add(profileButton);
-		}
-		else {
+		if (!securityService.isLoggedIn()) {
 			Button registerButton = new Button(getTranslation("menu.register"), e -> getUI().ifPresent(ui -> ui.navigate(RegisterView.class)));
 			registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 			navigation.add(registerButton);
@@ -66,28 +67,32 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		navigation.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 		navigation.setAlignItems(FlexComponent.Alignment.CENTER);
 
+		MenuBar menuBar = new MenuBar() //  https://vaadin.com/directory/component/app-layout-add-on   https://vaadin.com/docs/latest/components/menu-bar
+				.id("navbar")
+				.themeVariants(MenuBarVariant.LUMO_TERTIARY, MenuBarVariant.LUMO_END_ALIGNED);
+
 		// Right side of the navbar: language switcher, username, login/logout
 		Button nlButton = new Button(getTranslation("language.nl"), e -> localeService.switchLocale(Locale.of("nl")));
 		Button enButton = new Button(getTranslation("language.en"), e -> localeService.switchLocale(Locale.ENGLISH));
 		nlButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
 		enButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-
-		HorizontalLayout rightSide = new HorizontalLayout(nlButton, enButton);
-		rightSide.setAlignItems(FlexComponent.Alignment.CENTER);
+		menuBar.addItem(nlButton);
+		menuBar.addItem(enButton);
 
 		securityService.loggedInDancer().ifPresentOrElse(dancer -> {
-			Span username = new Span(dancer.name());
-			Button logoutButton = new Button(getTranslation("menu.logout"), e -> securityService.logout());
-			logoutButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-			rightSide.add(username, logoutButton);
+			MenuItem accountMenuItem = menuBar.addItem(createSubmenu(dancer.name(), VaadinIcon.CHEVRON_DOWN));
+			accountMenuItem.setId("accountMenuItem");
+			SubMenu accountSubMenu = accountMenuItem.getSubMenu();
+			accountSubMenu.addItem(getTranslation("menu.profile"), event -> getUI().ifPresent(ui -> ui.navigate(ProfileView.class))).setId("changePasswordItem");
+			accountSubMenu.addItem(getTranslation("menu.logout"), event -> securityService.logout());
 		}, () -> {
 			Button loginButton = new Button(getTranslation("menu.login"), e -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
 			loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-			rightSide.add(loginButton);
+			menuBar.addItem(loginButton);
 		});
 
 		// Navbar
-		addToNavbar(titleH1, navigation, rightSide);
+		addToNavbar(titleH1, navigation, menuBar);
 	}
 
 	@Override
@@ -125,5 +130,13 @@ implements HasDynamicTitle, AfterNavigationObserver {
 	public static void showSuccessNotification(String message) {
 		Notification notification = Notification.show(message, 5000, Notification.Position.BOTTOM_CENTER);
 		notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+	}
+
+	private HorizontalLayout createSubmenu(String text, VaadinIcon suffixIcon) {
+		Icon submenuIcon = new Icon(suffixIcon)
+				.size("0.8em")
+				.style("margin-left", "0.2em")
+				.style("margin-top", "0.2em");
+		return new HorizontalLayout(new Span(text), submenuIcon);
 	}
 }

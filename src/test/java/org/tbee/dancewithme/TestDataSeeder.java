@@ -114,7 +114,8 @@ public class TestDataSeeder implements ApplicationRunner {
                 .ageDistanceMax(50)
                 .active(true)
                 .publiclyFindable(true)
-                .privacyAgreementAcceptedAt(LocalDateTime.now());
+                .privacyAgreementAcceptedAt(LocalDateTime.now())
+                .emailConfirmedAt(LocalDateTime.now());
         List<Skilllevel> skilllevels = skilllevelRepository.findAllByOrderByLevelAsc();
         for (CanDo canDo : canDos) {
             dancer.addDancestyle(canDo.dancestyle(), canDo.role(), canDo.skilllevel());

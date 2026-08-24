@@ -20,8 +20,8 @@ import java.util.Locale;
 
 // TODO:
 // Profile en logout in menu
-// Remove age?
-// Email confirmation process
+// Attempt login when email is not confirmed does not report the correct error (goto confirm email page?)
+// Forgot password logic (login page)
 // Chat
 
 @SpringBootApplication
