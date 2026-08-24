@@ -1,5 +1,6 @@
 package org.tbee.dancewithme.infrastructure.vdn.security;
 
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,6 +27,9 @@ public class DancerUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Dancer dancer = dancerRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
+        if (dancer.emailConfirmedAt() == null) {
+            throw new DisabledException("Email not confirmed");
+        }
         return new User(dancer.email(), dancer.password(), List.of(new SimpleGrantedAuthority("ROLE_" + ROLE_USER)));
     }
 }

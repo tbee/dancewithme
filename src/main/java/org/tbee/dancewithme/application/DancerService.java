@@ -15,17 +15,22 @@ public class DancerService {
 
     private final DancerRepository dancerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailConfirmationService emailConfirmationService;
 
-    public DancerService(DancerRepository dancerRepository, PasswordEncoder passwordEncoder) {
+    public DancerService(DancerRepository dancerRepository, PasswordEncoder passwordEncoder,
+                         EmailConfirmationService emailConfirmationService) {
         this.dancerRepository = dancerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailConfirmationService = emailConfirmationService;
     }
 
     @Transactional
     public Dancer register(Dancer dancer, String rawPassword) {
         dancer.password(passwordEncoder.encode(rawPassword));
         dancer.privacyAgreementAcceptedAt(LocalDateTime.now());
-        return dancerRepository.save(dancer);
+        Dancer saved = dancerRepository.save(dancer);
+        emailConfirmationService.requestConfirmation(saved);
+        return saved;
     }
 
     @Transactional

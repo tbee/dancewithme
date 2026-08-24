@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.tbee.dancewithme.application.DancerService;
+import org.tbee.dancewithme.application.EmailConfirmationService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
@@ -22,10 +23,14 @@ import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 @AnonymousAllowed
 public class RegisterView extends DancewithmeAppLayout {
 
+    private final EmailConfirmationService emailConfirmationService;
+
     public RegisterView(SecurityService securityService, LocaleService localeService, DancerService dancerService,
+                        EmailConfirmationService emailConfirmationService,
                         CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
                         SkilllevelRepository skilllevelRepository) {
         super("register.title", securityService, localeService);
+        this.emailConfirmationService = emailConfirmationService;
         postConstruct();
 
         DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, roleRepository, skilllevelRepository);
@@ -37,9 +42,13 @@ public class RegisterView extends DancewithmeAppLayout {
                 return;
             }
             try {
-                dancerService.register(dancer, form.rawPassword());
-                showSuccessNotification(getTranslation("form.registered"));
-                UI.getCurrent().navigate(LoginView.class);
+                Dancer registered = dancerService.register(dancer, form.rawPassword());
+                if (emailConfirmationService.isDevelopment()) {
+                    UI.getCurrent().navigate("confirm?prefill=" + registered.emailConfirmationToken());
+                }
+                else {
+                    UI.getCurrent().navigate("confirm");
+                }
             }
             catch (Exception ex) {
                 showException(ex);

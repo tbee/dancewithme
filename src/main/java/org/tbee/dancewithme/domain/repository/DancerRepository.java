@@ -9,6 +9,8 @@ public interface DancerRepository extends CustomRepository<Dancer, Long> {
 
     Optional<Dancer> findByEmail(String email);
 
+    Optional<Dancer> findByEmailConfirmationToken(String token);
+
     List<Dancer> findByActiveTrue();
 
     List<Dancer> findByActiveTrueAndPubliclyFindableTrue();

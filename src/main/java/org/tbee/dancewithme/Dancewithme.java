@@ -20,6 +20,7 @@ import java.util.Locale;
 
 // TODO:
 // Profile en logout in menu
+// Remove age?
 // Email confirmation process
 // Chat
 

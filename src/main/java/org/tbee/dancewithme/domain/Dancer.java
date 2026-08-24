@@ -57,6 +57,13 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     // when the dancer accepted the privacy agreement at registration
     private LocalDateTime privacyAgreementAcceptedAt;
 
+    // when the dancer confirmed their email address (null = not yet confirmed)
+    private LocalDateTime emailConfirmedAt;
+
+    // the token used in the confirmation email; cleared once confirmed
+    @Column(unique = true)
+    private String emailConfirmationToken;
+
     @Column(columnDefinition = "text")
     private String whoami;
 
@@ -160,6 +167,22 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     }
     public Dancer privacyAgreementAcceptedAt(LocalDateTime privacyAgreementAcceptedAt) {
         this.privacyAgreementAcceptedAt = privacyAgreementAcceptedAt;
+        return this;
+    }
+
+    public LocalDateTime emailConfirmedAt() {
+        return emailConfirmedAt;
+    }
+    public Dancer emailConfirmedAt(LocalDateTime emailConfirmedAt) {
+        this.emailConfirmedAt = emailConfirmedAt;
+        return this;
+    }
+
+    public String emailConfirmationToken() {
+        return emailConfirmationToken;
+    }
+    public Dancer emailConfirmationToken(String emailConfirmationToken) {
+        this.emailConfirmationToken = emailConfirmationToken;
         return this;
     }
 
