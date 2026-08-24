@@ -37,9 +37,6 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     @Enumerated(EnumType.STRING)
     private Sex sex = Sex.UNKNOWN;
 
-    @Column(nullable = false)
-    private int yearOfBirth;
-
     @ManyToOne(fetch = FetchType.LAZY)
     private City city;
 
@@ -119,14 +116,6 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     }
     public Dancer sex(Sex sex) {
         this.sex = sex;
-        return this;
-    }
-
-    public int yearOfBirth() {
-        return yearOfBirth;
-    }
-    public Dancer yearOfBirth(int yearOfBirth) {
-        this.yearOfBirth = yearOfBirth;
         return this;
     }
 

@@ -158,9 +158,6 @@
             <column name="sex" type="varchar(10)" defaultValue="UNKNOWN">
                 <constraints nullable="false"/>
             </column>
-            <column name="year_of_birth" type="integer">
-                <constraints nullable="false"/>
-            </column>
             <column name="city_id" type="bigint"/>
             <column name="mugshot" type="bytea"/>
             <column name="active" type="boolean" defaultValueBoolean="true">

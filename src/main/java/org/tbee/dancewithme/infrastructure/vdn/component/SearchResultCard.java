@@ -27,10 +27,6 @@ public class SearchResultCard extends Card {
         Dancer dancer = searchResult.dancer();
         boolean loggedIn = (loggedInDancer != null);
 
-        // name, age
-        int age = Year.now().getValue() - dancer.yearOfBirth();
-        String nameAge = dancer.name() + ", " + getTranslation("card.yearsOld", age);
-
         // city + distance
         String city = dancer.city() != null ? dancer.city().name() : "";
         if (searchResult.distanceKm() != null) {
@@ -85,7 +81,7 @@ public class SearchResultCard extends Card {
             setMedia(avatar);
         }
         
-        setTitle(nameAge);
+        setTitle(dancer.name());
         setSubtitle(cityLayout);
         add(middle);
         setWidthFull();

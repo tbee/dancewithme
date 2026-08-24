@@ -56,9 +56,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
     }
 
     private void render(Dancer dancer) {
-        int age = Year.now().getValue() - dancer.yearOfBirth();
-
-        H2 nameH2 = new H2(dancer.name() + ", " + getTranslation("card.yearsOld", age));
+        H2 nameH2 = new H2(dancer.name());
 
         String cityText = dancer.city() != null ? dancer.city().name() : "";
         HorizontalLayout cityLayout = new HorizontalLayout(VaadinIcon.MAP_MARKER.create(), new Span(cityText));

@@ -57,13 +57,10 @@ public class SearchService {
     public List<SearchResult> match(SearchParameters criteria, List<Dancer> candidates, Dancer loggedInDancer) {
         boolean loggedIn = (loggedInDancer != null);
         City fromCity = (loggedIn ? loggedInDancer.city() : null);
-        int loggedInDancerAge = (loggedIn ? age(loggedInDancer) : 0);
 
         return candidates.stream()
                 // never include the searching dancer itself
                 .filter(dancer -> !loggedIn || dancer.id() != loggedInDancer.id())
-                // age distance must match
-                .filter(dancer -> !loggedIn || Math.abs(age(dancer) - loggedInDancerAge) <= criteria.ageDistanceMax())
                 // dance frequency should match
                 .filter(dancer -> dancer.weekFrequencyMax() >= criteria.weekFrequencyMin())
                 .filter(dancer -> dancer.weekFrequencyMin() <= criteria.weekFrequencyMax())
@@ -85,10 +82,6 @@ public class SearchService {
                 .filter(result -> !loggedIn || result.distanceKm() == null || result.distanceKm() <= criteria.distanceMax())
                 .sorted(Comparator.comparing(SearchResult::distanceKm, Comparator.nullsLast(Comparator.naturalOrder())))
                 .toList();
-    }
-
-    private static int age(Dancer dancer) {
-        return Year.now().getValue() - dancer.yearOfBirth();
     }
 
     private static Double distanceKm(City from, City to) {

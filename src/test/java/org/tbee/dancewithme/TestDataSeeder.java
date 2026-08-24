@@ -104,7 +104,6 @@ public class TestDataSeeder implements ApplicationRunner {
                 .password(passwordEncoder.encode("password"))
                 .name(name)
                 .sex(sex)
-                .yearOfBirth(yearOfBirth)
                 .city(city(cityName))
                 .mugshot(generateMugshot(name))
                 .whoami("Hi, I'm " + name + " and I love dancing!")

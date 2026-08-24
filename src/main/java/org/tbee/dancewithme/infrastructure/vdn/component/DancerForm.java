@@ -70,7 +70,6 @@ public class DancerForm extends VerticalLayout {
     private final PasswordField passwordField = new PasswordField();
     private final TextField nameField = new TextField();
     private final SexComboBox sexComboBox = new SexComboBox();
-    private final IntegerField yearOfBirthField = new IntegerField();
     private final ComboBox<City> cityComboBox;
     private final TextArea whoamiField = new TextArea();
     private final TextArea whatdoiwantField = new TextArea();
@@ -110,13 +109,6 @@ public class DancerForm extends VerticalLayout {
         nameField.setRequiredIndicatorVisible(true);
         nameField.setWidthFull();
         emailField.setWidthFull();
-        int minYearOfBirth = Year.now().getValue() - 100;
-        int maxYearOfBirth = Year.now().getValue() - 10;
-        yearOfBirthField.setMin(minYearOfBirth);
-        yearOfBirthField.setMax(maxYearOfBirth);
-        yearOfBirthField.setI18n(new IntegerField.IntegerFieldI18n()
-                .setMinErrorMessage(t("form.yearOfBirth.min", String.valueOf(minYearOfBirth)))
-                .setMaxErrorMessage(t("form.yearOfBirth.max", String.valueOf(maxYearOfBirth))));
         cityComboBox.setWidthFull();
         whoamiField.setWidthFull();
         whoamiField.setHeight("300px");
@@ -142,7 +134,6 @@ public class DancerForm extends VerticalLayout {
                 .withValidator(new EmailValidator(t("form.invalidEmail")))
                 .bind(Dancer::email, Dancer::email);
         binder.forField(nameField).asRequired(t("form.required")).bind(Dancer::name, Dancer::name);
-        binder.forField(yearOfBirthField).asRequired(t("form.required")).bind(Dancer::yearOfBirth, Dancer::yearOfBirth);
         binder.forField(sexComboBox).bind(Dancer::sex, Dancer::sex);
         binder.forField(cityComboBox).bind(Dancer::city, Dancer::city);
         binder.forField(whoamiField).bind(Dancer::whoami, Dancer::whoami);
@@ -166,7 +157,6 @@ public class DancerForm extends VerticalLayout {
         else {
             emailField.setReadOnly(true); // the email is the login name, changing it is not supported yet
         }
-        formLayout.addFormItem(yearOfBirthField, t("form.yearOfBirth"));
         formLayout.addFormItem(cityComboBox, t("form.city"));
 
         // sex, with an explanation shown when "unknown" is selected
@@ -407,7 +397,6 @@ public class DancerForm extends VerticalLayout {
     private String fieldLabel(HasValue<?, ?> field) {
         if (field == nameField) return t("form.name");
         if (field == emailField) return t("form.email");
-        if (field == yearOfBirthField) return t("form.yearOfBirth");
         if (field == sexComboBox) return t("form.sex");
         if (field == cityComboBox) return t("form.city");
         if (field == whoamiField) return t("form.whoami");
