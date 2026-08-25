@@ -38,6 +38,11 @@ public class DancerService {
         return dancerRepository.save(dancer);
     }
 
+    @Transactional
+    public void delete(Dancer dancer) {
+        dancerRepository.delete(dancer);
+    }
+
     public List<DancerSearchingFor> searchingForOf(long dancerId) {
         Dancer dancer = dancerRepository.findById(dancerId).orElseThrow();
         return dancer.searchingFor();

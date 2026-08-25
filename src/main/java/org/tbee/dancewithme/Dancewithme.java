@@ -19,7 +19,6 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 // TODO:
-// Profile en logout in menu
 // Attempt login when email is not confirmed does not report the correct error (goto confirm email page?)
 // Forgot password logic (login page)
 // Chat
