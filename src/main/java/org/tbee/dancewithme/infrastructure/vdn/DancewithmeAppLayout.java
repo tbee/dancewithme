@@ -136,7 +136,9 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		Icon submenuIcon = new Icon(suffixIcon)
 				.size("0.8em")
 				.style("margin-left", "0.2em")
-				.style("margin-top", "0.2em");
-		return new HorizontalLayout(new Span(text), submenuIcon);
+				.style("margin-top", "0.3em");
+		HorizontalLayout horizontalLayout = new HorizontalLayout(new Span(text), submenuIcon);
+		horizontalLayout.setSpacing(false);
+		return horizontalLayout;
 	}
 }
