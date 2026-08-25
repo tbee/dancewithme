@@ -19,8 +19,10 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 // TODO:
-// Privacy / cookie policy text
 // Attempt login when email is not confirmed does not report the correct error (goto confirm email page?)
+// Privacy / cookie policy text
+// About popup
+// Integration / web rests
 // Forgot password logic (login page)
 // Chat
 
