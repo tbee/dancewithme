@@ -68,6 +68,7 @@ public class DancerForm extends VerticalLayout {
 
     private final EmailField emailField = new EmailField();
     private final PasswordField passwordField = new PasswordField();
+    private final PasswordField confirmPasswordField = new PasswordField();
     private final TextField nameField = new TextField();
     private final SexComboBox sexComboBox = new SexComboBox();
     private final ComboBox<City> cityComboBox;
@@ -153,6 +154,7 @@ public class DancerForm extends VerticalLayout {
         formLayout.addFormItem(emailField, t("form.email"));
         if (mode == Mode.REGISTER) {
             formLayout.addFormItem(passwordField, t("form.password"));
+            formLayout.addFormItem(confirmPasswordField, t("form.password.confirm"));
         }
         else {
             emailField.setReadOnly(true); // the email is the login name, changing it is not supported yet
@@ -341,7 +343,8 @@ public class DancerForm extends VerticalLayout {
 
         // domain validation
         String rawPassword = (mode == Mode.REGISTER) ? passwordField.getValue() : null;
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, rawPassword, privacyAgreementCheckbox.getValue());
+        String rawPasswordConfirmation = (mode == Mode.REGISTER) ? confirmPasswordField.getValue() : null;
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, rawPassword, rawPasswordConfirmation, privacyAgreementCheckbox.getValue());
         if (!problems.isEmpty()) {
             errors.addAll(showValidationProblems(problems));
         }
@@ -365,6 +368,11 @@ public class DancerForm extends VerticalLayout {
                     passwordField.setInvalid(true);
                     passwordField.setErrorMessage(t("form.passwordTooShort"));
                     messages.add(t("form.password") + ": " + t("form.passwordTooShort"));
+                }
+                case PASSWORDS_DO_NOT_MATCH -> {
+                    confirmPasswordField.setInvalid(true);
+                    confirmPasswordField.setErrorMessage(t("form.password.mismatch"));
+                    messages.add(t("form.password.confirm") + ": " + t("form.password.mismatch"));
                 }
                 case PRIVACY_AGREEMENT_REQUIRED -> {
                     privacyAgreementCheckbox.setInvalid(true);

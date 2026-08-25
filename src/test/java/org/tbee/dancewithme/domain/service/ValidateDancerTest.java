@@ -33,7 +33,7 @@ class ValidateDancerTest {
     void emptyDancerProducesNoProblems() {
         Dancer dancer = new Dancer();
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, false);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
         assertThat(problems).isEmpty();
     }
@@ -42,16 +42,25 @@ class ValidateDancerTest {
     void tooShortPasswordIsReported() {
         Dancer dancer = new Dancer();
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, "short", true);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, "short", "short", true);
 
         assertThat(problems).contains(ValidateDancer.Problem.PASSWORD_TOO_SHORT);
+    }
+
+    @Test
+    void mismatchingPasswordsAreReported() {
+        Dancer dancer = new Dancer();
+
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, "long-enough", "different", true);
+
+        assertThat(problems).contains(ValidateDancer.Problem.PASSWORDS_DO_NOT_MATCH);
     }
 
     @Test
     void missingPrivacyAgreementIsReported() {
         Dancer dancer = new Dancer();
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, "long-enough", false);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, "long-enough", "long-enough", false);
 
         assertThat(problems).contains(ValidateDancer.Problem.PRIVACY_AGREEMENT_REQUIRED);
     }
@@ -60,7 +69,7 @@ class ValidateDancerTest {
     void nullRawPasswordSkipsRegistrationChecks() {
         Dancer dancer = new Dancer();
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, false);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
         assertThat(problems).isEmpty();
     }
@@ -71,7 +80,7 @@ class ValidateDancerTest {
         dancer.addDancestyle(ballroom, follow, beginner);
         dancer.addDancestyle(ballroom, lead, intermediate);
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, false);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
         assertThat(problems).contains(ValidateDancer.Problem.DUPLICATE_DANCESTYLE);
     }
@@ -82,7 +91,7 @@ class ValidateDancerTest {
         dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, follow, beginner, intermediate);
         dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, lead, beginner, intermediate);
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, false);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
         assertThat(problems).contains(ValidateDancer.Problem.DUPLICATE_SEARCHING_FOR);
     }
@@ -93,7 +102,7 @@ class ValidateDancerTest {
         dancer.addDancestyle(ballroom, follow, beginner);
         dancer.addDancestyle(latin, lead, intermediate);
 
-        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, false);
+        List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
         assertThat(problems).doesNotContain(
                 ValidateDancer.Problem.DUPLICATE_DANCESTYLE,

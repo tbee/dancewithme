@@ -22,6 +22,7 @@ public class ValidateDancer {
     /** The individual problems that can make a dancer invalid. */
     public enum Problem {
         PASSWORD_TOO_SHORT,
+        PASSWORDS_DO_NOT_MATCH,
         PRIVACY_AGREEMENT_REQUIRED,
         DUPLICATE_DANCESTYLE,
         DUPLICATE_SEARCHING_FOR
@@ -30,16 +31,20 @@ public class ValidateDancer {
     /**
      * Validates the dancer and returns the list of problems found (empty when valid).
      *
-     * @param dancer          the dancer to validate
-     * @param rawPassword     the un-hashed password, or {@code null} for the update use case
-     *                        (in which case the password and privacy checks are skipped)
-     * @param privacyAccepted whether the privacy agreement has been accepted
+     * @param dancer                  the dancer to validate
+     * @param rawPassword             the un-hashed password, or {@code null} for the update use case
+     *                                (in which case the password and privacy checks are skipped)
+     * @param rawPasswordConfirmation the repeated password, or {@code null} for the update use case
+     * @param privacyAccepted         whether the privacy agreement has been accepted
      */
-    public List<Problem> validate(Dancer dancer, String rawPassword, boolean privacyAccepted) {
+    public List<Problem> validate(Dancer dancer, String rawPassword, String rawPasswordConfirmation, boolean privacyAccepted) {
         List<Problem> problems = new ArrayList<>();
 
         if (rawPassword != null && rawPassword.length() < MIN_PASSWORD_LENGTH) {
             problems.add(Problem.PASSWORD_TOO_SHORT);
+        }
+        if (rawPassword != null && !rawPassword.equals(rawPasswordConfirmation)) {
+            problems.add(Problem.PASSWORDS_DO_NOT_MATCH);
         }
         if (rawPassword != null && !privacyAccepted) {
             problems.add(Problem.PRIVACY_AGREEMENT_REQUIRED);

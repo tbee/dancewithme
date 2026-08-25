@@ -13,4 +13,12 @@ public interface EmailService {
      * @param confirmationUrl the absolute URL the recipient must click to confirm
      */
     void sendConfirmationEmail(String to, String code, String confirmationUrl);
+
+    /**
+     * Sends the password reset email with the given reset link.
+     *
+     * @param to       the recipient email address
+     * @param resetUrl the absolute URL the recipient must click to reset their password
+     */
+    void sendPasswordResetEmail(String to, String resetUrl);
 }

@@ -29,4 +29,16 @@ public class SmtpEmailService implements EmailService {
                 + "If you did not register, you can ignore this message.");
         mailSender.send(message);
     }
+
+    @Override
+    public void sendPasswordResetEmail(String to, String resetUrl) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Reset your Dancewithme password");
+        message.setText("We received a request to reset your Dancewithme password.\n\n"
+                + "Click the link below to choose a new password:\n"
+                + resetUrl + "\n\n"
+                + "If you did not request this, you can ignore this message.");
+        mailSender.send(message);
+    }
 }

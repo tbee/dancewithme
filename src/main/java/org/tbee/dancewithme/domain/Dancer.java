@@ -61,6 +61,12 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     @Column(unique = true)
     private String emailConfirmationToken;
 
+    // the token used in the password reset email; cleared once the password is reset
+    private String passwordResetToken;
+
+    // when the password reset token expires
+    private LocalDateTime passwordResetTokenExpiresAt;
+
     @Column(columnDefinition = "text")
     private String whoami;
 
@@ -172,6 +178,22 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     }
     public Dancer emailConfirmationToken(String emailConfirmationToken) {
         this.emailConfirmationToken = emailConfirmationToken;
+        return this;
+    }
+
+    public String passwordResetToken() {
+        return passwordResetToken;
+    }
+    public Dancer passwordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
+        return this;
+    }
+
+    public LocalDateTime passwordResetTokenExpiresAt() {
+        return passwordResetTokenExpiresAt;
+    }
+    public Dancer passwordResetTokenExpiresAt(LocalDateTime passwordResetTokenExpiresAt) {
+        this.passwordResetTokenExpiresAt = passwordResetTokenExpiresAt;
         return this;
     }
 

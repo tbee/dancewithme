@@ -1,5 +1,6 @@
 package org.tbee.dancewithme.infrastructure.vdn.view;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -22,6 +23,7 @@ public class LoginView extends VerticalLayout implements BeforeEnterObserver {
         setJustifyContentMode(JustifyContentMode.CENTER);
 
         loginForm.setAction("login");
+        loginForm.addForgotPasswordListener(e -> UI.getCurrent().navigate(ForgotPasswordView.class));
         add(new H1("Dancewithme"), loginForm);
     }
 
