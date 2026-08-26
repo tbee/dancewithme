@@ -40,20 +40,14 @@ public class ConfirmEmailView extends VerticalLayout implements BeforeEnterObser
     public void beforeEnter(BeforeEnterEvent event) {
         Map<String, List<String>> params = event.getLocation().getQueryParameters().getParameters();
 
-        // clicked the confirmation link in the email
-        String code = first(params, "code");
-        if (code != null) {
-            showResult(emailConfirmationService.confirm(code));
-            return;
-        }
-
         // manual code entry
         TextField codeField = new TextField(getTranslation("confirm.code"));
         codeField.setWidth("200px");
 
-        String prefill = first(params, "prefill");
-        if (prefill != null) {
-            codeField.setValue(prefill);
+        // clicked the confirmation link in the email
+        String code = first(params, "code");
+        if (code != null) {
+            codeField.setValue(code);
         }
 
         Button confirmButton = new Button(getTranslation("confirm.button"),e -> showResult(emailConfirmationService.confirm(codeField.getValue())));
@@ -70,6 +64,6 @@ public class ConfirmEmailView extends VerticalLayout implements BeforeEnterObser
 
     private static String first(Map<String, List<String>> params, String key) {
         List<String> values = params.getOrDefault(key, List.of());
-        return values.isEmpty() ? null : values.get(0);
+        return values.isEmpty() ? null : values.getFirst();
     }
 }

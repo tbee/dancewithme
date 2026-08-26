@@ -44,7 +44,7 @@ public class RegisterView extends DancewithmeAppLayout {
             try {
                 Dancer registered = dancerService.register(dancer, form.rawPassword());
                 if (emailConfirmationService.isDevelopment()) {
-                    UI.getCurrent().navigate("confirm?prefill=" + registered.emailConfirmationToken());
+                    UI.getCurrent().navigate("confirm?code=" + registered.emailConfirmationToken());
                 }
                 else {
                     UI.getCurrent().navigate("confirm");

@@ -58,7 +58,7 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
         });
         resetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        add(new Span(getTranslation("reset.instruction")), passwordField, confirmPasswordField, resetButton);
+        add(new Span(getTranslation("reset.instruction", email)), passwordField, confirmPasswordField, resetButton);
     }
 
     private void showResult(boolean reset) {
@@ -69,6 +69,6 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
 
     private static String first(Map<String, List<String>> params, String key) {
         List<String> values = params.getOrDefault(key, List.of());
-        return values.isEmpty() ? null : values.get(0);
+        return values.isEmpty() ? null : values.getFirst();
     }
 }

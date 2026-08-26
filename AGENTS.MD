@@ -6,8 +6,7 @@ The core component of this application there is the SearchService, which tries t
 In order to do this, each search parameter needs to have a counterpart in the searchable items.
 For example: if you want to search on:
 - the distance two dancers are apart, you need to know where they live.
-- age difference, you need to know the year of birth.
-- how often then want to dance per week, you need to know the prefered frequency.
+- how often then want to dance per week, you need to know the preferred frequency.
 - dance style and their roles (lead or follow) and skill in them, you need to know what they can do.
 
 A dancers basically is an implementation of both searchable item and search parameters, 
@@ -27,3 +26,10 @@ It has the following main layers:
 - **Domain layer**: contains the core business logic and domain entities like `Dancer`, along with the interfaces for searchable items and search parameters. This layer is independent of any infrastructure concerns.
 - **Application layer**: contains the `SearchService` and orchestrates use cases, coordinating between the domain and infrastructure.
 - **Infrastructure layer**: external facing logic, like the Vaadin based web application.
+
+# Patterns
+Whenever a process uses outside services that are not available on development, like sending an email, make the process run as close as possible to the actual one.
+For example: when confirming the entered email after registering a profile, on development do not immediately mark the profile as confirmed.
+Instead, jump to the "email address confirmed" page that normally would be opened after clicking on the link in the email. 
+With the confirmation code prefilled. 
+In this way on development all the parts of the application involved in that process are visited.
