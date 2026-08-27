@@ -48,42 +48,45 @@ implements HasDynamicTitle, AfterNavigationObserver {
 
 	public void postConstruct() {
 		// Set the title, absolutely positioned on the left so the navigation can be truly centered
-		titleH1.text(getTranslation(titleKey))
+		String title = getTranslation(titleKey);
+		titleH1.text(title)
 				.style("font-size", "var(--lumo-font-size-l)")
 				.style("margin", "0")
 				.style("position", "absolute")
-				.style("left", "var(--vaadin-padding-l)");
-
-		// Navigation is in the middle of the navbar; no drawer needed
-		Button searchButton = new Button(getTranslation("menu.search"), e -> getUI().ifPresent(ui -> ui.navigate(SearchView.class)));
-		searchButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-		HorizontalLayout navigation = new HorizontalLayout(searchButton);
-		if (!securityService.isLoggedIn()) {
-			Button registerButton = new Button(getTranslation("menu.register"), e -> getUI().ifPresent(ui -> ui.navigate(RegisterView.class)));
-			registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-			navigation.add(registerButton);
-		}
-		navigation.getStyle().set("flex", "1");
-		navigation.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-		navigation.setAlignItems(FlexComponent.Alignment.CENTER);
+				.style("left", "var(--vaadin-padding-l)")
+				.style("padding-top", "5px")
+				.style("width", title.length() +"em");
 
 		MenuBar menuBar = new MenuBar() //  https://vaadin.com/directory/component/app-layout-add-on   https://vaadin.com/docs/latest/components/menu-bar
 				.id("navbar")
+				.widthFull()
 				.themeVariants(MenuBarVariant.LUMO_TERTIARY, MenuBarVariant.LUMO_END_ALIGNED);
 
-		// Right side of the navbar: language switcher, username, login/logout
-		Button nlButton = new Button(getTranslation("language.nl"), e -> localeService.switchLocale(Locale.of("nl")));
-		Button enButton = new Button(getTranslation("language.en"), e -> localeService.switchLocale(Locale.ENGLISH));
-		nlButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-		enButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-		menuBar.addItem(nlButton);
-		menuBar.addItem(enButton);
+		// Search
+		Button searchButton = new Button(getTranslation("menu.search"), e -> getUI().ifPresent(ui -> ui.navigate(SearchView.class)));
+		searchButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+		menuBar.addItem(searchButton);
 
+		// Register
+		if (!securityService.isLoggedIn()) {
+			Button registerButton = new Button(getTranslation("menu.register"), e -> getUI().ifPresent(ui -> ui.navigate(RegisterView.class)));
+			registerButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+			menuBar.addItem(registerButton);
+		}
+
+		// Languages
+		MenuItem languageMenuItem = menuBar.addItem(createSubmenu(getTranslation("language"), VaadinIcon.CHEVRON_DOWN));
+		languageMenuItem.setId("languageMenuItem");
+		SubMenu languageSubMenu = languageMenuItem.getSubMenu();
+		languageSubMenu.addItem(getTranslation("language.nl"), event -> localeService.switchLocale(Locale.of("nl")));
+		languageSubMenu.addItem(getTranslation("language.en"), event -> localeService.switchLocale(Locale.ENGLISH));
+
+		// Profile submenu or login button
 		securityService.loggedInDancer().ifPresentOrElse(dancer -> {
-			MenuItem accountMenuItem = menuBar.addItem(createSubmenu(dancer.name(), VaadinIcon.CHEVRON_DOWN));
+			MenuItem accountMenuItem = menuBar.addItem(createSubmenu(dancer.email(), VaadinIcon.CHEVRON_DOWN));
 			accountMenuItem.setId("accountMenuItem");
 			SubMenu accountSubMenu = accountMenuItem.getSubMenu();
-			accountSubMenu.addItem(getTranslation("menu.profile"), event -> getUI().ifPresent(ui -> ui.navigate(ProfileView.class))).setId("changePasswordItem");
+			accountSubMenu.addItem(getTranslation("menu.profile"), event -> getUI().ifPresent(ui -> ui.navigate(ProfileView.class)));
 			accountSubMenu.addItem(getTranslation("menu.logout"), event -> securityService.logout());
 		}, () -> {
 			Button loginButton = new Button(getTranslation("menu.login"), e -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
@@ -92,7 +95,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		});
 
 		// Navbar
-		addToNavbar(titleH1, navigation, menuBar);
+		addToNavbar(titleH1, menuBar);
 	}
 
 	@Override
