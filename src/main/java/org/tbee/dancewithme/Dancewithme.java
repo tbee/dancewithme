@@ -20,7 +20,6 @@ import java.util.Locale;
 // Privacy / cookie policy text
 // About popup
 // Integration / web rests
-// Forgot password logic (login page)
 // Chat
 
 @SpringBootApplication

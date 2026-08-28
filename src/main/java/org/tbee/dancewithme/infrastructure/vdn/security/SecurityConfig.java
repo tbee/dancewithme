@@ -15,10 +15,10 @@ import org.tbee.dancewithme.infrastructure.vdn.view.LoginView;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, DancerUserDetailsService userDetailsService) throws Exception {
+        // registering our own provider also keeps Spring Boot from adding the default one
+        http.authenticationProvider(new DancerAuthenticationProvider(userDetailsService, passwordEncoder()));
         http.with(VaadinSecurityConfigurer.vaadin(), configurer -> configurer.loginView(LoginView.class));
-        // a login attempt with an unconfirmed email address must not end up as a plain "wrong credentials"
-        http.formLogin(formLogin -> formLogin.failureHandler(new DancerAuthenticationFailureHandler()));
         return http.build();
     }
 

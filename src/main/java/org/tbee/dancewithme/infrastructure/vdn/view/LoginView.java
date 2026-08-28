@@ -8,10 +8,16 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinService;
+import com.vaadin.flow.server.WrappedSession;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import org.springframework.security.web.WebAttributes;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
+import org.tbee.dancewithme.infrastructure.vdn.RememberedEmail;
+import org.tbee.dancewithme.infrastructure.vdn.security.EmailNotConfirmedException;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 import org.tbee.webstack.vdn.component.html.H1;
 
@@ -59,8 +65,33 @@ public class LoginView extends DancewithmeAppLayout implements BeforeEnterObserv
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        if (event.getLocation().getQueryParameters().getParameters().containsKey("error")) {
-            loginForm.setError(true);
+        if (!event.getLocation().getQueryParameters().getParameters().containsKey("error")) {
+            return;
         }
+
+        // an unconfirmed email address is not a credentials problem, and showing it as such would be a dead end:
+        // send the dancer to the confirmation page, where the code can be entered or the email resent
+        if (lastAuthenticationFailure() instanceof EmailNotConfirmedException emailNotConfirmed) {
+            RememberedEmail.remember(emailNotConfirmed.email());
+            event.forwardTo("confirm", QueryParameters.of("unconfirmed", "true"));
+            return;
+        }
+
+        loginForm.setError(true);
+    }
+
+    /**
+     * Spring Security parks the failure in the session before redirecting to {@code login?error};
+     * it is consumed here, so a later visit to the login page does not act on a stale failure.
+     */
+    private Object lastAuthenticationFailure() {
+        WrappedSession session = VaadinService.getCurrentRequest() == null ? null
+                : VaadinService.getCurrentRequest().getWrappedSession(false);
+        if (session == null) {
+            return null;
+        }
+        Object failure = session.getAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+        return failure;
     }
 }

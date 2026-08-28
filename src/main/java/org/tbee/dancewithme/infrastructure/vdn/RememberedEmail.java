@@ -2,14 +2,13 @@ package org.tbee.dancewithme.infrastructure.vdn;
 
 import com.vaadin.flow.server.VaadinService;
 import com.vaadin.flow.server.WrappedSession;
-import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Remembers the email address a visitor last identified themselves with (registering, or a refused login),
  * so views further along in the flow can prefill it and the visitor does not have to type it again.
  * <p>
- * The value is kept in the HTTP session, because it is written both from Vaadin (views) and from plain servlet
- * code (the authentication failure handler), which has no {@code VaadinSession} available.
+ * The value is kept in the HTTP session rather than on the Vaadin session, next to the authentication failure
+ * that Spring Security parks there.
  */
 public final class RememberedEmail {
 
@@ -19,21 +18,12 @@ public final class RememberedEmail {
     }
 
     /**
-     * Remembers the email address, from within a Vaadin view.
+     * Remembers the email address.
      */
     public static void remember(String email) {
         WrappedSession session = session();
-        if (session != null) {
+        if (session != null && email != null && !email.isBlank()) {
             session.setAttribute(ATTRIBUTE, email);
-        }
-    }
-
-    /**
-     * Remembers the email address, from within plain servlet code.
-     */
-    public static void remember(HttpServletRequest request, String email) {
-        if (email != null && !email.isBlank()) {
-            request.getSession().setAttribute(ATTRIBUTE, email);
         }
     }
 

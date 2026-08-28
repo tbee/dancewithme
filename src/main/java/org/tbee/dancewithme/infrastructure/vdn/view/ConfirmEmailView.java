@@ -59,8 +59,11 @@ public class ConfirmEmailView extends DancewithmeAppLayout implements BeforeEnte
             verticalLayout.add(new Span(getTranslation("confirm.loginRefused")));
         }
         // registering an already registered but unconfirmed email address only resends the confirmation
-        if (first(params, "resent") != null) {
+        else if (first(params, "resent") != null) {
             verticalLayout.add(new Span(getTranslation("confirm.alreadyRegistered")));
+        }
+        else {
+            verticalLayout.add(new Span(getTranslation("confirm.instruction")));
         }
 
         // manual code entry, prefilled when the confirmation link in the email was clicked
@@ -74,7 +77,7 @@ public class ConfirmEmailView extends DancewithmeAppLayout implements BeforeEnte
         Button confirmButton = new Button(getTranslation("confirm.button"), e -> confirm());
         confirmButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        verticalLayout.add(new Span(getTranslation("confirm.instruction")), codeField, confirmButton,
+        verticalLayout.add(codeField, confirmButton,
                 new RouterLink(getTranslation("resend.link"), ResendConfirmationView.class));
     }
 

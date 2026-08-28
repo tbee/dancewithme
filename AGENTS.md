@@ -63,3 +63,6 @@ Instead, jump to the "email address confirmed" page that normally would be opene
 With the confirmation code prefilled. 
 In this way on development all the parts of the application involved in that process are visited.
 The switch for this is "is the `dev` profile active", see `EmailConfirmationService.isDevelopment()`.
+
+# Gotchas
+- Dancer.active only applies to searching, login is always allowed.
