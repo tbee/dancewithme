@@ -16,8 +16,12 @@ import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
+import org.tbee.dancewithme.infrastructure.vdn.RememberedEmail;
 import org.tbee.dancewithme.infrastructure.vdn.component.DancerForm;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Route("register")
 @AnonymousAllowed
@@ -42,13 +46,20 @@ public class RegisterView extends DancewithmeAppLayout {
                 return;
             }
             try {
-                Dancer registered = dancerService.register(dancer, form.rawPassword());
+                RememberedEmail.remember(dancer.email());
+                DancerService.Registration registration = dancerService.registerOrResend(dancer, form.rawPassword());
+                List<String> params = new ArrayList<>();
                 if (emailConfirmationService.isDevelopment()) {
-                    UI.getCurrent().navigate("confirm?code=" + registered.emailConfirmationToken());
+                    params.add("code=" + registration.dancer().emailConfirmationToken());
                 }
-                else {
-                    UI.getCurrent().navigate("confirm");
+                if (registration.resentForExisting()) {
+                    params.add("resent=true");
                 }
+                UI.getCurrent().navigate(params.isEmpty() ? "confirm" : "confirm?" + String.join("&", params));
+
+            }
+            catch (DancerService.EmailAlreadyRegisteredException ex) {
+                showErrorNotification(getTranslation("register.emailInUse"));
             }
             catch (Exception ex) {
                 showException(ex);

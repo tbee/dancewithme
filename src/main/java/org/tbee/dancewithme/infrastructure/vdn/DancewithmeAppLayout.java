@@ -44,9 +44,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		this.titleKey = titleKey;
 		this.securityService = securityService;
 		this.localeService = localeService;
-	}
 
-	public void postConstruct() {
 		// Set the title, absolutely positioned on the left so the navigation can be truly centered
 		String title = getTranslation(titleKey);
 		titleH1.text(title)
@@ -96,6 +94,9 @@ implements HasDynamicTitle, AfterNavigationObserver {
 
 		// Navbar
 		addToNavbar(titleH1, menuBar);
+	}
+
+	public void postConstruct() {
 	}
 
 	@Override

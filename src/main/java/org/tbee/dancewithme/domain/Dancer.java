@@ -61,6 +61,10 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     @Column(unique = true)
     private String emailConfirmationToken;
 
+    // when the confirmation token expires; a resend restarts this clock.
+    // an unconfirmed dancer whose token has expired is removed by DancerCleanupService.
+    private LocalDateTime emailConfirmationTokenExpiresAt;
+
     // the token used in the password reset email; cleared once the password is reset
     private String passwordResetToken;
 
@@ -178,6 +182,14 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     }
     public Dancer emailConfirmationToken(String emailConfirmationToken) {
         this.emailConfirmationToken = emailConfirmationToken;
+        return this;
+    }
+
+    public LocalDateTime emailConfirmationTokenExpiresAt() {
+        return emailConfirmationTokenExpiresAt;
+    }
+    public Dancer emailConfirmationTokenExpiresAt(LocalDateTime emailConfirmationTokenExpiresAt) {
+        this.emailConfirmationTokenExpiresAt = emailConfirmationTokenExpiresAt;
         return this;
     }
 

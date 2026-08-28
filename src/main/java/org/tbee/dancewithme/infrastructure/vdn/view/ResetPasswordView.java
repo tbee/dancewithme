@@ -3,6 +3,7 @@ package org.tbee.dancewithme.infrastructure.vdn.view;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -12,6 +13,9 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import org.tbee.dancewithme.application.PasswordResetService;
+import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
+import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
+import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.util.List;
 import java.util.Map;
@@ -20,17 +24,20 @@ import java.util.Map;
  * The page reached by clicking the reset link in the email, offering to set a new password.
  */
 @Route("reset-password")
-@PageTitle("Dancewithme")
 @AnonymousAllowed
-public class ResetPasswordView extends VerticalLayout implements BeforeEnterObserver {
+public class ResetPasswordView extends DancewithmeAppLayout implements BeforeEnterObserver {
 
     private final PasswordResetService passwordResetService;
+    private final VerticalLayout verticalLayout = new VerticalLayout();
 
-    public ResetPasswordView(PasswordResetService passwordResetService) {
+    public ResetPasswordView(SecurityService securityService, LocaleService localeService, PasswordResetService passwordResetService) {
+        super("reset.button", securityService, localeService);
         this.passwordResetService = passwordResetService;
-        setSizeFull();
-        setAlignItems(Alignment.CENTER);
-        setJustifyContentMode(JustifyContentMode.CENTER);
+
+        verticalLayout.setSizeFull();
+        verticalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        setContent(verticalLayout);
     }
 
     @Override
@@ -58,13 +65,13 @@ public class ResetPasswordView extends VerticalLayout implements BeforeEnterObse
         });
         resetButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        add(new Span(getTranslation("reset.instruction", email)), passwordField, confirmPasswordField, resetButton);
+        verticalLayout.add(new Span(getTranslation("reset.instruction", email)), passwordField, confirmPasswordField, resetButton);
     }
 
     private void showResult(boolean reset) {
-        removeAll();
-        add(new Span(getTranslation(reset ? "reset.success" : "reset.failure")));
-        add(new RouterLink(getTranslation("menu.login"), LoginView.class));
+        verticalLayout.removeAll();
+        verticalLayout.add(new Span(getTranslation(reset ? "reset.success" : "reset.failure")));
+        verticalLayout.add(new RouterLink(getTranslation("menu.login"), LoginView.class));
     }
 
     private static String first(Map<String, List<String>> params, String key) {

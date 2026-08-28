@@ -24,13 +24,45 @@ public class DancerService {
         this.emailConfirmationService = emailConfirmationService;
     }
 
+    /**
+     * Registers a new dancer and starts the email confirmation flow.
+     * When a dancer with the same email already exists but never confirmed that email, nothing is created:
+     * the confirmation is simply resent for the existing profile. That profile is the one the confirmation
+     * link belongs to, and after confirming, its owner can log in and correct the profile.
+     *
+     * @throws EmailAlreadyRegisteredException when a dancer with this email exists and has confirmed it
+     */
     @Transactional
-    public Dancer register(Dancer dancer, String rawPassword) {
+    public Registration registerOrResend(Dancer dancer, String rawPassword) {
+        Dancer existing = dancerRepository.findByEmail(dancer.email()).orElse(null);
+        if (existing != null) {
+            if (existing.emailConfirmedAt() != null) {
+                throw new EmailAlreadyRegisteredException(dancer.email());
+            }
+            emailConfirmationService.requestConfirmation(existing);
+            return new Registration(existing, true);
+        }
+
         dancer.password(passwordEncoder.encode(rawPassword));
         dancer.privacyAgreementAcceptedAt(LocalDateTime.now());
         Dancer saved = dancerRepository.save(dancer);
         emailConfirmationService.requestConfirmation(saved);
-        return saved;
+        return new Registration(saved, false);
+    }
+
+    /**
+     * The outcome of a registration attempt.
+     *
+     * @param dancer the dancer the confirmation was sent for; the newly registered one, or the pre-existing
+     *               unconfirmed one when {@code resentForExisting} is {@code true}
+     * @param resentForExisting whether the registration was turned into a resend for an existing unconfirmed profile
+     */
+    public record Registration(Dancer dancer, boolean resentForExisting) {}
+
+    public static class EmailAlreadyRegisteredException extends RuntimeException {
+        public EmailAlreadyRegisteredException(String email) {
+            super("Email already registered: " + email);
+        }
     }
 
     @Transactional

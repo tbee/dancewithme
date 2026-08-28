@@ -9,6 +9,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
@@ -16,7 +17,6 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 // TODO:
-// Attempt login when email is not confirmed does not report the correct error (goto confirm email page?)
 // Privacy / cookie policy text
 // About popup
 // Integration / web rests
@@ -25,6 +25,7 @@ import java.util.Locale;
 
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class, enableDefaultTransactions = false)
+@EnableScheduling
 @StyleSheet(Lumo.STYLESHEET)
 public class Dancewithme implements AppShellConfigurator {
     private static final Logger LOG = LoggerFactory.getLogger(Dancewithme.class);

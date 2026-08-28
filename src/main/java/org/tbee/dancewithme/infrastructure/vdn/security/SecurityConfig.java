@@ -17,6 +17,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.with(VaadinSecurityConfigurer.vaadin(), configurer -> configurer.loginView(LoginView.class));
+        // a login attempt with an unconfirmed email address must not end up as a plain "wrong credentials"
+        http.formLogin(formLogin -> formLogin.failureHandler(new DancerAuthenticationFailureHandler()));
         return http.build();
     }
 

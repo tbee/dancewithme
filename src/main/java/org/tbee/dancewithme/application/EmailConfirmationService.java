@@ -15,10 +15,15 @@ import java.util.Arrays;
  * Orchestrates the email confirmation flow:
  * after registration a confirmation code is generated and emailed, and entering the code (or clicking the link)
  * marks the email as confirmed.
+ * The code expires after {@value #TOKEN_EXPIRY_HOURS} hours; a resend generates a new code and restarts that clock.
+ * Unconfirmed dancers whose code has expired are removed by {@link DancerCleanupService}, so the email address
+ * becomes available again.
  * In development no email is sent, so the code can be prefilled in the UI to test the flow end to end.
  */
 @Service
 public class EmailConfirmationService {
+
+    static final int TOKEN_EXPIRY_HOURS = 24;
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -44,6 +49,7 @@ public class EmailConfirmationService {
     public String requestConfirmation(Dancer dancer) {
         String code = generateCode();
         dancer.emailConfirmationToken(code);
+        dancer.emailConfirmationTokenExpiresAt(LocalDateTime.now().plusHours(TOKEN_EXPIRY_HOURS));
         dancerRepository.save(dancer);
         if (!isDevelopment()) {
             emailService.sendConfirmationEmail(dancer.email(), code, confirmationUrl(code));
@@ -52,18 +58,39 @@ public class EmailConfirmationService {
     }
 
     /**
+     * Generates a fresh confirmation code for the dancer owning the given email and emails it again
+     * (except in development). The previous code stops working and the expiry clock restarts.
+     * To avoid revealing whether an account exists, this returns silently when no dancer is found or
+     * when the email is already confirmed.
+     *
+     * @return the generated code when a confirmation was resent, so it can be prefilled in the UI during
+     *         development; {@code null} when there is nothing to confirm for this email
+     */
+    @Transactional
+    public String resendConfirmation(String email) {
+        Dancer dancer = dancerRepository.findByEmail(email).orElse(null);
+        if (dancer == null || dancer.emailConfirmedAt() != null) {
+            return null;
+        }
+        return requestConfirmation(dancer);
+    }
+
+    /**
      * Confirms the email for the dancer owning the given code.
      *
-     * @return {@code true} when a dancer was confirmed, {@code false} when the code is unknown
+     * @return {@code true} when a dancer was confirmed, {@code false} when the code is unknown or expired
      */
     @Transactional
     public boolean confirm(String code) {
         Dancer dancer = dancerRepository.findByEmailConfirmationToken(code).orElse(null);
-        if (dancer == null) {
+        if (dancer == null
+                || dancer.emailConfirmationTokenExpiresAt() == null
+                || dancer.emailConfirmationTokenExpiresAt().isBefore(LocalDateTime.now())) {
             return false;
         }
         dancer.emailConfirmedAt(LocalDateTime.now());
         dancer.emailConfirmationToken(null);
+        dancer.emailConfirmationTokenExpiresAt(null);
         dancerRepository.save(dancer);
         return true;
     }
