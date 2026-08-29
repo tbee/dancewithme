@@ -1,5 +1,6 @@
 package org.tbee.dancewithme.infrastructure.vdn.component;
 
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.badge.Badge;
 import com.vaadin.flow.component.badge.BadgeVariant;
@@ -38,7 +39,8 @@ public class SearchResultCard extends Card {
 
         // whoami excerpt
         String whoami = dancer.whoami() == null ? "" : dancer.whoami();
-        Markdown whoamiMarkdown = new Markdown(whoami);
+        int maxlength = 500;
+        Markdown whoamiMarkdown = new Markdown(whoami.length() < maxlength ? whoami : whoami.substring(0, maxlength) + "...");
 
         // role + style badges
         HorizontalLayout badgeBar = new HorizontalLayout();
@@ -66,18 +68,18 @@ public class SearchResultCard extends Card {
                                      : new RouterLink(getTranslation("card.viewProfile"), LoginView.class);
         viewProfileLink.getElement().setAttribute("theme", "button");
 
-        VerticalLayout middle = new VerticalLayout(whoamiMarkdown, frequency);
+        VerticalLayout middle = new VerticalLayout(frequency, whoamiMarkdown);
         middle.setPadding(false);
         middle.setSpacing(false);
 
         if (loggedIn && dancer.mugshot() != null) {
-            Image image = new Image(dancer.mugshot(), dancer.name());
-            image.setWidth("160px");
-//            image.setHeight("160px");
-            setMedia(image);
+            setMedia(new Image(dancer.mugshot(), dancer.name()));
         }
         else if (!loggedIn) {
             Avatar avatar = new Avatar(dancer.name());
+            avatar.setSizeFull();
+            avatar.setWidth("200px");
+            avatar.setHeight("200px");
             setMedia(avatar);
         }
         
@@ -87,7 +89,6 @@ public class SearchResultCard extends Card {
         setWidthFull();
         setHeaderSuffix(badgeBar);
         addToFooter(viewProfileLink);
-//        setMaxHeight("300px");
         addThemeVariants(CardVariant.HORIZONTAL, CardVariant.COVER_MEDIA);
     }
 }
