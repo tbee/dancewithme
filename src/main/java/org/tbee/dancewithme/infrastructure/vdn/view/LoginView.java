@@ -40,7 +40,7 @@ public class LoginView extends DancewithmeAppLayout implements BeforeEnterObserv
         loginForm.addForgotPasswordListener(e -> UI.getCurrent().navigate(ForgotPasswordView.class));
 
         Image logoImage = new Image();
-        logoImage.src("images/logoTransparent1450x1450.png");
+        logoImage.src("images/logoTransparent2048x2048.png");
         logoImage.style("height", "300px")
                 .style("padding-top", "30px");
 
