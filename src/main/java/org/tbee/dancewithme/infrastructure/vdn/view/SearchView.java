@@ -43,7 +43,6 @@ public class SearchView extends DancewithmeAppLayout {
 
     private final VerticalLayout styleRowsLayout = new VerticalLayout();
     private final List<SearchingForRow> styleRows = new ArrayList<>();
-    private final IntegerField ageDistanceField = new IntegerField();
     private final IntegerField weekFrequencyMinField = new IntegerField();
     private final IntegerField weekFrequencyMaxField = new IntegerField();
     private final IntegerField distanceMaxField = new IntegerField();
@@ -68,7 +67,6 @@ public class SearchView extends DancewithmeAppLayout {
         this.dancestyleRepository = dancestyleRepository;
         this.roleRepository = roleRepository;
         this.skilllevelRepository = skilllevelRepository;
-        postConstruct();
 
         boolean loggedIn = securityService.isLoggedIn();
 
@@ -93,9 +91,6 @@ public class SearchView extends DancewithmeAppLayout {
         VerticalLayout styleRowsWithButton = new VerticalLayout(styleRowsLayout, addStyleButton);
         styleRowsWithButton.setPadding(false);
 
-        ageDistanceField.setMin(0);
-        ageDistanceField.setValue(currentDancer == null ? 0 : currentDancer.ageDistanceMax());
-        ageDistanceField.setVisible(loggedIn); // age distance is relative to the logged in user's age
         weekFrequencyMinField.setValue(currentDancer == null ? 0 : currentDancer.weekFrequencyMin());
         weekFrequencyMinField.setPlaceholder(getTranslation("search.age.min"));
         weekFrequencyMinField.setMin(0);
@@ -111,9 +106,6 @@ public class SearchView extends DancewithmeAppLayout {
         FormLayout formLayout = new FormLayout();
         formLayout.setResponsiveSteps(new FormLayout.ResponsiveStep("0", 1));
         formLayout.addFormItem(styleRowsWithButton, getTranslation("search.dancestyle"));
-        if (loggedIn) {
-            formLayout.addFormItem(ageDistanceField, getTranslation("search.ageDistance"));
-        }
         formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), getTranslation("search.weekFrequency"));
         if (loggedIn) {
             formLayout.addFormItem(distanceMaxField, getTranslation("search.distance"));
@@ -160,10 +152,6 @@ public class SearchView extends DancewithmeAppLayout {
 
     private void search() {
         SearchService.SearchParameters searchParameters = new SearchService.SearchParameters(){
-            @Override
-            public int ageDistanceMax() {
-                return ifNull(ageDistanceField.getValue(), 100);
-            }
 
             @Override
             public int weekFrequencyMin() {

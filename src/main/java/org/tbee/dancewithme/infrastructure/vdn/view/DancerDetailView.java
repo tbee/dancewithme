@@ -38,7 +38,6 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
         this.dancerService = dancerService;
         this.securityService = securityService;
         this.searchService = searchService;
-        postConstruct();
     }
 
     @Override

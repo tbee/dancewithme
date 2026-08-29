@@ -62,7 +62,7 @@ class SearchServiceTest {
         Dancer candidate = candidate(1L, amsterdam, 0, 7, null);
         when(dancerRepository.findByActiveTrueAndPubliclyFindableTrue()).thenReturn(List.of(candidate));
 
-        Dancer criteria = dancer(0L, "anonymous", Sex.UNKNOWN, 100, 0, 7, 100, List.of());
+        Dancer criteria = dancer(0L, "anonymous", Sex.UNKNOWN, 0, 7, 100, List.of());
 
         List<SearchService.SearchResult> result = searchService.search(criteria);
 
@@ -79,7 +79,7 @@ class SearchServiceTest {
         Dancer far = candidate(2L, berlin, 0, 7, null);
         when(dancerRepository.findByActiveTrueAndPubliclyFindableTrue()).thenReturn(List.of(near, far));
 
-        Dancer criteria = dancer(0L, "anonymous", Sex.UNKNOWN, 1, 0, 7, 1, List.of());
+        Dancer criteria = dancer(0L, "anonymous", Sex.UNKNOWN, 0, 7, 1, List.of());
 
         List<SearchService.SearchResult> result = searchService.search(criteria);
 
@@ -88,7 +88,7 @@ class SearchServiceTest {
 
     @Test
     void searchLoggedInExcludesSelfAndUsesActiveRepository() {
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of());
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
         when(securityService.loggedInDancer()).thenReturn(Optional.of(searcher));
         Dancer other = candidate(1L, amsterdam, 0, 7, null);
         when(dancerRepository.findByActiveTrue()).thenReturn(List.of(searcher, other));
@@ -96,7 +96,7 @@ class SearchServiceTest {
         List<SearchService.SearchResult> result = searchService.search(searcher);
 
         assertEquals(1, result.size());
-        assertEquals(other.id(), result.get(0).dancer().id());
+        assertEquals(other.id(), result.getFirst().dancer().id());
         verify(dancerRepository).findByActiveTrue();
         verify(dancerRepository, never()).findByActiveTrueAndPubliclyFindableTrue();
     }
@@ -106,7 +106,7 @@ class SearchServiceTest {
 
     @Test
     void matchFiltersOnWeekFrequency() {
-        Dancer searcher = searcher(amsterdam, 100, 2, 4, 100, List.of());
+        Dancer searcher = searcher(amsterdam, 2, 4, 100, List.of());
         Dancer overlapLow = candidate(1L, amsterdam, 1, 2, null);
         Dancer overlapHigh = candidate(2L, amsterdam, 4, 6, null);
         Dancer tooLow = candidate(3L, amsterdam, 0, 1, null);
@@ -121,7 +121,7 @@ class SearchServiceTest {
 
     @Test
     void matchWithoutSearchingForMatchesAllStyles() {
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of());
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
         Dancer withStyle = candidate(1L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, intermediate)));
         Dancer withoutStyle = candidate(2L, amsterdam, 0, 7, List.of());
 
@@ -133,7 +133,7 @@ class SearchServiceTest {
     @Test
     void matchFiltersOnDancestyle() {
         DancerSearchingFor want = searchingFor(ballroom, lead, SearchCriteriaSex.EITHER, beginner, intermediate);
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of(want));
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of(want));
 
         Dancer match = candidate(1L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, novice)));
         Dancer wrongStyle = candidate(2L, amsterdam, 0, 7, List.of(dancerDancestyle(latin, lead, novice)));
@@ -149,7 +149,7 @@ class SearchServiceTest {
     @Test
     void matchFiltersOnSex() {
         DancerSearchingFor wantFemale = searchingFor(ballroom, lead, SearchCriteriaSex.FEMALE, beginner, intermediate);
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of(wantFemale));
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of(wantFemale));
 
         Dancer female = candidate(1L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, novice))).sex(Sex.FEMALE);
         Dancer male = candidate(2L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, novice))).sex(Sex.MALE);
@@ -162,7 +162,7 @@ class SearchServiceTest {
 
     @Test
     void matchFiltersOnDistanceAndSortsAscending() {
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of());
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
         Dancer same = candidate(1L, amsterdam, 0, 7, null);
         Dancer close = candidate(2L, rotterdam, 0, 7, null);
         Dancer far = candidate(3L, berlin, 0, 7, null);
@@ -177,7 +177,7 @@ class SearchServiceTest {
 
     @Test
     void matchYieldsNullDistanceForAnonymous() {
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of());
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
         Dancer noCity = candidate(1L, amsterdam, 0, 7, null);
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(noCity), null);
@@ -188,7 +188,7 @@ class SearchServiceTest {
 
     @Test
     void matchIncludesNullDistanceCandidateWhenLoggedIn() {
-        Dancer searcher = searcher(amsterdam, 100, 0, 7, 100, List.of());
+        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
         Dancer noCity = candidate(1L, null, 0, 7, null);
         Dancer withCity = candidate(2L, amsterdam, 0, 7, null);
 
@@ -246,12 +246,11 @@ class SearchServiceTest {
         return new City().id(id).name(name).lat(lat).lon(lon);
     }
 
-    private static Dancer dancer(long id, String name, Sex sex, int ageMax, int weekMin, int weekMax, int distMax, List<DancerSearchingFor> styles) {
+    private static Dancer dancer(long id, String name, Sex sex, int weekMin, int weekMax, int distMax, List<DancerSearchingFor> styles) {
         Dancer dancer = new Dancer()
                 .id(id)
-                .name("Dancer " + id)
+                .name(name)
                 .sex(sex)
-                .ageDistanceMax(ageMax)
                 .weekFrequencyMin(weekMin)
                 .weekFrequencyMax(weekMax)
                 .distanceMax(distMax)
@@ -276,13 +275,13 @@ class SearchServiceTest {
                 .skilllevel(skilllevel);
     }
 
-    private Dancer searcher(City city, int ageDistMax, int weekMin, int weekMax, int distMax, List<DancerSearchingFor> styles) {
-        return dancer(99L, "Searcher", Sex.MALE, ageDistMax, weekMin, weekMax, distMax, styles)
+    private Dancer searcher(City city, int weekMin, int weekMax, int distMax, List<DancerSearchingFor> styles) {
+        return dancer(99L, "Searcher", Sex.MALE, weekMin, weekMax, distMax, styles)
                 .city(city);
     }
 
     private Dancer candidate(long id, City city, int weekMin, int weekMax, List<DancerDancestyle> styles) {
-        Dancer dancer = dancer(id, "Dancer " + id, Sex.FEMALE, 100, weekMin, weekMax, 100, List.of())
+        Dancer dancer = dancer(id, "Dancer " + id, Sex.FEMALE, weekMin, weekMax, 100, List.of())
                 .city(city);
         if (styles != null) {
             dancer.dancestyles(styles);

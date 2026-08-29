@@ -42,7 +42,6 @@ import org.tbee.webstack.vdn.component.ImageUpload;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.Year;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -76,8 +75,7 @@ public class DancerForm extends VerticalLayout {
     private final TextArea whatdoiwantField = new TextArea();
     private final IntegerField weekFrequencyMinField = new IntegerField();
     private final IntegerField weekFrequencyMaxField = new IntegerField();
-    private final IntegerField distanceToPartnerMaxField = new IntegerField();
-    private final IntegerField ageDistanceToPartnerMaxField = new IntegerField();
+    private final IntegerField maxDistanceField = new IntegerField();
     private final Checkbox activeCheckbox = new Checkbox();
     private final Checkbox publiclyFindableCheckbox = new Checkbox();
     private final Checkbox privacyAgreementCheckbox = new Checkbox();
@@ -141,8 +139,7 @@ public class DancerForm extends VerticalLayout {
         binder.forField(whatdoiwantField).bind(Dancer::whatdoiwant, Dancer::whatdoiwant);
         binder.forField(weekFrequencyMinField).bind(Dancer::weekFrequencyMin, Dancer::weekFrequencyMin);
         binder.forField(weekFrequencyMaxField).bind(Dancer::weekFrequencyMax, Dancer::weekFrequencyMax);
-        binder.forField(distanceToPartnerMaxField).bind(Dancer::distanceMax, Dancer::distanceMax);
-        binder.forField(ageDistanceToPartnerMaxField).bind(Dancer::ageDistanceMax, Dancer::ageDistanceMax);
+        binder.forField(maxDistanceField).bind(Dancer::distanceMax, Dancer::distanceMax);
         binder.forField(activeCheckbox).bind(Dancer::active, Dancer::active);
         binder.forField(publiclyFindableCheckbox).bind(Dancer::publiclyFindable, Dancer::publiclyFindable);
     }
@@ -211,8 +208,7 @@ public class DancerForm extends VerticalLayout {
 
         formLayout.addFormItem(whatdoiwantField, t("form.whatdoiwant"));
         formLayout.addFormItem(new HorizontalLayout(weekFrequencyMinField, weekFrequencyMaxField), t("form.weekFrequency"));
-        formLayout.addFormItem(distanceToPartnerMaxField, t("form.distanceMax"));
-        formLayout.addFormItem(ageDistanceToPartnerMaxField, t("form.ageDistanceMax"));
+        formLayout.addFormItem(maxDistanceField, t("form.distanceMax"));
 
         return createCard(t("form.whatdoiwant"), formLayout);
     }
@@ -410,8 +406,7 @@ public class DancerForm extends VerticalLayout {
         if (field == whoamiField) return t("form.whoami");
         if (field == whatdoiwantField) return t("form.whatdoiwant");
         if (field == weekFrequencyMinField || field == weekFrequencyMaxField) return t("form.weekFrequency");
-        if (field == distanceToPartnerMaxField) return t("form.distanceMax");
-        if (field == ageDistanceToPartnerMaxField) return t("form.ageDistanceMax");
+        if (field == maxDistanceField) return t("form.distanceMax");
         if (field == activeCheckbox) return t("form.active");
         if (field == publiclyFindableCheckbox) return t("form.publiclyFindable");
         if (field == passwordField) return t("form.password");

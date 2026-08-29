@@ -35,7 +35,6 @@ public class RegisterView extends DancewithmeAppLayout {
                         SkilllevelRepository skilllevelRepository) {
         super("register.title", securityService, localeService);
         this.emailConfirmationService = emailConfirmationService;
-        postConstruct();
 
         DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, roleRepository, skilllevelRepository);
         form.setDancer(new Dancer());

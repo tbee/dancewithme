@@ -31,7 +31,6 @@ public class SearchService {
 
         // only applied for logged in users
         int distanceMax();
-        int ageDistanceMax();
         int weekFrequencyMin();
     }
 

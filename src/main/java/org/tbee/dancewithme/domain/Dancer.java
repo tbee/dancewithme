@@ -84,8 +84,6 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     private int weekFrequencyMax = 7;
     @Column(nullable = false)
     private int distanceMax = 100;
-    @Column(nullable = false)
-    private int ageDistanceMax = 100;
 
     @OneToMany(mappedBy = "dancer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DancerDancestyle> dancestyles = new ArrayList<>();
@@ -246,14 +244,6 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     }
     public Dancer distanceMax(int distanceMax) {
         this.distanceMax = distanceMax;
-        return this;
-    }
-
-    public int ageDistanceMax() {
-        return ageDistanceMax;
-    }
-    public Dancer ageDistanceMax(int ageDistanceMax) {
-        this.ageDistanceMax = ageDistanceMax;
         return this;
     }
 

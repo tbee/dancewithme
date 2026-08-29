@@ -178,9 +178,6 @@
             <column name="distance_max" type="integer" defaultValueNumeric="100">
                 <constraints nullable="false"/>
             </column>
-            <column name="age_distance_max" type="integer" defaultValueNumeric="100">
-                <constraints nullable="false"/>
-            </column>
         </createTable>
         <addUniqueConstraint tableName="dancer" columnNames="email" constraintName="dancer__email_UK"/>
         <addForeignKeyConstraint baseTableName="dancer" baseColumnNames="city_id"

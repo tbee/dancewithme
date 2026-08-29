@@ -1,17 +1,18 @@
 package org.tbee.dancewithme.infrastructure.vdn;
 
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -24,11 +25,16 @@ import org.tbee.dancewithme.infrastructure.vdn.view.LoginView;
 import org.tbee.dancewithme.infrastructure.vdn.view.ProfileView;
 import org.tbee.dancewithme.infrastructure.vdn.view.RegisterView;
 import org.tbee.dancewithme.infrastructure.vdn.view.SearchView;
+import org.tbee.webstack.vdn.component.ConfirmationDialog;
+import org.tbee.webstack.vdn.component.html.Anchor;
+import org.tbee.webstack.vdn.component.html.Div;
 import org.tbee.webstack.vdn.component.html.H1;
+import org.tbee.webstack.vdn.component.html.H4;
 import org.tbee.webstack.vdn.component.html.Image;
 import org.tbee.webstack.vdn.component.icon.Icon;
 import org.tbee.webstack.vdn.component.menubar.MenuBar;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
@@ -73,13 +79,6 @@ implements HasDynamicTitle, AfterNavigationObserver {
 			menuBar.addItem(registerButton);
 		}
 
-		// Languages
-		MenuItem languageMenuItem = menuBar.addItem(createSubmenu(getTranslation("language"), VaadinIcon.CHEVRON_DOWN));
-		languageMenuItem.setId("languageMenuItem");
-		SubMenu languageSubMenu = languageMenuItem.getSubMenu();
-		languageSubMenu.addItem(getTranslation("language.nl"), event -> localeService.switchLocale(Locale.of("nl")));
-		languageSubMenu.addItem(getTranslation("language.en"), event -> localeService.switchLocale(Locale.ENGLISH));
-
 		// Profile submenu or login button
 		securityService.loggedInDancer().ifPresentOrElse(dancer -> {
 			MenuItem accountMenuItem = menuBar.addItem(createSubmenu(dancer.email(), VaadinIcon.CHEVRON_DOWN));
@@ -88,16 +87,24 @@ implements HasDynamicTitle, AfterNavigationObserver {
 			accountSubMenu.addItem(getTranslation("menu.profile"), event -> getUI().ifPresent(ui -> ui.navigate(ProfileView.class)));
 			accountSubMenu.addItem(getTranslation("menu.logout"), event -> securityService.logout());
 		}, () -> {
-			Button loginButton = new Button(getTranslation("menu.login"), e -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
-			loginButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-			menuBar.addItem(loginButton);
+			MenuItem loginMenuItem = menuBar.addItem(getTranslation("menu.login"), e -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
+			menuBar.addItem(loginMenuItem);
 		});
+
+		// Languages
+		MenuItem languageMenuItem = menuBar.addItem(createSubmenu(getTranslation("language"), VaadinIcon.CHEVRON_DOWN));
+		languageMenuItem.setId("languageMenuItem");
+		SubMenu languageSubMenu = languageMenuItem.getSubMenu();
+		languageSubMenu.addItem(getTranslation("language.nl"), event -> localeService.switchLocale(Locale.of("nl")));
+		languageSubMenu.addItem(getTranslation("language.en"), event -> localeService.switchLocale(Locale.ENGLISH));
+
+		// About
+		MenuItem helpMenuItem = menuBar.addItem(createSubmenu("?", VaadinIcon.CHEVRON_DOWN));
+		SubMenu helpSubMenu = helpMenuItem.getSubMenu();
+		helpSubMenu.addItem("Over", this::aboutPopup).setId("changePasswordItem");
 
 		// Navbar
 		addToNavbar(logoImage, titleH1, menuBar);
-	}
-
-	public void postConstruct() {
 	}
 
 	@Override
@@ -110,6 +117,19 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		return "Dance With Me";
 	}
 
+	private void aboutPopup(ClickEvent<MenuItem> menuItemClickEvent) {
+		ConfirmationDialog.confirm("Dance With Me",
+				new org.tbee.webstack.vdn.component.orderedlayout.HorizontalLayout(
+						new Div(new Image("images/logoTransparent100x100.png", "Dance With Me logo").height("100px")),
+						new org.tbee.webstack.vdn.component.orderedlayout.VerticalLayout(
+								new H4("DanceWithMe " + getClass().getPackage().getImplementationVersion()),
+								new Div(new Anchor("https://softworks.nl", "Softworks © " + LocalDate.now().getYear()).target(AnchorTarget.BLANK)),
+								new Div("Deze software is nog in test, gebruik is op eigen risico.")
+								//new Div("Dit is 'best effort' software. Er kunnen geen rechten ontleend worden aan het gebruik.")
+						)
+				)
+		).open();
+	}
 	public static void showException(Exception e) {
 		LOG.error(e.getMessage(), e);
 		showErrorNotification(e.getMessage());

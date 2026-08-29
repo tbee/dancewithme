@@ -111,7 +111,6 @@ public class TestDataSeeder implements ApplicationRunner {
                 .weekFrequencyMin(1)
                 .weekFrequencyMax(3)
                 .distanceMax(125)
-                .ageDistanceMax(50)
                 .active(true)
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now())

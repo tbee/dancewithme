@@ -32,7 +32,6 @@ public class ProfileView extends DancewithmeAppLayout {
         super("profile.title", securityService, localeService);
         this.securityService = securityService;
         this.dancerService = dancerService;
-        postConstruct();
 
         Dancer dancer = securityService.loggedInDancer().orElseThrow();
         Dancer detailedDancer = dancerService.loadWithDetails(dancer.id());
