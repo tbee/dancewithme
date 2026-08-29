@@ -101,7 +101,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		// About
 		MenuItem helpMenuItem = menuBar.addItem(createSubmenu("?", VaadinIcon.CHEVRON_DOWN));
 		SubMenu helpSubMenu = helpMenuItem.getSubMenu();
-		helpSubMenu.addItem("Over", this::aboutPopup).setId("changePasswordItem");
+		helpSubMenu.addItem(getTranslation("menu.about"), this::aboutPopup).setId("changePasswordItem");
 
 		// Navbar
 		addToNavbar(logoImage, titleH1, menuBar);
@@ -114,15 +114,15 @@ implements HasDynamicTitle, AfterNavigationObserver {
 
 	@Override
 	public String getPageTitle() {
-		return "Dance With Me";
+		return getTranslation("app.title") + " " + getTranslation(titleKey);
 	}
 
 	private void aboutPopup(ClickEvent<MenuItem> menuItemClickEvent) {
-		ConfirmationDialog.confirm("Dance With Me",
+		ConfirmationDialog.confirm(getTranslation("menu.about"),
 				new org.tbee.webstack.vdn.component.orderedlayout.HorizontalLayout(
 						new Div(new Image("images/logoTransparent100x100.png", "Dance With Me logo").height("100px")),
 						new org.tbee.webstack.vdn.component.orderedlayout.VerticalLayout(
-								new H4("DanceWithMe " + getClass().getPackage().getImplementationVersion()),
+								new H4(getTranslation("app.title") + " " + getClass().getPackage().getImplementationVersion()),
 								new Div(new Anchor("https://softworks.nl", "Softworks © " + LocalDate.now().getYear()).target(AnchorTarget.BLANK)),
 								new Div("Deze software is nog in test, gebruik is op eigen risico.")
 								//new Div("Dit is 'best effort' software. Er kunnen geen rechten ontleend worden aan het gebruik.")

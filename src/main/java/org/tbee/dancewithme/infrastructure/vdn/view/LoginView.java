@@ -48,7 +48,7 @@ public class LoginView extends DancewithmeAppLayout implements BeforeEnterObserv
         verticalLayout.setSizeFull();
         verticalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        verticalLayout.add(new H1("Dance With Me"), new HorizontalLayout(logoImage, loginForm));
+        verticalLayout.add(new H1(getTranslation("app.title")), new HorizontalLayout(logoImage, loginForm));
         setContent(verticalLayout);
     }
 
