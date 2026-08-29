@@ -19,6 +19,15 @@ services:
       SPRING_DATASOURCE_USERNAME: dancewithme
       SPRING_DATASOURCE_PASSWORD: "dancewithme"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.tbee.webstack.postgres.PostgreSQLOnHsqldbCompatibilityDialect
+      SPRING_MAIL_HOST: mailhog
+      SPRING_MAIL_PORT: "1025"
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: dancewithme-mailhog
+    ports:
+      - "1025:1025" # SMTP
+      - "8025:8025" # web UI
 
   postgres:
     image: postgres:18.3

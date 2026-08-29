@@ -17,10 +17,12 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 // TODO:
+// Zoom popup when clicking on a photo
+// Add photos in a flow layout
 // Privacy / cookie policy text
-// About popup
 // Integration / web rests
 // Chat
+// Allow to change the emailaddress
 
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class, enableDefaultTransactions = false)

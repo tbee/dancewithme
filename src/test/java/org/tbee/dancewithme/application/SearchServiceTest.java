@@ -41,9 +41,15 @@ class SearchServiceTest {
     private final Dancestyle latin = dancestyle(2L, "Latin");
     private final Role lead = role(1L, "lead");
     private final Role follow = role(2L, "follow");
-    private final Skilllevel beginner = skilllevel(1L, "absolute_beginner", 1);
-    private final Skilllevel novice = skilllevel(2L, "novice", 2);
-    private final Skilllevel intermediate = skilllevel(3L, "intermediate_social", 3);
+    private final Skilllevel beginner1 = skilllevel(1L, "absolute_beginner", 1);
+    private final Skilllevel novice2 = skilllevel(2L, "novice", 2);
+    private final Skilllevel intermediate3 = skilllevel(3L, "intermediate_social", 3);
+    private final Skilllevel advanced4 = skilllevel(4L, "advanced", 4);
+    private final Skilllevel preCompetition5 = skilllevel(5L, "pre_competition", 5);
+    private final Skilllevel regional6 = skilllevel(6L, "regional", 6);
+    private final Skilllevel national7 = skilllevel(7L, "national", 7);
+    private final Skilllevel nationalFinalist8 = skilllevel(8L, "national_finalist", 8);
+    private final Skilllevel international9 = skilllevel(9L, "international", 9);
     private final City amsterdam = city(1L, "Amsterdam", 52.3676, 4.9041);
     private final City rotterdam = city(2L, "Rotterdam", 51.9225, 4.47917);
     private final City berlin = city(3L, "Berlin", 52.5200, 13.4050);
@@ -59,7 +65,7 @@ class SearchServiceTest {
     @Test
     void searchAnonymousUsesPubliclyFindableRepository() {
         stubAnonymous();
-        Dancer candidate = candidate(1L, amsterdam, 0, 7, null);
+        Dancer candidate = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100);
         when(dancerRepository.findByActiveTrueAndPubliclyFindableTrue()).thenReturn(List.of(candidate));
 
         Dancer criteria = dancer(0L, "anonymous", Sex.UNKNOWN, 0, 7, 100, List.of());
@@ -75,8 +81,8 @@ class SearchServiceTest {
     @Test
     void searchAnonymousDoesNotApplyDistanceFilter() {
         stubAnonymous();
-        Dancer near = candidate(1L, amsterdam, 0, 7, null);
-        Dancer far = candidate(2L, berlin, 0, 7, null);
+        Dancer near = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100);
+        Dancer far = dancer(2L, Sex.FEMALE, berlin, 0, 7, 100);
         when(dancerRepository.findByActiveTrueAndPubliclyFindableTrue()).thenReturn(List.of(near, far));
 
         Dancer criteria = dancer(0L, "anonymous", Sex.UNKNOWN, 0, 7, 1, List.of());
@@ -88,9 +94,9 @@ class SearchServiceTest {
 
     @Test
     void searchLoggedInExcludesSelfAndUsesActiveRepository() {
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100);
         when(securityService.loggedInDancer()).thenReturn(Optional.of(searcher));
-        Dancer other = candidate(1L, amsterdam, 0, 7, null);
+        Dancer other = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100);
         when(dancerRepository.findByActiveTrue()).thenReturn(List.of(searcher, other));
 
         List<SearchService.SearchResult> result = searchService.search(searcher);
@@ -106,11 +112,11 @@ class SearchServiceTest {
 
     @Test
     void matchFiltersOnWeekFrequency() {
-        Dancer searcher = searcher(amsterdam, 2, 4, 100, List.of());
-        Dancer overlapLow = candidate(1L, amsterdam, 1, 2, null);
-        Dancer overlapHigh = candidate(2L, amsterdam, 4, 6, null);
-        Dancer tooLow = candidate(3L, amsterdam, 0, 1, null);
-        Dancer tooHigh = candidate(4L, amsterdam, 5, 7, null);
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 2, 4, 100);
+        Dancer overlapLow = dancer(1L, Sex.FEMALE, amsterdam, 1, 2, 100);
+        Dancer overlapHigh = dancer(2L, Sex.FEMALE, amsterdam, 4, 6, 100);
+        Dancer tooLow = dancer(3L, Sex.FEMALE, amsterdam, 0, 1, 100);
+        Dancer tooHigh = dancer(4L, Sex.FEMALE, amsterdam, 5, 7, 100);
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(overlapLow, overlapHigh, tooLow, tooHigh), searcher);
 
@@ -121,9 +127,9 @@ class SearchServiceTest {
 
     @Test
     void matchWithoutSearchingForMatchesAllStyles() {
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
-        Dancer withStyle = candidate(1L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, intermediate)));
-        Dancer withoutStyle = candidate(2L, amsterdam, 0, 7, List.of());
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100);
+        Dancer withStyle = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(ballroom, lead, intermediate3)));
+        Dancer withoutStyle = dancer(2L, Sex.FEMALE, amsterdam, 0, 7, 100);
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(withStyle, withoutStyle), searcher);
 
@@ -132,27 +138,27 @@ class SearchServiceTest {
 
     @Test
     void matchFiltersOnDancestyle() {
-        DancerSearchingFor want = searchingFor(ballroom, lead, SearchCriteriaSex.EITHER, beginner, intermediate);
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of(want));
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100)
+                .searchingFor(List.of(searchingFor(ballroom, lead, SearchCriteriaSex.EITHER, beginner1, intermediate3)));
 
-        Dancer match = candidate(1L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, novice)));
-        Dancer wrongStyle = candidate(2L, amsterdam, 0, 7, List.of(dancerDancestyle(latin, lead, novice)));
-        Dancer wrongRole = candidate(3L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, follow, novice)));
-        Dancer tooSkilled = candidate(4L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, skilllevel(4L, "advanced", 4))));
+        Dancer match = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(ballroom, lead, novice2)));
+        Dancer wrongStyle = dancer(2L, Sex.FEMALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(latin, lead, novice2)));
+        Dancer wrongRole = dancer(3L, Sex.FEMALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(ballroom, follow, novice2)));
+        Dancer tooSkilled = dancer(4L, Sex.FEMALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(ballroom, lead, advanced4)));
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(match, wrongStyle, wrongRole, tooSkilled), searcher);
 
         assertEquals(1, result.size());
-        assertEquals(match.id(), result.get(0).dancer().id());
+        assertEquals(match.id(), result.getFirst().dancer().id());
     }
 
     @Test
     void matchFiltersOnSex() {
-        DancerSearchingFor wantFemale = searchingFor(ballroom, lead, SearchCriteriaSex.FEMALE, beginner, intermediate);
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of(wantFemale));
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100)
+                    .searchingFor(List.of(searchingFor(ballroom, lead, SearchCriteriaSex.FEMALE, beginner1, intermediate3)));
 
-        Dancer female = candidate(1L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, novice))).sex(Sex.FEMALE);
-        Dancer male = candidate(2L, amsterdam, 0, 7, List.of(dancerDancestyle(ballroom, lead, novice))).sex(Sex.MALE);
+        Dancer female = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(ballroom, lead, novice2)));
+        Dancer male = dancer(2L, Sex.MALE, amsterdam, 0, 7, 100).dancestyles(List.of(dancerDancestyle(ballroom, lead, novice2)));
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(female, male), searcher);
 
@@ -162,10 +168,10 @@ class SearchServiceTest {
 
     @Test
     void matchFiltersOnDistanceAndSortsAscending() {
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
-        Dancer same = candidate(1L, amsterdam, 0, 7, null);
-        Dancer close = candidate(2L, rotterdam, 0, 7, null);
-        Dancer far = candidate(3L, berlin, 0, 7, null);
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100);
+        Dancer same = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100);
+        Dancer close = dancer(2L, Sex.FEMALE, rotterdam, 0, 7, 100);
+        Dancer far = dancer(3L, Sex.FEMALE, berlin, 0, 7, 100);
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(far, close, same), searcher);
 
@@ -177,20 +183,20 @@ class SearchServiceTest {
 
     @Test
     void matchYieldsNullDistanceForAnonymous() {
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
-        Dancer noCity = candidate(1L, amsterdam, 0, 7, null);
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100);
+        Dancer noCity = dancer(1L, Sex.FEMALE, amsterdam, 0, 7, 100);
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(noCity), null);
 
         assertEquals(1, result.size());
-        assertEquals(null, result.get(0).distanceKm());
+        assertEquals(null, result.getFirst().distanceKm());
     }
 
     @Test
     void matchIncludesNullDistanceCandidateWhenLoggedIn() {
-        Dancer searcher = searcher(amsterdam, 0, 7, 100, List.of());
-        Dancer noCity = candidate(1L, null, 0, 7, null);
-        Dancer withCity = candidate(2L, amsterdam, 0, 7, null);
+        Dancer searcher = dancer(99L, Sex.MALE, amsterdam, 0, 7, 100);
+        Dancer noCity = dancer(1L, Sex.FEMALE, null, 0, 7, 100);
+        Dancer withCity = dancer(2L, Sex.FEMALE, amsterdam, 0, 7, 100);
 
         List<SearchService.SearchResult> result = searchService.match(searcher, List.of(noCity, withCity), searcher);
 
@@ -198,6 +204,32 @@ class SearchServiceTest {
         assertEquals(withCity.id(), result.get(0).dancer().id());
         assertEquals(noCity.id(), result.get(1).dancer().id());
         assertEquals(null, result.get(1).distanceKm());
+    }
+
+    @Test
+    void tomMarijke() {
+        Dancer tom = dancer(1L, Sex.MALE, amsterdam, 2, 3, 100)
+                .dancestyles(List.of(
+                        dancerDancestyle(ballroom, lead, national7),
+                        dancerDancestyle(latin, lead, regional6)
+                ))
+                .searchingFor(List.of(
+                        searchingFor(ballroom, follow, SearchCriteriaSex.FEMALE, preCompetition5, international9),
+                        searchingFor(latin, follow, SearchCriteriaSex.FEMALE, advanced4, national7)
+                ));
+
+        Dancer marijke = dancer(2L, Sex.FEMALE, rotterdam, 1, 2, 100)
+                .dancestyles(List.of(
+                        dancerDancestyle(ballroom, follow, national7),
+                        dancerDancestyle(latin, follow, regional6)
+                ))
+                .searchingFor(List.of(
+                        searchingFor(ballroom, lead, SearchCriteriaSex.MALE, advanced4, international9),
+                        searchingFor(latin, lead, SearchCriteriaSex.MALE, advanced4, national7)
+                ));
+
+        assertEquals(1, searchService.match(tom, List.of(marijke), tom).size());
+        assertEquals(1, searchService.match(marijke, List.of(tom), marijke).size());
     }
 
 
@@ -275,17 +307,8 @@ class SearchServiceTest {
                 .skilllevel(skilllevel);
     }
 
-    private Dancer searcher(City city, int weekMin, int weekMax, int distMax, List<DancerSearchingFor> styles) {
-        return dancer(99L, "Searcher", Sex.MALE, weekMin, weekMax, distMax, styles)
+    private Dancer dancer(long id, Sex sex, City city, int weekMin, int weekMax, int distMax) {
+        return dancer(id, "Dancer " + id, sex, weekMin, weekMax, distMax, List.of())
                 .city(city);
-    }
-
-    private Dancer candidate(long id, City city, int weekMin, int weekMax, List<DancerDancestyle> styles) {
-        Dancer dancer = dancer(id, "Dancer " + id, Sex.FEMALE, weekMin, weekMax, 100, List.of())
-                .city(city);
-        if (styles != null) {
-            dancer.dancestyles(styles);
-        }
-        return dancer;
     }
 }
