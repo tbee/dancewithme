@@ -32,9 +32,11 @@ import org.tbee.webstack.vdn.component.menubar.MenuBar;
 import java.util.List;
 import java.util.Locale;
 
+@StyleSheet("context://css/vaadin.css?" + DancewithmeAppLayout.CACHEBUSTER)
 abstract public class DancewithmeAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
 implements HasDynamicTitle, AfterNavigationObserver {
 	private static final Logger LOG = LoggerFactory.getLogger(DancewithmeAppLayout.class);
+	public static final String CACHEBUSTER="20260829a";
 
 	private final String titleKey;
 
@@ -52,10 +54,6 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		String title = getTranslation(titleKey);
 		titleH1.text(title)
 				.style("font-size", "var(--lumo-font-size-l)")
-//				.style("margin", "0")
-//				.style("position", "absolute")
-//				.style("left", "var(--vaadin-padding-l)")
-//				.style("padding-top", "5px")
 				.style("width", title.length() +"em");
 
 		MenuBar menuBar = new MenuBar() //  https://vaadin.com/directory/component/app-layout-add-on   https://vaadin.com/docs/latest/components/menu-bar

@@ -1,9 +1,13 @@
 package org.tbee.dancewithme.infrastructure.vdn.view;
 
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.card.Card;
+import com.vaadin.flow.component.card.CardVariant;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -20,6 +24,7 @@ import org.tbee.dancewithme.infrastructure.vdn.RememberedEmail;
 import org.tbee.dancewithme.infrastructure.vdn.security.EmailNotConfirmedException;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 import org.tbee.webstack.vdn.component.html.H1;
+import org.tbee.webstack.vdn.component.html.Image;
 
 @Route("login")
 @AnonymousAllowed
@@ -29,28 +34,33 @@ public class LoginView extends DancewithmeAppLayout implements BeforeEnterObserv
 
     public LoginView(SecurityService securityService, LocaleService localeService) {
         super("login.title", securityService, localeService);
-        VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setSizeFull();
-        verticalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
 
         loginForm.setAction("login");
         loginForm.setI18n(i18n());
         loginForm.addForgotPasswordListener(e -> UI.getCurrent().navigate(ForgotPasswordView.class));
-        verticalLayout.add(new H1("Dance With Me"), loginForm);
 
+        Image logoImage = new Image();
+        logoImage.src("images/logoTransparent1450x1450.png");
+        logoImage.style("height", "300px")
+                .style("padding-top", "30px");
+
+        VerticalLayout verticalLayout = new VerticalLayout();
+        verticalLayout.setSizeFull();
+        verticalLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        verticalLayout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        verticalLayout.add(new H1("Dance With Me"), new HorizontalLayout(logoImage, loginForm));
         setContent(verticalLayout);
     }
 
     /**
      * The login form is a prefabricated component, so its labels are set through its i18n object;
-     * dancers log in with their email address, not with some separate user name.
+     * dancers log in with their email address, not with some separate username.
      */
     private LoginI18n i18n() {
         LoginI18n i18n = LoginI18n.createDefault();
 
         LoginI18n.Form form = i18n.getForm();
-        form.setTitle(getTranslation("login.title"));
+        form.setTitle("");//getTranslation("login.title"));
         form.setUsername(getTranslation("form.email"));
         form.setPassword(getTranslation("form.password"));
         form.setSubmit(getTranslation("menu.login"));
@@ -69,7 +79,7 @@ public class LoginView extends DancewithmeAppLayout implements BeforeEnterObserv
             return;
         }
 
-        // an unconfirmed email address is not a credentials problem, and showing it as such would be a dead end:
+        // An unconfirmed email address is not a credentials problem, and showing it as such would be a dead end:
         // send the dancer to the confirmation page, where the code can be entered or the email resent
         if (lastAuthenticationFailure() instanceof EmailNotConfirmedException emailNotConfirmed) {
             RememberedEmail.remember(emailNotConfirmed.email());

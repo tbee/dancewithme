@@ -19,7 +19,7 @@ public class SecurityConfig {
         // registering our own provider also keeps Spring Boot from adding the default one
         http.authenticationProvider(new DancerAuthenticationProvider(userDetailsService, passwordEncoder()));
         // static resources in META-INF/resources are not permitted by VaadinSecurityConfigurer, so do that here
-        http.authorizeHttpRequests(auth -> auth.requestMatchers("/images/**", "/favicon.ico").permitAll());
+        http.authorizeHttpRequests(auth -> auth.requestMatchers("/images/**", "/css/**", "/favicon.ico").permitAll());
         http.with(VaadinSecurityConfigurer.vaadin(), configurer -> configurer.loginView(LoginView.class));
         return http.build();
     }
