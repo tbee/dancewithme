@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -24,6 +25,7 @@ import org.tbee.dancewithme.infrastructure.vdn.view.ProfileView;
 import org.tbee.dancewithme.infrastructure.vdn.view.RegisterView;
 import org.tbee.dancewithme.infrastructure.vdn.view.SearchView;
 import org.tbee.webstack.vdn.component.html.H1;
+import org.tbee.webstack.vdn.component.html.Image;
 import org.tbee.webstack.vdn.component.icon.Icon;
 import org.tbee.webstack.vdn.component.menubar.MenuBar;
 
@@ -35,24 +37,25 @@ implements HasDynamicTitle, AfterNavigationObserver {
 	private static final Logger LOG = LoggerFactory.getLogger(DancewithmeAppLayout.class);
 
 	private final String titleKey;
-	private final SecurityService securityService;
-	private final LocaleService localeService;
 
 	private final H1 titleH1 = new H1();
 
 	public DancewithmeAppLayout(String titleKey, SecurityService securityService, LocaleService localeService) {
 		this.titleKey = titleKey;
-		this.securityService = securityService;
-		this.localeService = localeService;
 
 		// Set the title, absolutely positioned on the left so the navigation can be truly centered
+		Image logoImage = new Image();
+		logoImage.src("images/logoTransparent100x100.png");
+		logoImage.style("height", "45px")
+				.style("margin-left", "20px")
+				.style("margin-right", "10px");
 		String title = getTranslation(titleKey);
 		titleH1.text(title)
 				.style("font-size", "var(--lumo-font-size-l)")
-				.style("margin", "0")
-				.style("position", "absolute")
-				.style("left", "var(--vaadin-padding-l)")
-				.style("padding-top", "5px")
+//				.style("margin", "0")
+//				.style("position", "absolute")
+//				.style("left", "var(--vaadin-padding-l)")
+//				.style("padding-top", "5px")
 				.style("width", title.length() +"em");
 
 		MenuBar menuBar = new MenuBar() //  https://vaadin.com/directory/component/app-layout-add-on   https://vaadin.com/docs/latest/components/menu-bar
@@ -93,7 +96,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 		});
 
 		// Navbar
-		addToNavbar(titleH1, menuBar);
+		addToNavbar(logoImage, titleH1, menuBar);
 	}
 
 	public void postConstruct() {
