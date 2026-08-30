@@ -23,6 +23,7 @@ import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
+import org.tbee.dancewithme.infrastructure.vdn.component.ImageGallery;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.time.Year;
@@ -85,15 +86,10 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
             card.setWidthFull();
             card.setTitle(getTranslation("form.photos"));
             content.add(card);
-            HorizontalLayout gallery = new HorizontalLayout();
+            ImageGallery gallery = new ImageGallery();
             dancer.photos().forEach(photo -> {
-                Image image = new Image(photo.image(), dancer.name());
-                image.setWidth("200px");
-                image.setHeight("200px");
-                image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
-                gallery.add(image);
+                gallery.addImage(photo.image());
             });
-            gallery.getStyle().set("flex-wrap", "wrap");
             card.add(gallery);
         }
 

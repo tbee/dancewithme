@@ -8,7 +8,6 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -92,7 +91,7 @@ public class DancerForm extends VerticalLayout {
     private final VerticalLayout searchingForLayout = noPaddingVerticalLayout();
     private final List<SearchingForRow> searchingForRows = new ArrayList<>();
 
-    private final VerticalLayout photosLayout = noPaddingVerticalLayout();
+    private final ImageGallery imageGallery = new ImageGallery();
 
     public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository,
                       RoleRepository roleRepository, SkilllevelRepository skilllevelRepository) {
@@ -194,11 +193,12 @@ public class DancerForm extends VerticalLayout {
         // extra photos
         Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
             dancer.addPhoto(bytes);
-            refreshPhotosLayout();
+            refreshPhotos();
         }));
         photoUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
         photoUpload.setUploadButton(new Button(t("form.upload")));
-        formLayout.add(new H5(t("form.photos")), photoUpload, photosLayout);
+        imageGallery.getStyle().set("margin-top", "5px");
+        formLayout.add(new H5(t("form.photos")), photoUpload, imageGallery);
 
         return createCard(t("form.photos"), formLayout);
     }
@@ -266,7 +266,7 @@ public class DancerForm extends VerticalLayout {
         searchingForLayout.removeAll();
         dancer.searchingFor().forEach(sf -> addDancestyleRow(searchingForRows, searchingForLayout, false, sf.dancestyle(), sf.role(), sf.sex(), sf.skilllevelMin(), sf.skilllevelMax()));
         if (mode == Mode.UPDATE) {
-            refreshPhotosLayout();
+            refreshPhotos();
         }
     }
 
@@ -418,26 +418,16 @@ public class DancerForm extends VerticalLayout {
         return passwordField.getValue();
     }
 
-    private void refreshPhotosLayout() {
-        photosLayout.removeAll();
-        HorizontalLayout row = new HorizontalLayout();
-        row.getStyle().set("flex-wrap", "wrap");
+    private void refreshPhotos() {
+        imageGallery.removeAll();
         dancer.photos().forEach(photo -> {
-            Image image = new Image(photo.image(), "photo");
-            image.setWidth("150px");
-            image.setHeight("150px");
-            image.getStyle().set("object-fit", "cover").set("border-radius", "var(--lumo-border-radius-m)");
-            Button deleteButton = new Button(VaadinIcon.TRASH.create());
-            deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR, ButtonVariant.LUMO_SMALL);
-            deleteButton.addClickListener(e -> {
+            imageGallery.addImage(photo.image(), () -> {
                 List<org.tbee.dancewithme.domain.DancerPhoto> remaining = new ArrayList<>(dancer.photos());
                 remaining.remove(photo);
                 dancer.photos(remaining);
-                refreshPhotosLayout();
+                refreshPhotos();
             });
-            row.add(new VerticalLayout(image, deleteButton));
         });
-        photosLayout.add(row);
     }
 
     private void addDancestyleRow(List<SearchingForRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {

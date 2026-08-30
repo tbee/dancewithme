@@ -17,8 +17,7 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 // TODO:
-// Zoom popup when clicking on a photo
-// Add photos in a flow layout
+// Implement ImageGallery
 // Allow to change the emailaddress
 // i18n SmtpEmailService
 // Privacy / cookie policy text
