@@ -91,10 +91,12 @@ public class SearchView extends DancewithmeAppLayout {
         VerticalLayout styleRowsWithButton = new VerticalLayout(styleRowsLayout, addStyleButton);
         styleRowsWithButton.setPadding(false);
 
+        weekFrequencyMinField.setId("weekFrequencyMinField");
         weekFrequencyMinField.setValue(currentDancer == null ? 0 : currentDancer.weekFrequencyMin());
         weekFrequencyMinField.setPlaceholder(getTranslation("search.age.min"));
         weekFrequencyMinField.setMin(0);
         weekFrequencyMinField.setMax(7);
+        weekFrequencyMaxField.setId("weekFrequencyMaxField");
         weekFrequencyMaxField.setValue(currentDancer == null ? 7 : currentDancer.weekFrequencyMax());
         weekFrequencyMaxField.setPlaceholder(getTranslation("search.age.max"));
         weekFrequencyMaxField.setMin(0);
@@ -112,6 +114,7 @@ public class SearchView extends DancewithmeAppLayout {
         }
 
         Button searchButton = new Button(getTranslation("search.button"), e -> search());
+        searchButton.setId("searchButton");
         searchButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
         VerticalLayout searchContent = new VerticalLayout(formLayout, searchButton);
