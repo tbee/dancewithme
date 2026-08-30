@@ -1,19 +1,15 @@
 package org.tbee.dancewithme.infrastructure.vdn.view;
 
-import com.vaadin.copilot.shaded.checkerframework.checker.units.qual.C;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.badge.Badge;
 import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.card.Card;
 import com.vaadin.flow.component.card.CardVariant;
-import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.markdown.Markdown;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
@@ -24,10 +20,9 @@ import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
-import org.tbee.dancewithme.infrastructure.vdn.component.ImageGallery;
+import org.tbee.webstack.vdn.component.ImageGallery;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
-import java.time.Year;
 import java.util.List;
 
 @Route("dancer/:dancerId")

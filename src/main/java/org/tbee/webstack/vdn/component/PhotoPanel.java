@@ -1,11 +1,10 @@
-package org.tbee.dancewithme.infrastructure.vdn.component;
+package org.tbee.webstack.vdn.component;
 
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import org.tbee.webstack.vdn.component.ConfirmationDialog;
 
-public class PhotoPanel extends HorizontalLayout {
+class PhotoPanel extends HorizontalLayout {
 
     public PhotoPanel(byte[] bytes) {
         this(bytes, null);
@@ -46,5 +45,4 @@ public class PhotoPanel extends HorizontalLayout {
         }
         confirmationDialog.show();
     }
-
 }

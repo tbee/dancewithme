@@ -1,4 +1,4 @@
-package org.tbee.dancewithme.infrastructure.vdn.component;
+package org.tbee.webstack.vdn.component;
 
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 

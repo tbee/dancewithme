@@ -37,6 +37,7 @@ import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.domain.service.ValidateDancer;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
+import org.tbee.webstack.vdn.component.ImageGallery;
 import org.tbee.webstack.vdn.component.ImageUpload;
 
 import java.io.IOException;
