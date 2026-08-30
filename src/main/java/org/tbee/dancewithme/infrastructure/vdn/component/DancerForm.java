@@ -423,7 +423,7 @@ public class DancerForm extends VerticalLayout {
     private void refreshPhotos() {
         imageGallery.removeAll();
         dancer.photos().forEach(photo -> {
-            imageGallery.addImage(photo.image(), () -> {
+            imageGallery.addImage(photo.image(), photo.contentType(), () -> {
                 List<org.tbee.dancewithme.domain.DancerPhoto> remaining = new ArrayList<>(dancer.photos());
                 remaining.remove(photo);
                 dancer.photos(remaining);

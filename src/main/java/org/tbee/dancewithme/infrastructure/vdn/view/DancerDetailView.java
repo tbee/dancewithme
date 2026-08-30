@@ -72,7 +72,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
         if (!dancer.photos().isEmpty()) {
             ImageGallery imageGallery = new ImageGallery();
             dancer.photos().forEach(photo -> {
-                imageGallery.addImage(photo.image());
+                imageGallery.addImage(photo.image(), photo.contentType());
             });
             content.add(card(getTranslation("form.photos"), imageGallery));
         }

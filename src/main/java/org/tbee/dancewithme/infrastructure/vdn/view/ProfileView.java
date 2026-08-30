@@ -55,7 +55,8 @@ public class ProfileView extends DancewithmeAppLayout {
             return;
         }
         try {
-            dancerService.update(dancer);
+            Dancer saved = dancerService.update(dancer);
+            form.setDancer(saved);
             showSuccessNotification(getTranslation("form.saved"));
         }
         catch (Exception ex) {
