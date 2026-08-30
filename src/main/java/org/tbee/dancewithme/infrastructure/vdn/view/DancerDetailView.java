@@ -1,6 +1,7 @@
 package org.tbee.dancewithme.infrastructure.vdn.view;
 
 import com.vaadin.copilot.shaded.checkerframework.checker.units.qual.C;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.badge.Badge;
 import com.vaadin.flow.component.badge.BadgeVariant;
 import com.vaadin.flow.component.card.Card;
@@ -60,37 +61,25 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
 
     private void render(Dancer dancer) {
 
-        Card dancerCard = dancerCard(dancer);
-
-        VerticalLayout content = new VerticalLayout(dancerCard);
+        VerticalLayout content = new VerticalLayout();
         content.setMaxWidth("1200px");
 
+        content.add(dancerCard(dancer));
+
         if (dancer.whoami() != null && !dancer.whoami().isBlank()) {
-            Card card = new Card();
-            card.setWidthFull();
-            card.setTitle(getTranslation("form.whoami"));
-            card.add(new Markdown(dancer.whoami()));
-            content.add(card);
-        }
-        if (dancer.whatdoiwant() != null && !dancer.whatdoiwant().isBlank()) {
-            Card card = new Card();
-            card.setWidthFull();
-            card.setTitle(getTranslation("form.whatdoiwant"));
-            card.add(new Markdown(dancer.whatdoiwant()));
-            content.add(card);
+            content.add(card(getTranslation("form.whoami"), new Markdown(dancer.whoami())));
         }
 
-        // photo gallery
+        if (dancer.whatdoiwant() != null && !dancer.whatdoiwant().isBlank()) {
+            content.add(card(getTranslation("form.whatdoiwant"), new Markdown(dancer.whatdoiwant())));
+        }
+
         if (!dancer.photos().isEmpty()) {
-            Card card = new Card();
-            card.setWidthFull();
-            card.setTitle(getTranslation("form.photos"));
-            content.add(card);
-            ImageGallery gallery = new ImageGallery();
+            ImageGallery imageGallery = new ImageGallery();
             dancer.photos().forEach(photo -> {
-                gallery.addImage(photo.image());
+                imageGallery.addImage(photo.image());
             });
-            card.add(gallery);
+            content.add(card(getTranslation("form.photos"), imageGallery));
         }
 
         setContent(content);
@@ -130,6 +119,14 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
         verticalLayout.setMargin(false);
         verticalLayout.setPadding(false);
         card.add(verticalLayout);
+        return card;
+    }
+
+    private Card card(String title, Component contents) {
+        Card card = new Card();
+        card.setWidthFull();
+        card.setTitle(title);
+        card.add(contents);
         return card;
     }
 }
