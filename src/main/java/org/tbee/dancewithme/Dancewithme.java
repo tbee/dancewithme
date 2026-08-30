@@ -19,10 +19,13 @@ import java.util.Locale;
 // TODO:
 // Zoom popup when clicking on a photo
 // Add photos in a flow layout
-// Privacy / cookie policy text
-// Integration / web rests
-// Chat
 // Allow to change the emailaddress
+// i18n SmtpEmailService
+// Privacy / cookie policy text
+// Integration / web tests
+// Chat, two or more profiles should be able to exchange text messages. Visually it should look like the Whatsapp styling with text bubbles on two sides of the timeline.
+// A profile should be able to block other profiles into sending them messages or initiating new chats.
+// When a profile is deleted, his chat messages no longer refer to the sending profile (and thus be labeled as send by "unknown"). But underwater the email address of the sender should be copied into each message when it was send.
 
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class, enableDefaultTransactions = false)

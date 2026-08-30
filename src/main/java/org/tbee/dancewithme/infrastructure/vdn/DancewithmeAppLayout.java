@@ -120,7 +120,7 @@ implements HasDynamicTitle, AfterNavigationObserver {
 	private void aboutPopup(ClickEvent<MenuItem> menuItemClickEvent) {
 		ConfirmationDialog.confirm(getTranslation("menu.about"),
 				new org.tbee.webstack.vdn.component.orderedlayout.HorizontalLayout(
-						new Div(new Image("images/logoTransparent100x100.png", "Dance With Me logo").height("100px")),
+						new Div(new Image("images/logoTransparent100x100.png", "logo").height("100px")),
 						new org.tbee.webstack.vdn.component.orderedlayout.VerticalLayout(
 								new H4(getTranslation("app.title") + " " + getClass().getPackage().getImplementationVersion()),
 								new Div(new Anchor("https://softworks.nl", "Softworks © " + LocalDate.now().getYear()).target(AnchorTarget.BLANK)),

@@ -1,4 +1,5 @@
 This application is a web based search engine, intended to match people who want to participate in partner dances like slow walz, rumba, salsa, etc.
+Even though the technical name of the project is "dancewithme" it public facing name is "Shall we Dance?". We may rename this sometime in the future if this sticks.
 
 # Functionality
 

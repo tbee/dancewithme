@@ -21,8 +21,8 @@ public class SmtpEmailService implements EmailService {
     public void sendConfirmationEmail(String to, String code, String confirmationUrl) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Confirm your Dancewithme account");
-        message.setText("Welcome to Dancewithme!\n\n"
+        message.setSubject("Confirm your 'Shall we Dance?' account");
+        message.setText("Welcome to 'Shall we Dance?'\n\n"
                 + "Your confirmation code is: " + code + "\n\n"
                 + "Click the link below, or enter the code on the confirmation page:\n"
                 + confirmationUrl + "\n\n"
@@ -34,8 +34,8 @@ public class SmtpEmailService implements EmailService {
     public void sendPasswordResetEmail(String to, String resetUrl) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
-        message.setSubject("Reset your Dancewithme password");
-        message.setText("We received a request to reset your Dancewithme password.\n\n"
+        message.setSubject("Reset your 'Shall we Dance?' password");
+        message.setText("We received a request to reset your 'Shall we Dance?' password.\n\n"
                 + "Click the link below to choose a new password:\n"
                 + resetUrl + "\n\n"
                 + "If you did not request this, you can ignore this message.");
