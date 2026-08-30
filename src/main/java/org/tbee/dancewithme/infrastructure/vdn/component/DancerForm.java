@@ -193,7 +193,7 @@ public class DancerForm extends VerticalLayout {
 
         // extra photos
         Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
-            dancer.addPhoto(bytes);
+            dancer.addPhoto(bytes, metadata.contentType());
             refreshPhotos();
         }));
         photoUpload.setAcceptedFileTypes("image/jpeg", "image/png", "image/webp");
@@ -289,12 +289,13 @@ public class DancerForm extends VerticalLayout {
         if (mugshotUpload.hasUpload()) {
             try (InputStream inputStream = mugshotUpload.inputStream()) {
                 mugshotBytes = inputStream.readAllBytes();
+                dancer.mugshot(mugshotBytes);
+                dancer.mugshotContentType(mugshotUpload.mimeType());
             }
             catch (IOException e) {
                 throw new IllegalStateException(e);
             }
         }
-        dancer.mugshot(mugshotBytes);
 
         // dancestyles
         // reuse existing entries (matched by dancestyle) so a merge does not insert duplicates of existing rows

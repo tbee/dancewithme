@@ -44,6 +44,8 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     @JdbcTypeCode(SqlTypes.BINARY)
     private byte[] mugshot;
 
+    private String mugshotContentType;
+
     @Column(nullable = false)
     private boolean active = true;
 
@@ -293,10 +295,11 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
         photos.forEach(photo -> this.photos.add(photo.dancer(this)));
         return this;
     }
-    public DancerPhoto addPhoto(byte[] image) {
+    public DancerPhoto addPhoto(byte[] image, String contentType) {
         DancerPhoto photo = new DancerPhoto()
                 .dancer(this)
-                .image(image);
+                .image(image)
+                .contentType(contentType);
         photos.add(photo);
         return photo;
     }
@@ -304,5 +307,14 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
     @Override
     public String toString() {
         return super.toString() + ", email=" + email;
+    }
+
+    public String mugshotContentType() {
+        return mugshotContentType;
+    }
+
+    public Dancer mugshotContentType(String mugshotContentType) {
+        this.mugshotContentType = mugshotContentType;
+        return this;
     }
 }

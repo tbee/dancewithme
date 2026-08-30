@@ -21,6 +21,9 @@ public class DancerPhoto extends BaseEntity<DancerPhoto> {
     @Column(nullable = false)
     private byte[] image;
 
+    @Column(nullable = false)
+    private String contentType;
+
     public Dancer dancer() {
         return dancer;
     }
@@ -34,6 +37,15 @@ public class DancerPhoto extends BaseEntity<DancerPhoto> {
     }
     public DancerPhoto image(byte[] image) {
         this.image = image;
+        return this;
+    }
+
+    public String contentType() {
+        return contentType;
+    }
+
+    public DancerPhoto contentType(String contentType) {
+        this.contentType = contentType;
         return this;
     }
 }
