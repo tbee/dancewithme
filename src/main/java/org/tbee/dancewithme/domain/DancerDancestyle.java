@@ -10,9 +10,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.valueobject.Role;
-import org.tbee.dancewithme.domain.valueobject.Sex;
 
 @Entity
 @Table(name = "dancer_dancestyle", uniqueConstraints = @UniqueConstraint(name = "dancer_dancestyle__dancer_dancestyle_UK", columnNames = {"dancer_id", "dancestyle_id"}))
@@ -26,7 +24,7 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role = Role.EITHER;
+    private Role role;
 
     // 1 (absolute beginner) to 10 (world elite)
     @Column(nullable = false)

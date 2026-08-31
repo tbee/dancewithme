@@ -31,7 +31,7 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implement
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role = Role.EITHER;
+    private Role role;
 
     // the required sex of the partner
     @Enumerated(EnumType.STRING)
