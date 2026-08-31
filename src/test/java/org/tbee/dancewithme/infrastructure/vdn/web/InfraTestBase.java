@@ -104,7 +104,12 @@ abstract public class InfraTestBase {
                            """)) {
                     while (rs.next()) {
                         String name = rs.getString(1);
-                        if (!"DATABASECHANGELOG".equalsIgnoreCase(name) && !"DATABASECHANGELOGLOCK".equalsIgnoreCase(name)) {
+                        if (!"DATABASECHANGELOG".equalsIgnoreCase(name)
+                                && !"DATABASECHANGELOGLOCK".equalsIgnoreCase(name)
+                                && !"dancestyle".equalsIgnoreCase(name)
+                                && !"skilllevel".equalsIgnoreCase(name)
+                                && !"country".equalsIgnoreCase(name)
+                                && !"city".equalsIgnoreCase(name)) {
                             tableNames.add(name);
                         }
                     }
