@@ -91,7 +91,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
         stylesLayout.setSpacing(false);
         stylesLayout.setMargin(false);
         dancer.dancestyles().forEach(dd -> stylesLayout.add(new Span(
-                dd.dancestyle().name() + " — " + dd.role().name() + " — " + getTranslation("skilllevel." + dd.skilllevel().code()))));
+                dd.dancestyle().name() + " — " + getTranslation(dd.role().translationKey()) + " — " + dd.skilllevel() + " - " + getTranslation("skilllevel" + dd.skilllevel()))));
 
         // mutual match badge: we know the dancer matches our search parameters, but do wo also match the search of the `viewed` dancer? Are we a match?
         Dancer loggedInDancer = securityService.loggedInDancer().orElseThrow();
@@ -105,7 +105,7 @@ public class DancerDetailView extends DancewithmeAppLayout implements BeforeEnte
             card.setMedia(new Image(dancer.mugshot(), dancer.name()));
         }
         card.addThemeVariants(CardVariant.HORIZONTAL, CardVariant.COVER_MEDIA);
-        card.setTitle(dancer.name());
+        card.setTitle(dancer.name() + (dancer.sex() == null ? "" : " (" + getTranslation(dancer.sex().translationKeyNoun()) + ")"));
         card.setSubtitle(cityLayout);
         card.setHeaderSuffix(matchBadge);
         VerticalLayout verticalLayout = new VerticalLayout(

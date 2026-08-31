@@ -10,7 +10,6 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerDancestyle;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
@@ -41,15 +40,15 @@ class SearchServiceTest {
 
     private final Dancestyle ballroom = dancestyle(1L, "Ballroom");
     private final Dancestyle latin = dancestyle(2L, "Latin");
-    private final Skilllevel beginner1 = skilllevel(1L, "absolute_beginner", 1);
-    private final Skilllevel novice2 = skilllevel(2L, "novice", 2);
-    private final Skilllevel intermediate3 = skilllevel(3L, "intermediate_social", 3);
-    private final Skilllevel advanced4 = skilllevel(4L, "advanced", 4);
-    private final Skilllevel preCompetition5 = skilllevel(5L, "pre_competition", 5);
-    private final Skilllevel regional6 = skilllevel(6L, "regional", 6);
-    private final Skilllevel national7 = skilllevel(7L, "national", 7);
-    private final Skilllevel nationalFinalist8 = skilllevel(8L, "national_finalist", 8);
-    private final Skilllevel international9 = skilllevel(9L, "international", 9);
+    private final int beginner1 = 1;
+    private final int novice2 = 2;
+    private final int intermediate3 = 3;
+    private final int advanced4 = 4;
+    private final int preCompetition5 = 5;
+    private final int regional6 = 6;
+    private final int national7 = 7;
+    private final int nationalFinalist8 = 8;
+    private final int international9 = 9;
     private final City amsterdam = city(1L, "Amsterdam", 52.3676, 4.9041);
     private final City rotterdam = city(2L, "Rotterdam", 51.9225, 4.47917);
     private final City berlin = city(3L, "Berlin", 52.5200, 13.4050);
@@ -266,10 +265,6 @@ class SearchServiceTest {
         return new Dancestyle().id(id).name(name);
     }
 
-    private static Skilllevel skilllevel(long id, String code, int level) {
-        return new Skilllevel().id(id).code(code).level(level);
-    }
-
     private static City city(long id, String name, double lat, double lon) {
         return new City().id(id).name(name).lat(lat).lon(lon);
     }
@@ -287,7 +282,7 @@ class SearchServiceTest {
         return dancer;
     }
 
-    private static DancerSearchingFor searchingFor(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel min, Skilllevel max) {
+    private static DancerSearchingFor searchingFor(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, int min, int max) {
         return new DancerSearchingFor()
                 .dancestyle(dancestyle)
                 .sex(sex)
@@ -296,7 +291,7 @@ class SearchServiceTest {
                 .skilllevelMax(max);
     }
 
-    private static DancerDancestyle dancerDancestyle(Dancestyle dancestyle, Role role, Skilllevel skilllevel) {
+    private static DancerDancestyle dancerDancestyle(Dancestyle dancestyle, Role role, int skilllevel) {
         return new DancerDancestyle()
                 .dancestyle(dancestyle)
                 .role(role)

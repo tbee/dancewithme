@@ -30,10 +30,8 @@ import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.domain.service.ValidateDancer;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.webstack.vdn.component.ImageGallery;
@@ -57,7 +55,6 @@ public class DancerForm extends VerticalLayout {
 
     private final Mode mode;
     private final DancestyleRepository dancestyleRepository;
-    private final SkilllevelRepository skilllevelRepository;
     private final ValidateDancer validateDancer = new ValidateDancer();
 
     private final Binder<Dancer> binder = new Binder<>(Dancer.class);
@@ -92,10 +89,9 @@ public class DancerForm extends VerticalLayout {
 
     private final ImageGallery imageGallery = new ImageGallery();
 
-    public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository, SkilllevelRepository skilllevelRepository) {
+    public DancerForm(Mode mode, CityRepository cityRepository, DancestyleRepository dancestyleRepository) {
         this.mode = mode;
         this.dancestyleRepository = dancestyleRepository;
-        this.skilllevelRepository = skilllevelRepository;
         this.cityComboBox = new CityComboBox(cityRepository);
 
         setWidthFull();
@@ -428,16 +424,16 @@ public class DancerForm extends VerticalLayout {
         });
     }
 
-    private void addDancestyleRow(List<SearchingForRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevel, Skilllevel skilllevelMax) {
+    private void addDancestyleRow(List<SearchingForRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Integer skilllevel, Integer skilllevelMax) {
         SearchingForRow row;
         if (aboutDancer) {
-            row = new DancestyleRow(dancestyleRepository, skilllevelRepository, r -> {
+            row = new DancestyleRow(dancestyleRepository, r -> {
                 rows.remove(r);
                 layout.remove(r);
             });
         }
         else {
-            row = new SearchingForRow(dancestyleRepository, skilllevelRepository, r -> {
+            row = new SearchingForRow(dancestyleRepository, r -> {
                 rows.remove(r);
                 layout.remove(r);
             });

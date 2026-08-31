@@ -8,9 +8,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.jspecify.annotations.NonNull;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 
@@ -24,12 +22,12 @@ public class SearchingForRow extends HorizontalLayout {
     protected final SkilllevelComboBox skilllevelMaxComboBox;
     protected final Button removeButton;
 
-    public SearchingForRow(DancestyleRepository dancestyleRepository, SkilllevelRepository skilllevelRepository, Consumer<SearchingForRow> removeButtonConsumer) {
+    public SearchingForRow(DancestyleRepository dancestyleRepository, Consumer<SearchingForRow> removeButtonConsumer) {
         styleComboBox = new DancestyleComboBox(dancestyleRepository);
         roleSelect = new RoleSelect();
         searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
-        skilllevelMinComboBox = new SkilllevelComboBox(skilllevelRepository);
-        skilllevelMaxComboBox = new SkilllevelComboBox(skilllevelRepository);
+        skilllevelMinComboBox = new SkilllevelComboBox();
+        skilllevelMaxComboBox = new SkilllevelComboBox();
         removeButton = removeButton(removeButtonConsumer);
 
         noPaddingHorizontalLayout();
@@ -88,18 +86,18 @@ public class SearchingForRow extends HorizontalLayout {
         return this;
     }
 
-    public Skilllevel skilllevelMin() {
+    public Integer skilllevelMin() {
         return skilllevelMinComboBox.getValue();
     }
-    public SearchingForRow skilllevelMin(Skilllevel v) {
+    public SearchingForRow skilllevelMin(Integer v) {
         skilllevelMinComboBox.setValue(v);
         return this;
     }
 
-    public Skilllevel skilllevelMax() {
+    public Integer skilllevelMax() {
         return skilllevelMaxComboBox.getValue();
     }
-    public SearchingForRow skilllevelMax(Skilllevel v) {
+    public SearchingForRow skilllevelMax(Integer v) {
         skilllevelMaxComboBox.setValue(v);
         return this;
     }

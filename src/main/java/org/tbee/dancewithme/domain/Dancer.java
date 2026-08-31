@@ -258,7 +258,7 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
         dancestyles.forEach(dancerDancestyle -> this.dancestyles.add(dancerDancestyle.dancer(this)));
         return this;
     }
-    public DancerDancestyle addDancestyle(Dancestyle dancestyle, Role role, Skilllevel skilllevel) {
+    public DancerDancestyle addDancestyle(Dancestyle dancestyle, Role role, int skilllevel) {
         DancerDancestyle dancerDancestyle = new DancerDancestyle()
                 .dancer(this)
                 .dancestyle(dancestyle)
@@ -276,7 +276,7 @@ public class Dancer extends BaseEntity<Dancer> implements SearchService.SearchPa
         searchingFor.forEach(entry -> this.searchingFor.add(entry.dancer(this)));
         return this;
     }
-    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, SearchCriteriaSex sex, Role role, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
+    public DancerSearchingFor addSearchingFor(Dancestyle dancestyle, SearchCriteriaSex sex, Role role, int skilllevelMin, int skilllevelMax) {
         DancerSearchingFor entry = new DancerSearchingFor()
                 .dancer(this)
                 .dancestyle(dancestyle)

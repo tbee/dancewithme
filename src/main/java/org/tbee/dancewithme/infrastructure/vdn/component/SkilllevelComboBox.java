@@ -5,31 +5,34 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import org.jspecify.annotations.NonNull;
-import org.tbee.dancewithme.domain.Skilllevel;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 
-public class SkilllevelComboBox extends ComboBox<Skilllevel> {
+import java.util.stream.IntStream;
 
-    public SkilllevelComboBox(SkilllevelRepository skilllevelRepository) {
-        setItems(skilllevelRepository.findAllByOrderByLevelAsc());
+public class SkilllevelComboBox extends ComboBox<Integer> {
+
+    public static final int MIN = 1;
+    public static final int MAX = 10;
+
+    public SkilllevelComboBox() {
+        setItems(IntStream.rangeClosed(MIN, MAX).boxed().toList());
         setItemLabelGenerator(this::label);
 
         // show the description as a tooltip when hovering over the unfolded options
         setRenderer(new ComponentRenderer<>(sl -> {
             Span name = new Span(label(sl));
             Tooltip tooltip = Tooltip.forComponent(name)
-                    .withText(getTranslation(sl.translationKeyDescription()))
+                    .withText(getTranslation("skilllevel" + sl + ".description"))
                     .withHoverDelay(300);
             tooltip.setPosition(Tooltip.TooltipPosition.END);
             return name;
         }));
     }
 
-    private @NonNull String label(Skilllevel sl) {
-        return sl.level() + " - " + getTranslation(sl.translationKey());
+    private @NonNull String label(Integer sl) {
+        return sl + " - " + getTranslation("skilllevel" + sl);
     }
 
-    public SkilllevelComboBox withValue(Skilllevel v) {
+    public SkilllevelComboBox withValue(Integer v) {
         setValue(v);
         return this;
     }

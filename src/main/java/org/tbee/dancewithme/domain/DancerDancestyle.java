@@ -26,8 +26,9 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
     @Enumerated(EnumType.STRING)
     private Role role = Role.EITHER;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Skilllevel skilllevel;
+    // 1 (absolute beginner) to 10 (world elite)
+    @Column(nullable = false)
+    private int skilllevel = 1;
 
     public Dancer dancer() {
         return dancer;
@@ -53,10 +54,10 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
         return this;
     }
 
-    public Skilllevel skilllevel() {
+    public int skilllevel() {
         return skilllevel;
     }
-    public DancerDancestyle skilllevel(Skilllevel skilllevel) {
+    public DancerDancestyle skilllevel(int skilllevel) {
         this.skilllevel = skilllevel;
         return this;
     }

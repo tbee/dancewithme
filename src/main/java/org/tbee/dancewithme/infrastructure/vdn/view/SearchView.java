@@ -19,13 +19,12 @@ import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
 import org.tbee.dancewithme.infrastructure.vdn.component.SearchResultCard;
 import org.tbee.dancewithme.infrastructure.vdn.component.SearchingForRow;
+import org.tbee.dancewithme.infrastructure.vdn.component.SkilllevelComboBox;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
 import java.util.ArrayList;
@@ -47,7 +46,6 @@ public class SearchView extends DancewithmeAppLayout {
     private final IntegerField distanceMaxField = new IntegerField();
 
     private final DancestyleRepository dancestyleRepository;
-    private final SkilllevelRepository skilllevelRepository;
 
     private final VerticalLayout resultsLayout = new VerticalLayout();
     private final HorizontalLayout pagingLayout = new HorizontalLayout();
@@ -57,13 +55,11 @@ public class SearchView extends DancewithmeAppLayout {
     private int page = 0;
 
     public SearchView(SecurityService securityService, LocaleService localeService, SearchService searchService,
-                      DancerService dancerService, DancestyleRepository dancestyleRepository,
-                      SkilllevelRepository skilllevelRepository) {
+                      DancerService dancerService, DancestyleRepository dancestyleRepository) {
         super("search.title", securityService, localeService);
         this.securityService = securityService;
         this.searchService = searchService;
         this.dancestyleRepository = dancestyleRepository;
-        this.skilllevelRepository = skilllevelRepository;
 
         boolean loggedIn = securityService.isLoggedIn();
 
@@ -135,8 +131,8 @@ public class SearchView extends DancewithmeAppLayout {
         setContent(content);
     }
 
-    private void addStyleRow(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
-        SearchingForRow row = new SearchingForRow(dancestyleRepository, skilllevelRepository, r -> {
+    private void addStyleRow(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Integer skilllevelMin, Integer skilllevelMax) {
+        SearchingForRow row = new SearchingForRow(dancestyleRepository, r -> {
             styleRows.remove(r);
             styleRowsLayout.remove(r);
         });
@@ -190,13 +186,13 @@ public class SearchView extends DancewithmeAppLayout {
                             }
 
                             @Override
-                            public Skilllevel skilllevelMin() {
-                                return row.skilllevelMin();
+                            public int skilllevelMin() {
+                                return ifNull(row.skilllevelMin(), SkilllevelComboBox.MIN);
                             }
 
                             @Override
-                            public Skilllevel skilllevelMax() {
-                                return row.skilllevelMax();
+                            public int skilllevelMax() {
+                                return ifNull(row.skilllevelMax(), SkilllevelComboBox.MAX);
                             }
                         })
                         .toList();

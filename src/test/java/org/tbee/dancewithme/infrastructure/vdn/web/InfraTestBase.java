@@ -107,7 +107,6 @@ abstract public class InfraTestBase {
                         if (!"DATABASECHANGELOG".equalsIgnoreCase(name)
                                 && !"DATABASECHANGELOGLOCK".equalsIgnoreCase(name)
                                 && !"dancestyle".equalsIgnoreCase(name)
-                                && !"skilllevel".equalsIgnoreCase(name)
                                 && !"country".equalsIgnoreCase(name)
                                 && !"city".equalsIgnoreCase(name)) {
                             tableNames.add(name);

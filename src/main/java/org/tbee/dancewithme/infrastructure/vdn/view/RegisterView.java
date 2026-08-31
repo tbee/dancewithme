@@ -11,7 +11,6 @@ import org.tbee.dancewithme.application.EmailConfirmationService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
 import org.tbee.dancewithme.infrastructure.vdn.RememberedEmail;
@@ -29,11 +28,11 @@ public class RegisterView extends DancewithmeAppLayout {
 
     public RegisterView(SecurityService securityService, LocaleService localeService, DancerService dancerService,
                         EmailConfirmationService emailConfirmationService,
-                        CityRepository cityRepository, DancestyleRepository dancestyleRepository, SkilllevelRepository skilllevelRepository) {
+                        CityRepository cityRepository, DancestyleRepository dancestyleRepository) {
         super("register.title", securityService, localeService);
         this.emailConfirmationService = emailConfirmationService;
 
-        DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, skilllevelRepository);
+        DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository);
         form.setDancer(new Dancer());
 
         Button registerButton = new Button(getTranslation("form.register"), e -> {

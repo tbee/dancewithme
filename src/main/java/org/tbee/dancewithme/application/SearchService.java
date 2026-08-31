@@ -6,7 +6,6 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.infrastructure.vdn.security.SecurityService;
 
@@ -21,8 +20,8 @@ public class SearchService {
         Dancestyle dancestyle();
         SearchCriteriaSex sex();
         Role role();
-        Skilllevel skilllevelMin();
-        Skilllevel skilllevelMax();
+        int skilllevelMin();
+        int skilllevelMax();
     }
 
     public interface SearchParameters {
@@ -70,8 +69,8 @@ public class SearchService {
                                         (searchingFor.dancestyle() == null || searchingFor.dancestyle().equals(dancerDancestyle.dancestyle())) &&
                                         (searchingFor.role() == null || searchingFor.role().equals(dancerDancestyle.role())) &&
                                         (searchingFor.sex() == null || searchingFor.sex().match(dancer.sex())) &&
-                                        (searchingFor.skilllevelMin() == null || searchingFor.skilllevelMin().level() <= dancerDancestyle.skilllevel().level()) &&
-                                        (searchingFor.skilllevelMax() == null || searchingFor.skilllevelMax().level() >= dancerDancestyle.skilllevel().level())
+                                        (searchingFor.skilllevelMin() <= dancerDancestyle.skilllevel()) &&
+                                        (searchingFor.skilllevelMax() >= dancerDancestyle.skilllevel())
                                 )
                         )
                 )

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
@@ -21,8 +20,6 @@ class ValidateDancerTest {
 
     private final Dancestyle ballroom = new Dancestyle().id(1L).name("Ballroom");
     private final Dancestyle latin = new Dancestyle().id(2L).name("Latin");
-    private final Skilllevel beginner = new Skilllevel().id(1L).code("absolute_beginner").level(1);
-    private final Skilllevel intermediate = new Skilllevel().id(3L).code("intermediate_social").level(3);
 
     @BeforeEach
     void setUp() {
@@ -77,8 +74,8 @@ class ValidateDancerTest {
     @Test
     void duplicateDancestylesAreReported() {
         Dancer dancer = new Dancer();
-        dancer.addDancestyle(ballroom, FOLLOW, beginner);
-        dancer.addDancestyle(ballroom, LEAD, intermediate);
+        dancer.addDancestyle(ballroom, FOLLOW, 1);
+        dancer.addDancestyle(ballroom, LEAD, 3);
 
         List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
@@ -88,8 +85,8 @@ class ValidateDancerTest {
     @Test
     void duplicateSearchingForIsReported() {
         Dancer dancer = new Dancer();
-        dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, FOLLOW, beginner, intermediate);
-        dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, LEAD, beginner, intermediate);
+        dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, FOLLOW, 1, 3);
+        dancer.addSearchingFor(latin, SearchCriteriaSex.FEMALE, LEAD, 1, 3);
 
         List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 
@@ -99,8 +96,8 @@ class ValidateDancerTest {
     @Test
     void distinctDancestylesProduceNoDuplicateProblems() {
         Dancer dancer = new Dancer();
-        dancer.addDancestyle(ballroom, FOLLOW, beginner);
-        dancer.addDancestyle(latin, LEAD, intermediate);
+        dancer.addDancestyle(ballroom, FOLLOW, 1);
+        dancer.addDancestyle(latin, LEAD, 3);
 
         List<ValidateDancer.Problem> problems = validateDancer.validate(dancer, null, null, false);
 

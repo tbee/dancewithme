@@ -5,10 +5,8 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerDancestyle;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
@@ -32,21 +30,9 @@ public class Populate {
             sc.inTransaction(() -> {
                 DancerRepository dancerRepository = sc.beanFactory.getBean(DancerRepository.class);
                 DancestyleRepository dancestyleRepository = sc.beanFactory.getBean(DancestyleRepository.class);
-                SkilllevelRepository skilllevelRepository = sc.beanFactory.getBean(SkilllevelRepository.class);
                 PasswordEncoder passwordEncoder = sc.beanFactory.getBean(PasswordEncoder.class);
 
                 Dancestyle ballroom = dancestyleRepository.findBallroom();
-
-                Skilllevel beginner1 = skilllevelRepository.findByLevel(1).orElseThrow();
-                Skilllevel novice2 = skilllevelRepository.findByLevel(2).orElseThrow();
-                Skilllevel intermediateSocial3 = skilllevelRepository.findByLevel(3).orElseThrow();
-                Skilllevel advancedSocial4 = skilllevelRepository.findByLevel(4).orElseThrow();
-                Skilllevel precompetitive5 = skilllevelRepository.findByLevel(5).orElseThrow();
-                Skilllevel regionalCompetitor6 = skilllevelRepository.findByLevel(6).orElseThrow();
-                Skilllevel nationalCompetitor7 = skilllevelRepository.findByLevel(7).orElseThrow();
-                Skilllevel nationalFinalist8 = skilllevelRepository.findByLevel(8).orElseThrow();
-                Skilllevel international9 = skilllevelRepository.findByLevel(9).orElseThrow();
-                Skilllevel worldElite10 = skilllevelRepository.findByLevel(10).orElseThrow();
 
                 dancerRepository.save(new Dancer()
                         .name("Only bare minimum fields are filled")
@@ -65,8 +51,8 @@ public class Populate {
                         .weekFrequencyMin(1)
                         .weekFrequencyMax(2)
                         .distanceMax(50)
-                        .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(LEAD).skilllevel(beginner1)))
-                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.FEMALE).role(FOLLOW).skilllevelMax(beginner1).skilllevelMax(advancedSocial4)));
+                        .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(LEAD).skilllevel(1)))
+                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.FEMALE).role(FOLLOW).skilllevelMin(1).skilllevelMax(4)));
             });
         };
     }

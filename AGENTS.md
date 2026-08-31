@@ -30,7 +30,7 @@ It has the following main layers:
 
 ## Package layout
 Root package `org.tbee.dancewithme`, entry point `Dancewithme.java`.
-- `domain` - entities (`Dancer`, `DancerDancestyle`, `DancerSearchingFor`, `DancerPhoto`, `Dancestyle`, `Role`, `Skilllevel`, `City`, `Country`) plus `BaseEntity`, and the subpackages `repository`, `service`, `valueobject`.
+- `domain` - entities (`Dancer`, `DancerDancestyle`, `DancerSearchingFor`, `DancerPhoto`, `Dancestyle`, `City`, `Country`) plus `BaseEntity`, and the subpackages `repository`, `service`, `valueobject`.
 - `application` - `SearchService`, `DancerService`, `EmailConfirmationService`, `PasswordResetService`, and the outbound port `EmailService`.
 - `infrastructure` - `jpa` (`CustomRepositoryImpl`, `JpaConfiguration`), `mail` (`SmtpEmailService`), `vdn` (app layout, `LocaleService`) with subpackages `view`, `component`, `security`.
 

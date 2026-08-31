@@ -37,11 +37,11 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implement
     private SearchCriteriaSex sex = SearchCriteriaSex.EITHER;
 
     // the minimum and maximum skilllevel the searching dancer accepts in a partner
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Skilllevel skilllevelMin;
+    @Column(nullable = false)
+    private int skilllevelMin = 1;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Skilllevel skilllevelMax;
+    @Column(nullable = false)
+    private int skilllevelMax = 10;
 
     public Dancer dancer() {
         return dancer;
@@ -75,18 +75,18 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implement
         return this;
     }
 
-    public Skilllevel skilllevelMin() {
+    public int skilllevelMin() {
         return skilllevelMin;
     }
-    public DancerSearchingFor skilllevelMin(Skilllevel skilllevelMin) {
+    public DancerSearchingFor skilllevelMin(int skilllevelMin) {
         this.skilllevelMin = skilllevelMin;
         return this;
     }
 
-    public Skilllevel skilllevelMax() {
+    public int skilllevelMax() {
         return skilllevelMax;
     }
-    public DancerSearchingFor skilllevelMax(Skilllevel skilllevelMax) {
+    public DancerSearchingFor skilllevelMax(int skilllevelMax) {
         this.skilllevelMax = skilllevelMax;
         return this;
     }

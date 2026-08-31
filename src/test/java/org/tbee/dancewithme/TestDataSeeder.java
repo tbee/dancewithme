@@ -14,11 +14,9 @@ import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
-import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -48,17 +46,14 @@ public class TestDataSeeder implements ApplicationRunner {
     private final DancerRepository dancerRepository;
     private final CityRepository cityRepository;
     private final DancestyleRepository dancestyleRepository;
-    private final SkilllevelRepository skilllevelRepository;
     private final PasswordEncoder passwordEncoder;
     private final Random random = new Random();
 
     public TestDataSeeder(DancerRepository dancerRepository, CityRepository cityRepository,
-                          DancestyleRepository dancestyleRepository,
-                          SkilllevelRepository skilllevelRepository, PasswordEncoder passwordEncoder) {
+                          DancestyleRepository dancestyleRepository, PasswordEncoder passwordEncoder) {
         this.dancerRepository = dancerRepository;
         this.cityRepository = cityRepository;
         this.dancestyleRepository = dancestyleRepository;
-        this.skilllevelRepository = skilllevelRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -71,31 +66,31 @@ public class TestDataSeeder implements ApplicationRunner {
         LOGGER.info("Seeding test dancers");
 
         createDancer("Tbee", Sex.MALE, 1970, "Aalten", List.of(
-                canDo("Ballroom", LEAD, "advanced_social"),
-                canDo("Latin", LEAD, "intermediate_social")));
+                canDo("Ballroom", LEAD, 4),
+                canDo("Latin", LEAD, 3)));
         createDancer("Anna", Sex.FEMALE, 1992, "Amsterdam", List.of(
-                canDo("Ballroom", FOLLOW, "intermediate_social")));
+                canDo("Ballroom", FOLLOW, 3)));
         createDancer("Bram", Sex.MALE, 1985, "Rotterdam", List.of(
-                canDo("Latin", LEAD, "novice"),
-                canDo("Salsa", LEAD, "advanced_social")));
+                canDo("Latin", LEAD, 2),
+                canDo("Salsa", LEAD, 4)));
         createDancer("Carmen", Sex.FEMALE, 1998, "Utrecht", List.of(
-                canDo("Ballroom", FOLLOW, "pre_competitive"),
-                canDo("Latin", FOLLOW, "pre_competitive")));
+                canDo("Ballroom", FOLLOW, 5),
+                canDo("Latin", FOLLOW, 5)));
         createDancer("Daan", Sex.MALE, 1979, "Haarlem", List.of(
-                canDo("Tango argentine", LEAD, "intermediate_social"),
-                canDo("Ballroom", LEAD, "novice")));
+                canDo("Tango argentine", LEAD, 3),
+                canDo("Ballroom", LEAD, 2)));
         createDancer("Evi", Sex.FEMALE, 1990, "Eindhoven", List.of(
-                canDo("West coast swing", FOLLOW, "novice"),
-                canDo("Salsa", FOLLOW, "intermediate_social"),
-                canDo("Ballroom", FOLLOW, "absolute_beginner")));
+                canDo("West coast swing", FOLLOW, 2),
+                canDo("Salsa", FOLLOW, 3),
+                canDo("Ballroom", FOLLOW, 1)));
     }
 
     /** What a dancer can do: dancestyle, role and skill level. */
-    private record CanDo(Dancestyle dancestyle, Role role, Skilllevel skilllevel) {
+    private record CanDo(Dancestyle dancestyle, Role role, int skilllevel) {
     }
 
-    private CanDo canDo(String dancestyleName, Role role, String skilllevelCode) {
-        return new CanDo(dancestyle(dancestyleName), role, skilllevel(skilllevelCode));
+    private CanDo canDo(String dancestyleName, Role role, int skilllevel) {
+        return new CanDo(dancestyle(dancestyleName), role, skilllevel);
     }
 
     private void createDancer(String name, Sex sex, int yearOfBirth, String cityName, List<CanDo> canDos) {
@@ -115,7 +110,7 @@ public class TestDataSeeder implements ApplicationRunner {
                 .publiclyFindable(true)
                 .privacyAgreementAcceptedAt(LocalDateTime.now())
                 .emailConfirmedAt(LocalDateTime.now());
-        List<Skilllevel> skilllevels = skilllevelRepository.findAllByOrderByLevelAsc();
+        List<Integer> skilllevels = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
         for (CanDo canDo : canDos) {
             dancer.addDancestyle(canDo.dancestyle(), canDo.role(), canDo.skilllevel());
             // searching for a partner with the complementary role in the same style,
@@ -128,13 +123,6 @@ public class TestDataSeeder implements ApplicationRunner {
                     skilllevels.get(Math.min(skilllevels.size() - 1, ownIndex + 2)));
         }
         dancerRepository.save(dancer);
-    }
-
-    private Skilllevel skilllevel(String code) {
-        return skilllevelRepository.findAll().stream()
-                .filter(skilllevel -> skilllevel.code().equals(code))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Skilllevel not found: " + code));
     }
 
     private Dancestyle dancestyle(String name) {
