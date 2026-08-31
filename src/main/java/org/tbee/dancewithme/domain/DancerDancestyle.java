@@ -8,6 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.Sex;
@@ -28,6 +30,8 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
 
     // 1 (absolute beginner) to 10 (world elite)
     @Column(nullable = false)
+    @Min(1)
+    @Max(10)
     private int skilllevel = 1;
 
     public Dancer dancer() {

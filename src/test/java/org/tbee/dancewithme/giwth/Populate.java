@@ -15,6 +15,7 @@ import org.tbee.giwth.Given;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.tbee.dancewithme.domain.valueobject.Role.FOLLOW;
@@ -34,19 +35,21 @@ public class Populate {
 
                 Dancestyle ballroom = dancestyleRepository.findBallroom();
 
+                LocalDateTime now = sc.nowSupplier.get();
+
                 dancerRepository.save(new Dancer()
                         .name("Only bare minimum fields are filled")
                         .email(EMPTY_DANCER)
                         .password(passwordEncoder.encode(EMPTY_DANCER))
-                        .emailConfirmedAt(sc.nowSupplier.get())
-                        .privacyAgreementAcceptedAt(sc.nowSupplier.get()));
+                        .emailConfirmedAt(now)
+                        .privacyAgreementAcceptedAt(now));
 
                 dancerRepository.save(new Dancer()
                         .name("Ballroom beginner lead, 1-2/week, 50km")
                         .email(BALLROOM_BEGINNER_DANCER)
                         .password(passwordEncoder.encode(BALLROOM_BEGINNER_DANCER))
-                        .emailConfirmedAt(sc.nowSupplier.get())
-                        .privacyAgreementAcceptedAt(sc.nowSupplier.get()))
+                        .emailConfirmedAt(now)
+                        .privacyAgreementAcceptedAt(now))
                         .sex(Sex.MALE)
                         .weekFrequencyMin(1)
                         .weekFrequencyMax(2)

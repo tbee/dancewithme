@@ -75,7 +75,7 @@ public class DancerForm extends VerticalLayout {
     private final Checkbox publiclyFindableCheckbox = new Checkbox();
     private final Checkbox privacyAgreementCheckbox = new Checkbox();
 
-    private final ImageUpload mugshotUpload = new ImageUpload()
+    private final ImageUpload mugshotImageUpload = new ImageUpload()
             .filetypes(new String[]{"image/jpeg", "image/png", "image/webp"})
             .imageWidth("150px")
             .imageHeight("150px");
@@ -181,7 +181,7 @@ public class DancerForm extends VerticalLayout {
         FormLayout formLayout = createFormLayout();
 
         // mugshot
-        formLayout.add(new H5(t("form.mugshot")), mugshotUpload);
+        formLayout.add(new H5(t("form.mugshot")), mugshotImageUpload);
 
         // extra photos
         Upload photoUpload = new Upload(UploadHandler.inMemory((metadata, bytes) -> {
@@ -250,7 +250,7 @@ public class DancerForm extends VerticalLayout {
         this.mugshotBytes = dancer.mugshot();
         if (mugshotBytes != null && mugshotBytes.length > 0) {
             // browsers sniff the actual image type, so a generic mime is fine
-            mugshotUpload.src("data:image/*;base64," + java.util.Base64.getEncoder().encodeToString(mugshotBytes));
+            mugshotImageUpload.src("data:image/*;base64," + java.util.Base64.getEncoder().encodeToString(mugshotBytes));
         }
         dancestyleRows.clear();
         dancestylesLayout.removeAll();
@@ -278,15 +278,19 @@ public class DancerForm extends VerticalLayout {
         }
 
         // apply mugshot
-        if (mugshotUpload.hasUpload()) {
-            try (InputStream inputStream = mugshotUpload.inputStream()) {
+        if (mugshotImageUpload.hasUpload()) {
+            try (InputStream inputStream = mugshotImageUpload.inputStream()) {
                 mugshotBytes = inputStream.readAllBytes();
                 dancer.mugshot(mugshotBytes);
-                dancer.mugshotContentType(mugshotUpload.mimeType());
+                dancer.mugshotContentType(mugshotImageUpload.mimeType());
             }
             catch (IOException e) {
                 throw new IllegalStateException(e);
             }
+        }
+        else if (mugshotImageUpload.src().isBlank()) {
+            dancer.mugshot(null);
+            dancer.mugshotContentType(null);
         }
 
         // dancestyles

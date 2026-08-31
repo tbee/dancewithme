@@ -8,6 +8,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
@@ -38,9 +40,13 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implement
 
     // the minimum and maximum skilllevel the searching dancer accepts in a partner
     @Column(nullable = false)
+    @Min(1)
+    @Max(10)
     private int skilllevelMin = 1;
 
     @Column(nullable = false)
+    @Min(1)
+    @Max(10)
     private int skilllevelMax = 10;
 
     public Dancer dancer() {

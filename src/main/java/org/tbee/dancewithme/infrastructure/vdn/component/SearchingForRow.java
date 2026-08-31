@@ -5,12 +5,12 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.jspecify.annotations.NonNull;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
+import org.tbee.webstack.vdn.component.orderedlayout.HorizontalLayout;
 
 import java.util.function.Consumer;
 
@@ -30,7 +30,12 @@ public class SearchingForRow extends HorizontalLayout {
         skilllevelMaxComboBox = new SkilllevelComboBox();
         removeButton = removeButton(removeButtonConsumer);
 
-        noPaddingHorizontalLayout();
+        padding(false);
+        margin(false);
+        centered();
+        widthFull();
+        // the fields together can be wider than the card; allow them to wrap to a second line
+        wrap();
 
         add(    styleComboBox,
                 //new NativeLabel(getTranslation("search.role")),
@@ -41,18 +46,8 @@ public class SearchingForRow extends HorizontalLayout {
                 new NativeLabel(getTranslation("search.skillTo")),
                 skilllevelMaxComboBox,
                 removeButton);
-        setFlexGrow(1, skilllevelMinComboBox);
-        setFlexGrow(1, skilllevelMaxComboBox);
-    }
-
-    private void noPaddingHorizontalLayout() {
-        setPadding(false);
-        setMargin(false);
-        setAlignItems(FlexComponent.Alignment.CENTER);
-        setWidthFull();
-        // the fields together can be wider than the card; allow them to wrap to a second line
-        getStyle().set("flex-wrap", "wrap");
-        getStyle().set("row-gap", "var(--lumo-space-s)");
+        flexGrow(1, skilllevelMinComboBox);
+        flexGrow(1, skilllevelMaxComboBox);
     }
 
     private @NonNull Button removeButton(Consumer<SearchingForRow> consumer) {
