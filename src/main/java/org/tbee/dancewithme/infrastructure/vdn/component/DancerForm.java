@@ -288,7 +288,7 @@ public class DancerForm extends VerticalLayout {
                 throw new IllegalStateException(e);
             }
         }
-        else if (mugshotImageUpload.src().isBlank()) {
+        else if (!mugshotImageUpload.hasImage()) {
             dancer.mugshot(null);
             dancer.mugshotContentType(null);
         }
