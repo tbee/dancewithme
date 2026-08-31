@@ -18,7 +18,7 @@ public class SearchWebTest extends WebTestBase {
     public void simpleSearch() {
         Scenario.of(context(port))
                 .given( Populate.standardSetExists() )
-                .and( Dancer.isLoggedIn(Populate.DANCER1EMAIL) )
+                .and( Dancer.isLoggedIn(Populate.EMPTY_DANCER) )
 
                 .when( Search.on().weekFrequencyMin(2) )
 //

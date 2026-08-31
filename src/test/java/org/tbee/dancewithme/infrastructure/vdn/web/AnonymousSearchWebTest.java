@@ -14,13 +14,11 @@ public class AnonymousSearchWebTest extends WebTestBase {
     private int port;
 
     @Test
-    public void simpleSearch() {
+    public void defaultSearch() {
         Scenario.of(context(port))
                 .given( Populate.standardSetExists() )
 
-                .when( Search.on()
-                        .weekFrequencyMin(2)
-                        .weekFrequencyMax(6))
+                .when( Search.on() )
         ;
         sleepForALongTime();
     }
