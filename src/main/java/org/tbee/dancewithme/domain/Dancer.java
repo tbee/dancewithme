@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
 

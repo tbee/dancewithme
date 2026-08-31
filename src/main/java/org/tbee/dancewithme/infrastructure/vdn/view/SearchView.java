@@ -17,11 +17,10 @@ import org.tbee.dancewithme.application.SearchService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
@@ -48,7 +47,6 @@ public class SearchView extends DancewithmeAppLayout {
     private final IntegerField distanceMaxField = new IntegerField();
 
     private final DancestyleRepository dancestyleRepository;
-    private final RoleRepository roleRepository;
     private final SkilllevelRepository skilllevelRepository;
 
     private final VerticalLayout resultsLayout = new VerticalLayout();
@@ -59,13 +57,12 @@ public class SearchView extends DancewithmeAppLayout {
     private int page = 0;
 
     public SearchView(SecurityService securityService, LocaleService localeService, SearchService searchService,
-                      DancerService dancerService, DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
+                      DancerService dancerService, DancestyleRepository dancestyleRepository,
                       SkilllevelRepository skilllevelRepository) {
         super("search.title", securityService, localeService);
         this.securityService = securityService;
         this.searchService = searchService;
         this.dancestyleRepository = dancestyleRepository;
-        this.roleRepository = roleRepository;
         this.skilllevelRepository = skilllevelRepository;
 
         boolean loggedIn = securityService.isLoggedIn();
@@ -139,7 +136,7 @@ public class SearchView extends DancewithmeAppLayout {
     }
 
     private void addStyleRow(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Skilllevel skilllevelMin, Skilllevel skilllevelMax) {
-        SearchingForRow row = new SearchingForRow(dancestyleRepository, roleRepository, skilllevelRepository, r -> {
+        SearchingForRow row = new SearchingForRow(dancestyleRepository, skilllevelRepository, r -> {
             styleRows.remove(r);
             styleRowsLayout.remove(r);
         });

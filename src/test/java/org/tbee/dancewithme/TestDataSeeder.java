@@ -11,14 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 
 import javax.imageio.ImageIO;
@@ -33,6 +32,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
+import static org.tbee.dancewithme.domain.valueobject.Role.FOLLOW;
+import static org.tbee.dancewithme.domain.valueobject.Role.LEAD;
+
 /**
  * Temporary test data: a few dancers with a generated profile picture.
  * Only active in the dev-testcontainer profile (started via DancewithmeTestContainer),
@@ -46,18 +48,16 @@ public class TestDataSeeder implements ApplicationRunner {
     private final DancerRepository dancerRepository;
     private final CityRepository cityRepository;
     private final DancestyleRepository dancestyleRepository;
-    private final RoleRepository roleRepository;
     private final SkilllevelRepository skilllevelRepository;
     private final PasswordEncoder passwordEncoder;
     private final Random random = new Random();
 
     public TestDataSeeder(DancerRepository dancerRepository, CityRepository cityRepository,
-                          DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
+                          DancestyleRepository dancestyleRepository,
                           SkilllevelRepository skilllevelRepository, PasswordEncoder passwordEncoder) {
         this.dancerRepository = dancerRepository;
         this.cityRepository = cityRepository;
         this.dancestyleRepository = dancestyleRepository;
-        this.roleRepository = roleRepository;
         this.skilllevelRepository = skilllevelRepository;
         this.passwordEncoder = passwordEncoder;
     }
@@ -71,31 +71,31 @@ public class TestDataSeeder implements ApplicationRunner {
         LOGGER.info("Seeding test dancers");
 
         createDancer("Tbee", Sex.MALE, 1970, "Aalten", List.of(
-                canDo("Ballroom", "lead", "advanced_social"),
-                canDo("Latin", "lead", "intermediate_social")));
+                canDo("Ballroom", LEAD, "advanced_social"),
+                canDo("Latin", LEAD, "intermediate_social")));
         createDancer("Anna", Sex.FEMALE, 1992, "Amsterdam", List.of(
-                canDo("Ballroom", "follow", "intermediate_social")));
+                canDo("Ballroom", FOLLOW, "intermediate_social")));
         createDancer("Bram", Sex.MALE, 1985, "Rotterdam", List.of(
-                canDo("Latin", "lead", "novice"),
-                canDo("Salsa", "lead", "advanced_social")));
+                canDo("Latin", LEAD, "novice"),
+                canDo("Salsa", LEAD, "advanced_social")));
         createDancer("Carmen", Sex.FEMALE, 1998, "Utrecht", List.of(
-                canDo("Ballroom", "follow", "pre_competitive"),
-                canDo("Latin", "follow", "pre_competitive")));
+                canDo("Ballroom", FOLLOW, "pre_competitive"),
+                canDo("Latin", FOLLOW, "pre_competitive")));
         createDancer("Daan", Sex.MALE, 1979, "Haarlem", List.of(
-                canDo("Tango argentine", "lead", "intermediate_social"),
-                canDo("Ballroom", "lead", "novice")));
+                canDo("Tango argentine", LEAD, "intermediate_social"),
+                canDo("Ballroom", LEAD, "novice")));
         createDancer("Evi", Sex.FEMALE, 1990, "Eindhoven", List.of(
-                canDo("West coast swing", "follow", "novice"),
-                canDo("Salsa", "follow", "intermediate_social"),
-                canDo("Ballroom", "follow", "absolute_beginner")));
+                canDo("West coast swing", FOLLOW, "novice"),
+                canDo("Salsa", FOLLOW, "intermediate_social"),
+                canDo("Ballroom", FOLLOW, "absolute_beginner")));
     }
 
     /** What a dancer can do: dancestyle, role and skill level. */
     private record CanDo(Dancestyle dancestyle, Role role, Skilllevel skilllevel) {
     }
 
-    private CanDo canDo(String dancestyleName, String roleName, String skilllevelCode) {
-        return new CanDo(dancestyle(dancestyleName), role(roleName), skilllevel(skilllevelCode));
+    private CanDo canDo(String dancestyleName, Role role, String skilllevelCode) {
+        return new CanDo(dancestyle(dancestyleName), role, skilllevel(skilllevelCode));
     }
 
     private void createDancer(String name, Sex sex, int yearOfBirth, String cityName, List<CanDo> canDos) {
@@ -123,7 +123,7 @@ public class TestDataSeeder implements ApplicationRunner {
             int ownIndex = skilllevels.indexOf(canDo.skilllevel());
             dancer.addSearchingFor(canDo.dancestyle(),
                     sex == Sex.MALE ? SearchCriteriaSex.FEMALE : SearchCriteriaSex.MALE,
-                    role("lead".equals(canDo.role().name()) ? "follow" : "lead"),
+                    (LEAD == canDo.role() ? FOLLOW : LEAD),
                     skilllevels.get(Math.max(0, ownIndex - 2)),
                     skilllevels.get(Math.min(skilllevels.size() - 1, ownIndex + 2)));
         }
@@ -142,12 +142,6 @@ public class TestDataSeeder implements ApplicationRunner {
                 .filter(dancestyle -> dancestyle.name().equals(name))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("Dancestyle not found: " + name));
-    }
-
-    private Role role(String name) {        return roleRepository.findAll().stream()
-                .filter(role -> role.name().equals(name))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Role not found: " + name));
     }
 
     private City city(String name) {

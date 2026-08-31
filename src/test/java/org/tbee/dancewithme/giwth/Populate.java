@@ -5,12 +5,11 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerDancestyle;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Role;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
 import org.tbee.giwth.Given;
@@ -19,7 +18,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Optional;
+
+import static org.tbee.dancewithme.domain.valueobject.Role.FOLLOW;
+import static org.tbee.dancewithme.domain.valueobject.Role.LEAD;
 
 public class Populate {
 
@@ -31,14 +32,10 @@ public class Populate {
             sc.inTransaction(() -> {
                 DancerRepository dancerRepository = sc.beanFactory.getBean(DancerRepository.class);
                 DancestyleRepository dancestyleRepository = sc.beanFactory.getBean(DancestyleRepository.class);
-                RoleRepository roleRepository = sc.beanFactory.getBean(RoleRepository.class);
                 SkilllevelRepository skilllevelRepository = sc.beanFactory.getBean(SkilllevelRepository.class);
                 PasswordEncoder passwordEncoder = sc.beanFactory.getBean(PasswordEncoder.class);
 
-                Dancestyle ballroom = dancestyleRepository.findByName("ballroom").orElseThrow();
-
-                Role lead = roleRepository.findLead();
-                Role follow = roleRepository.findFollow();
+                Dancestyle ballroom = dancestyleRepository.findBallroom();
 
                 Skilllevel beginner1 = skilllevelRepository.findByLevel(1).orElseThrow();
                 Skilllevel novice2 = skilllevelRepository.findByLevel(2).orElseThrow();
@@ -68,8 +65,8 @@ public class Populate {
                         .weekFrequencyMin(1)
                         .weekFrequencyMax(2)
                         .distanceMax(50)
-                        .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(lead).skilllevel(beginner1)))
-                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.FEMALE).role(follow).skilllevelMax(beginner1).skilllevelMax(advancedSocial4)));
+                        .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(LEAD).skilllevel(beginner1)))
+                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.FEMALE).role(FOLLOW).skilllevelMax(beginner1).skilllevelMax(advancedSocial4)));
             });
         };
     }

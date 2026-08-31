@@ -30,6 +30,6 @@ public class Dancestyle extends BaseEntity<Dancestyle> {
 
     @Override
     public String toString() {
-        return super.toString() + ", name=" + name;
+        return super.toString() + ", name='" + name + "'";
     }
 }

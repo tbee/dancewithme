@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.tbee.dancewithme.domain.City;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Role;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancerRepository;

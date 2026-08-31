@@ -3,7 +3,6 @@ package org.tbee.dancewithme.infrastructure.vdn.view;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -12,7 +11,6 @@ import org.tbee.dancewithme.application.EmailConfirmationService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
@@ -31,12 +29,11 @@ public class RegisterView extends DancewithmeAppLayout {
 
     public RegisterView(SecurityService securityService, LocaleService localeService, DancerService dancerService,
                         EmailConfirmationService emailConfirmationService,
-                        CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
-                        SkilllevelRepository skilllevelRepository) {
+                        CityRepository cityRepository, DancestyleRepository dancestyleRepository, SkilllevelRepository skilllevelRepository) {
         super("register.title", securityService, localeService);
         this.emailConfirmationService = emailConfirmationService;
 
-        DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, roleRepository, skilllevelRepository);
+        DancerForm form = new DancerForm(DancerForm.Mode.REGISTER, cityRepository, dancestyleRepository, skilllevelRepository);
         form.setDancer(new Dancer());
 
         Button registerButton = new Button(getTranslation("form.register"), e -> {

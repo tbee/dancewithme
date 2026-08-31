@@ -8,11 +8,10 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import org.jspecify.annotations.NonNull;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.Role;
 import org.tbee.dancewithme.domain.Skilllevel;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 
 import java.util.function.Consumer;
@@ -25,9 +24,9 @@ public class SearchingForRow extends HorizontalLayout {
     protected final SkilllevelComboBox skilllevelMaxComboBox;
     protected final Button removeButton;
 
-    public SearchingForRow(DancestyleRepository dancestyleRepository, RoleRepository roleRepository, SkilllevelRepository skilllevelRepository, Consumer<SearchingForRow> removeButtonConsumer) {
+    public SearchingForRow(DancestyleRepository dancestyleRepository, SkilllevelRepository skilllevelRepository, Consumer<SearchingForRow> removeButtonConsumer) {
         styleComboBox = new DancestyleComboBox(dancestyleRepository);
-        roleSelect = new RoleSelect(roleRepository);
+        roleSelect = new RoleSelect();
         searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
         skilllevelMinComboBox = new SkilllevelComboBox(skilllevelRepository);
         skilllevelMaxComboBox = new SkilllevelComboBox(skilllevelRepository);

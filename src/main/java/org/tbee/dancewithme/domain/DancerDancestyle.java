@@ -1,11 +1,16 @@
 package org.tbee.dancewithme.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.domain.valueobject.Role;
+import org.tbee.dancewithme.domain.valueobject.Sex;
 
 @Entity
 @Table(name = "dancer_dancestyle", uniqueConstraints = @UniqueConstraint(name = "dancer_dancestyle__dancer_dancestyle_UK", columnNames = {"dancer_id", "dancestyle_id"}))
@@ -17,8 +22,9 @@ public class DancerDancestyle extends BaseEntity<DancerDancestyle> {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Dancestyle dancestyle;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Role role;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.EITHER;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Skilllevel skilllevel;

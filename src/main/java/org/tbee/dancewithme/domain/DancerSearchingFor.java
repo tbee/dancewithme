@@ -9,6 +9,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import org.tbee.dancewithme.application.SearchService;
+import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 
 /**
@@ -26,8 +27,9 @@ public class DancerSearchingFor extends BaseEntity<DancerSearchingFor> implement
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Dancestyle dancestyle;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private Role role;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.EITHER;
 
     // the required sex of the partner
     @Enumerated(EnumType.STRING)

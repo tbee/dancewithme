@@ -66,26 +66,6 @@
                                  referencedTableName="country" referencedColumnNames="id"
                                  constraintName="city__country_FK"/>
 
-        <!-- role -->
-        <createTable tableName="role">
-            <column name="id" type="bigint" autoIncrement="true" startWith="1">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="lazylock" type="bigint" defaultValue="0">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_at" type="timestamp" defaultValueComputed="now()">
-                <constraints nullable="false"/>
-            </column>
-            <column name="updated_at" type="timestamp" defaultValueComputed="now()">
-                <constraints nullable="false"/>
-            </column>
-            <column name="name" type="varchar(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-        <addUniqueConstraint tableName="role" columnNames="name" constraintName="role__name_UK"/>
-
         <!-- dancestyle -->
         <createTable tableName="dancestyle">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
@@ -204,7 +184,7 @@
             <column name="dancestyle_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="role_id" type="bigint">
+            <column name="role" type="varchar(10)" defaultValue="EITHER">
                 <constraints nullable="false"/>
             </column>
             <column name="skilllevel_id" type="bigint">
@@ -218,9 +198,6 @@
         <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="dancestyle_id"
                                  referencedTableName="dancestyle" referencedColumnNames="id"
                                  constraintName="dancer_dancestyle__dancestyle_FK"/>
-        <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="role_id"
-                                 referencedTableName="role" referencedColumnNames="id"
-                                 constraintName="dancer_dancestyle__role_FK"/>
         <addForeignKeyConstraint baseTableName="dancer_dancestyle" baseColumnNames="skilllevel_id"
                                  referencedTableName="skilllevel" referencedColumnNames="id"
                                  constraintName="dancer_dancestyle__skilllevel_FK"/>
@@ -245,7 +222,7 @@
             <column name="dancestyle_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="role_id" type="bigint">
+            <column name="role" type="varchar(10)" defaultValue="EITHER">
                 <constraints nullable="false"/>
             </column>
             <column name="sex" type="varchar(10)" defaultValue="EITHER">
@@ -265,9 +242,6 @@
         <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="dancestyle_id"
                                  referencedTableName="dancestyle" referencedColumnNames="id"
                                  constraintName="dancer_searching_for__dancestyle_FK"/>
-        <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="role_id"
-                                 referencedTableName="role" referencedColumnNames="id"
-                                 constraintName="dancer_searching_for__role_FK"/>
         <addForeignKeyConstraint baseTableName="dancer_searching_for" baseColumnNames="skilllevel_min_id"
                                  referencedTableName="skilllevel" referencedColumnNames="id"
                                  constraintName="dancer_searching_for__skilllevel_min_FK"/>

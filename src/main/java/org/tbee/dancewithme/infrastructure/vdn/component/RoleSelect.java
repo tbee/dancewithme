@@ -1,13 +1,12 @@
 package org.tbee.dancewithme.infrastructure.vdn.component;
 
 import com.vaadin.flow.component.select.Select;
-import org.tbee.dancewithme.domain.Role;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
+import org.tbee.dancewithme.domain.valueobject.Role;
 
 public class RoleSelect extends Select<Role> {
 
-    public RoleSelect(RoleRepository roleRepository) {
-        setItems(roleRepository.findAll());
+    public RoleSelect() {
+        setItems(Role.values());
         setItemLabelGenerator(role -> getTranslation(role.translationKey()));
         setWidth("100px");
     }

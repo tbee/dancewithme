@@ -24,14 +24,6 @@
             <column name="name" value="Tango argentine"/>
         </insert>
 
-        <!-- initial roles -->
-        <insert tableName="role">
-            <column name="name" value="lead"/>
-        </insert>
-        <insert tableName="role">
-            <column name="name" value="follow"/>
-        </insert>
-
         <!-- initial skilllevels -->
         <insert tableName="skilllevel"><column name="code" value="absolute_beginner"/><column name="level" valueNumeric="1"/></insert>
         <insert tableName="skilllevel"><column name="code" value="novice"/><column name="level" valueNumeric="2"/></insert>

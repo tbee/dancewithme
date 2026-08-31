@@ -11,7 +11,6 @@ import org.tbee.dancewithme.application.DancerService;
 import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.repository.RoleRepository;
 import org.tbee.dancewithme.domain.repository.SkilllevelRepository;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.dancewithme.infrastructure.vdn.LocaleService;
@@ -27,7 +26,7 @@ public class ProfileView extends DancewithmeAppLayout {
     private final DancerService dancerService;
     private final DancerForm form;
     public ProfileView(SecurityService securityService, LocaleService localeService, DancerService dancerService,
-                       CityRepository cityRepository, DancestyleRepository dancestyleRepository, RoleRepository roleRepository,
+                       CityRepository cityRepository, DancestyleRepository dancestyleRepository,
                        SkilllevelRepository skilllevelRepository) {
         super("profile.title", securityService, localeService);
         this.securityService = securityService;
@@ -36,7 +35,7 @@ public class ProfileView extends DancewithmeAppLayout {
         Dancer dancer = securityService.loggedInDancer().orElseThrow();
         Dancer detailedDancer = dancerService.loadWithDetails(dancer.id());
 
-        form = new DancerForm(DancerForm.Mode.UPDATE, cityRepository, dancestyleRepository, roleRepository, skilllevelRepository);
+        form = new DancerForm(DancerForm.Mode.UPDATE, cityRepository, dancestyleRepository, skilllevelRepository);
         form.setDancer(detailedDancer);
 
         Button saveButton = new Button(getTranslation("form.save"), e -> save());
