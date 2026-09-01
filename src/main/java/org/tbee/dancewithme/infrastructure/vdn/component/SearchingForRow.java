@@ -24,11 +24,17 @@ public class SearchingForRow extends HorizontalLayout {
 
     public SearchingForRow(DancestyleRepository dancestyleRepository, Consumer<SearchingForRow> removeButtonConsumer) {
         styleComboBox = new DancestyleComboBox(dancestyleRepository);
+        styleComboBox.setId(DancestyleComboBox.class.getSimpleName());
         roleSelect = new RoleSelect();
+        roleSelect.setId(roleSelect.getClass().getSimpleName());
         searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
+        searchCriteriaSexComboBox.setId(SearchCriteriaSexComboBox.class.getSimpleName());
         skilllevelMinComboBox = new SkilllevelComboBox();
+        skilllevelMinComboBox.setId(SkilllevelComboBox.class.getSimpleName() + "Min");
         skilllevelMaxComboBox = new SkilllevelComboBox();
+        skilllevelMaxComboBox.setId(SkilllevelComboBox.class.getSimpleName() + "Max");
         removeButton = removeButton(removeButtonConsumer);
+        removeButton.setId("RemoveButton");
 
         padding(false);
         margin(false);

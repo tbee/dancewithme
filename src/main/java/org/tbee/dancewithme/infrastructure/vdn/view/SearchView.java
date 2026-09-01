@@ -34,7 +34,7 @@ import java.util.List;
 @AnonymousAllowed
 public class SearchView extends DancewithmeAppLayout {
 
-    private static final int PAGE_SIZE = 3;
+    private static final int PAGE_SIZE = 10;
 
     private final SecurityService securityService;
     private final SearchService searchService;
@@ -75,6 +75,7 @@ public class SearchView extends DancewithmeAppLayout {
             searchingFor.forEach(entry -> addStyleRow(entry.dancestyle(), entry.role(), entry.sex(), entry.skilllevelMin(), entry.skilllevelMax()));
         }
         Button addStyleButton = new Button(VaadinIcon.PLUS.create());
+        addStyleButton.setId("addSearchingForStyleButton");
         addStyleButton.getElement().setAttribute("aria-label", getTranslation("form.addDancestyle"));
         addStyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         addStyleButton.addClickListener(e -> addStyleRow(null, null, null, null, null));
@@ -94,6 +95,7 @@ public class SearchView extends DancewithmeAppLayout {
         weekFrequencyMaxField.setPlaceholder(getTranslation("search.age.max"));
         weekFrequencyMaxField.setMin(0);
         weekFrequencyMaxField.setMax(7);
+        distanceMaxField.setId("distanceMaxField");
         distanceMaxField.setValue(currentDancer == null ? 0 : currentDancer.distanceMax());
         distanceMaxField.setMin(0);
         distanceMaxField.setVisible(loggedIn); // distance search is only available for logged in users
@@ -126,18 +128,19 @@ public class SearchView extends DancewithmeAppLayout {
     }
 
     private void addStyleRow(Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Integer skilllevelMin, Integer skilllevelMax) {
-        SearchingForRow row = new SearchingForRow(dancestyleRepository, r -> {
+        SearchingForRow searchingForRow = new SearchingForRow(dancestyleRepository, r -> {
             styleRows.remove(r);
             styleRowsLayout.remove(r);
         });
-        row.style(dancestyle);
-        row.sex(sex);
-        row.role(role);
-        row.skilllevelMin(skilllevelMin);
-        row.skilllevelMax(skilllevelMax);
+        searchingForRow.setId(SearchingForRow.class.getSimpleName() + styleRows.size());
+        searchingForRow.style(dancestyle);
+        searchingForRow.sex(sex);
+        searchingForRow.role(role);
+        searchingForRow.skilllevelMin(skilllevelMin);
+        searchingForRow.skilllevelMax(skilllevelMax);
 
-        styleRows.add(row);
-        styleRowsLayout.add(row);
+        styleRows.add(searchingForRow);
+        styleRowsLayout.add(searchingForRow);
     }
 
     private void search() {

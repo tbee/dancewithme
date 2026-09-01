@@ -24,7 +24,9 @@ public class Populate {
 
     public static final String EMPTY_DANCER = "empty@example.com";
     public static final String BALLROOM_LEAD_MALE_BEGINNER = "B_L_M_B@example.com";
-    public static final String BALLROOM_FOLLOW_FEMALE_BEGINNER = "M_F_F_B@example.com";
+    public static final String BALLROOM_FOLLOW_FEMALE_BEGINNER = "B_F_F_B@example.com";
+    public static final String LATIN_LEAD_MALE_BEGINNER = "L_L_M_B@example.com";
+    public static final String LATIN_FOLLOW_FEMALE_BEGINNER = "L_F_F_B@example.com";
 
     static public Given<StepContext> standardSetExists() {
         return sc -> {
@@ -33,7 +35,8 @@ public class Populate {
                 DancestyleRepository dancestyleRepository = sc.beanFactory.getBean(DancestyleRepository.class);
                 PasswordEncoder passwordEncoder = sc.beanFactory.getBean(PasswordEncoder.class);
 
-                Dancestyle ballroom = dancestyleRepository.findBallroom();
+                Dancestyle ballroom = sc.ballroom();
+                Dancestyle latin = sc.latin();
 
                 LocalDateTime now = sc.nowSupplier.get();
 
@@ -69,6 +72,32 @@ public class Populate {
                         .distanceMax(50)
                         .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(FOLLOW).skilllevel(1)))
                         .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.MALE).role(LEAD).skilllevelMin(1).skilllevelMax(4)));
+
+                dancerRepository.save(new Dancer()
+                                .name("Latin male lead beginner lead, 1-2/week, 50km")
+                                .email(LATIN_LEAD_MALE_BEGINNER)
+                                .password(passwordEncoder.encode(LATIN_LEAD_MALE_BEGINNER))
+                                .emailConfirmedAt(now)
+                                .privacyAgreementAcceptedAt(now))
+                        .sex(Sex.MALE)
+                        .weekFrequencyMin(1)
+                        .weekFrequencyMax(2)
+                        .distanceMax(50)
+                        .dancestyles(List.of(new DancerDancestyle().dancestyle(latin).role(LEAD).skilllevel(1)))
+                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.FEMALE).role(FOLLOW).skilllevelMin(1).skilllevelMax(4)));
+
+                dancerRepository.save(new Dancer()
+                                .name("Latin female lead beginner lead, 1-2/week, 50km")
+                                .email(LATIN_FOLLOW_FEMALE_BEGINNER)
+                                .password(passwordEncoder.encode(LATIN_FOLLOW_FEMALE_BEGINNER))
+                                .emailConfirmedAt(now)
+                                .privacyAgreementAcceptedAt(now))
+                        .sex(Sex.FEMALE)
+                        .weekFrequencyMin(1)
+                        .weekFrequencyMax(2)
+                        .distanceMax(50)
+                        .dancestyles(List.of(new DancerDancestyle().dancestyle(latin).role(FOLLOW).skilllevel(1)))
+                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(latin).sex(SearchCriteriaSex.MALE).role(LEAD).skilllevelMin(1).skilllevelMax(4)));
             });
         };
     }

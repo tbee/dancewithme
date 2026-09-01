@@ -8,7 +8,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
+import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +35,16 @@ public class StepContext {
 
     public DancerRepository dancerRepository() {
         return beanFactory.getBean(DancerRepository.class);
+    }
+    public DancestyleRepository dancestyleRepository() {
+        return beanFactory.getBean(DancestyleRepository.class);
+    }
+
+    public Dancestyle ballroom() {
+        return dancestyleRepository().findBallroom();
+    }
+    public Dancestyle latin() {
+        return dancestyleRepository().findLatin();
     }
 
     public void inTransaction(Runnable runnable) {
