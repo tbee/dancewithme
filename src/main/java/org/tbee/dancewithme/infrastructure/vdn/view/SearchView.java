@@ -114,20 +114,14 @@ public class SearchView extends DancewithmeAppLayout {
         searchContent.setWidthFull();
         searchContent.setMaxWidth("1200px");
         Card searchCard = new Card();
-//        searchCard.setWidthFull();
-//        searchCard.setMaxWidth("1200px");
         searchCard.add(searchContent);
 
         VerticalLayout resultContent = new VerticalLayout(resultsLayout, pagingLayout);
-//        resultContent.setWidthFull();
         resultContent.setMaxWidth("1200px");
         Card resultCard = new Card();
-//        resultCard.setWidthFull();
-//        resultCard.setMaxWidth("1200px");
         resultCard.add(resultContent);
 
         VerticalLayout content = new VerticalLayout(searchCard, resultContent);
-//        content.setMaxWidth("1200px");
         setContent(content);
     }
 

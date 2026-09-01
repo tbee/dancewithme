@@ -1,6 +1,5 @@
 package org.tbee.dancewithme.infrastructure.vdn.component;
 
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.badge.Badge;
 import com.vaadin.flow.component.badge.BadgeVariant;
@@ -19,7 +18,6 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.infrastructure.vdn.view.DancerDetailView;
 import org.tbee.dancewithme.infrastructure.vdn.view.LoginView;
 
-import java.time.Year;
 import java.util.List;
 
 public class SearchResultCard extends Card {
@@ -27,6 +25,7 @@ public class SearchResultCard extends Card {
     public SearchResultCard(SearchService.SearchResult searchResult, Dancer loggedInDancer, SearchService searchService) {
         Dancer dancer = searchResult.dancer();
         boolean loggedIn = (loggedInDancer != null);
+        setId(this.getClass().getSimpleName() + "-" + dancer.id());
 
         // city + distance
         String city = dancer.city() != null ? dancer.city().name() : "";

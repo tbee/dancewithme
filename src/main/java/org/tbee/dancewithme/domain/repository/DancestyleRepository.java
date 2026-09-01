@@ -9,7 +9,6 @@ public interface DancestyleRepository extends CustomRepository<Dancestyle, Long>
     Optional<Dancestyle> findByName(String name);
 
     default Dancestyle findBallroom() {
-        System.out.println("!!!!!!! " +  findAll());
         return findByName("Ballroom").orElseThrow();
     }
     default Dancestyle findLatin() {

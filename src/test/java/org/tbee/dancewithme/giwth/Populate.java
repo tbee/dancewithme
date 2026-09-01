@@ -7,7 +7,6 @@ import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.repository.DancerRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
-import org.tbee.dancewithme.domain.valueobject.Role;
 import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.valueobject.Sex;
 import org.tbee.giwth.Given;
@@ -24,7 +23,8 @@ import static org.tbee.dancewithme.domain.valueobject.Role.LEAD;
 public class Populate {
 
     public static final String EMPTY_DANCER = "empty@example.com";
-    public static final String BALLROOM_BEGINNER_DANCER = "ballroom_beginner@example.com";
+    public static final String BALLROOM_LEAD_MALE_BEGINNER = "B_L_M_B@example.com";
+    public static final String BALLROOM_FOLLOW_FEMALE_BEGINNER = "M_F_F_B@example.com";
 
     static public Given<StepContext> standardSetExists() {
         return sc -> {
@@ -45,9 +45,9 @@ public class Populate {
                         .privacyAgreementAcceptedAt(now));
 
                 dancerRepository.save(new Dancer()
-                        .name("Ballroom beginner lead, 1-2/week, 50km")
-                        .email(BALLROOM_BEGINNER_DANCER)
-                        .password(passwordEncoder.encode(BALLROOM_BEGINNER_DANCER))
+                        .name("Ballroom male lead beginner lead, 1-2/week, 50km")
+                        .email(BALLROOM_LEAD_MALE_BEGINNER)
+                        .password(passwordEncoder.encode(BALLROOM_LEAD_MALE_BEGINNER))
                         .emailConfirmedAt(now)
                         .privacyAgreementAcceptedAt(now))
                         .sex(Sex.MALE)
@@ -56,6 +56,19 @@ public class Populate {
                         .distanceMax(50)
                         .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(LEAD).skilllevel(1)))
                         .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.FEMALE).role(FOLLOW).skilllevelMin(1).skilllevelMax(4)));
+
+                dancerRepository.save(new Dancer()
+                                .name("Ballroom female lead beginner lead, 1-2/week, 50km")
+                                .email(BALLROOM_FOLLOW_FEMALE_BEGINNER)
+                                .password(passwordEncoder.encode(BALLROOM_FOLLOW_FEMALE_BEGINNER))
+                                .emailConfirmedAt(now)
+                                .privacyAgreementAcceptedAt(now))
+                        .sex(Sex.FEMALE)
+                        .weekFrequencyMin(1)
+                        .weekFrequencyMax(2)
+                        .distanceMax(50)
+                        .dancestyles(List.of(new DancerDancestyle().dancestyle(ballroom).role(FOLLOW).skilllevel(1)))
+                        .searchingFor(List.of(new DancerSearchingFor().dancestyle(ballroom).sex(SearchCriteriaSex.MALE).role(LEAD).skilllevelMin(1).skilllevelMax(4)));
             });
         };
     }
