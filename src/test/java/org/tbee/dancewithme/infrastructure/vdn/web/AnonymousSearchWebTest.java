@@ -3,7 +3,6 @@ package org.tbee.dancewithme.infrastructure.vdn.web;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.giwth.Populate;
 import org.tbee.dancewithme.giwth.Search;
 import org.tbee.dancewithme.giwth.SearchResult;
