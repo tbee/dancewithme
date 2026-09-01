@@ -96,6 +96,23 @@ public class DancerForm extends VerticalLayout {
 
         setWidthFull();
 
+        nameField.setId("nameField");
+        emailField.setId("emailField");
+        passwordField.setId("passwordField");
+        confirmPasswordField.setId("confirmPasswordField");
+        cityComboBox.setId("cityComboBox");
+        whoamiField.setId("whoamiField");
+        whatdoiwantField.setId("whatdoiwantField");
+        sexComboBox.setId("sexComboBox");
+        weekFrequencyMinField.setId("weekFrequencyMinField");
+        weekFrequencyMaxField.setId("weekFrequencyMaxField");
+        maxDistanceField.setId("maxDistanceField");
+        activeCheckbox.setId("activeCheckbox");
+        publiclyFindableCheckbox.setId("publiclyFindableCheckbox");
+        privacyAgreementCheckbox.setId("privacyAgreementCheckbox");
+        mugshotImageUpload.setId("mugshotImageUpload");
+        imageGallery.setId("imageGallery");
+
         // basic fields
         nameField.setRequiredIndicatorVisible(true);
         nameField.setWidthFull();

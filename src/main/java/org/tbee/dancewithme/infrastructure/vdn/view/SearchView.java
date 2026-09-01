@@ -33,7 +33,6 @@ import java.util.List;
 @Route("")
 @AnonymousAllowed
 public class SearchView extends DancewithmeAppLayout {
-
     private static final int PAGE_SIZE = 10;
 
     private final SecurityService securityService;
