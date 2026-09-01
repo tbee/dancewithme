@@ -28,11 +28,11 @@ import org.tbee.dancewithme.domain.Dancer;
 import org.tbee.dancewithme.domain.DancerDancestyle;
 import org.tbee.dancewithme.domain.DancerSearchingFor;
 import org.tbee.dancewithme.domain.Dancestyle;
-import org.tbee.dancewithme.domain.valueobject.Role;
-import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.domain.repository.CityRepository;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 import org.tbee.dancewithme.domain.service.ValidateDancer;
+import org.tbee.dancewithme.domain.valueobject.Role;
+import org.tbee.dancewithme.domain.valueobject.SearchCriteriaSex;
 import org.tbee.dancewithme.infrastructure.vdn.DancewithmeAppLayout;
 import org.tbee.webstack.vdn.component.ImageGallery;
 import org.tbee.webstack.vdn.component.ImageUpload;
@@ -185,6 +185,7 @@ public class DancerForm extends VerticalLayout {
 
         // dances I can do
         Button addDancestyleButton = new Button(VaadinIcon.PLUS.create());
+        addDancestyleButton.setId("addDancestyleButton");
         addDancestyleButton.getElement().setAttribute("aria-label", t("form.addDancestyle"));
         addDancestyleButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         addDancestyleButton.addClickListener(e -> addDancestyleRow(dancestyleRows, dancestylesLayout, true, null, null, null, null, null));
@@ -228,6 +229,7 @@ public class DancerForm extends VerticalLayout {
 
         // searching for
         Button addSearchingForButton = new Button(VaadinIcon.PLUS.create());
+        addSearchingForButton.setId("addSearchingForButton");
         addSearchingForButton.getElement().setAttribute("aria-label", t("form.addDancestyle"));
         addSearchingForButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         addSearchingForButton.addClickListener(e -> addDancestyleRow(searchingForRows, searchingForLayout, false, null, null, null, null, null));
@@ -448,16 +450,18 @@ public class DancerForm extends VerticalLayout {
     private void addDancestyleRow(List<SearchingForRow> rows, VerticalLayout layout, boolean aboutDancer, Dancestyle dancestyle, Role role, SearchCriteriaSex sex, Integer skilllevel, Integer skilllevelMax) {
         SearchingForRow row;
         if (aboutDancer) {
-            row = new DancestyleRow(dancestyleRepository, r -> {
+            row = new CandoRow(dancestyleRepository, r -> {
                 rows.remove(r);
                 layout.remove(r);
             });
+            row.setId("canDo" + rows.size());
         }
         else {
             row = new SearchingForRow(dancestyleRepository, r -> {
                 rows.remove(r);
                 layout.remove(r);
             });
+            row.setId("searchingFor" + rows.size());
         }
         row.searchCriteriaSexComboBox.setValue(sex);
         row.skilllevelMaxComboBox.setValue(skilllevelMax);

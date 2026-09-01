@@ -29,7 +29,16 @@ public class RegisterWebTest extends WebTestBase {
                         .maxDistance(50)
                         .active(true)
                         .publiclyFindable(true)
-                        .privacyAgreement(true))
+                        .privacyAgreement(true)
+                        .canDo()
+                        .dancestyle("Ballroom").role("Lead").skilllevel(3)
+                        .and()
+                        .dancestyle("Latin").role("Follow").skilllevel(2)
+                        .also()
+                        .searchingFor()
+                        .dancestyle("Ballroom").sex("Female").role("Follow").skilllevelMin(2).skilllevelMax(4)
+                        .or()
+                        .dancestyle("Latin").sex("Male").role("Lead").skilllevelMin(1).skilllevelMax(5))
         ;
         //sleepForALongTime();
     }

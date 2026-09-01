@@ -5,10 +5,11 @@ import org.tbee.dancewithme.domain.repository.DancestyleRepository;
 
 import java.util.function.Consumer;
 
-public class DancestyleRow extends SearchingForRow {
+public class CandoRow extends SearchingForRow {
+    public static final String SKILLLEVEL_COMBO_BOX_ID = SKILLLEVEL_MIN_COMBO_BOX_ID;
 
-    public DancestyleRow(DancestyleRepository dancestyleRepository, Consumer<DancestyleRow> removeButtonConsumer) {
-        super(dancestyleRepository, (r) -> removeButtonConsumer.accept((DancestyleRow) r));
+    public CandoRow(DancestyleRepository dancestyleRepository, Consumer<CandoRow> removeButtonConsumer) {
+        super(dancestyleRepository, (r) -> removeButtonConsumer.accept((CandoRow) r));
 
         removeAll();
         add(    styleComboBox,

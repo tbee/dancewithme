@@ -33,6 +33,10 @@ public class StepContext {
         this.transactionManager = transactionManager;
     }
 
+    public void english() {
+//        beanFactory.getBean(LocaleService.class).switchLocale(Locale.ENGLISH);
+    }
+
     public DancerRepository dancerRepository() {
         return beanFactory.getBean(DancerRepository.class);
     }

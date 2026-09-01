@@ -14,6 +14,12 @@ import org.tbee.webstack.vdn.component.orderedlayout.HorizontalLayout;
 import java.util.function.Consumer;
 
 public class SearchingForRow extends HorizontalLayout {
+    public static final String STYLE_COMBO_BOX_ID = "styleComboBox";
+    public static final String ROLE_SELECT_ID = "roleSelect";
+    public static final String SEARCH_CRITERIA_SEX_COMBO_BOX_ID = "searchCriteriaSexComboBox";
+    public static final String SKILLLEVEL_MIN_COMBO_BOX_ID = "skilllevelMinComboBox";
+    public static final String SKILLLEVEL_MAX_COMBO_BOX_ID = "skilllevelMaxComboBox";
+    public static final String REMOVE_BUTTON_IS = "removeButton";
     protected final DancestyleComboBox styleComboBox;
     protected final RoleSelect roleSelect;
     protected final SearchCriteriaSexComboBox searchCriteriaSexComboBox;
@@ -29,12 +35,12 @@ public class SearchingForRow extends HorizontalLayout {
         skilllevelMaxComboBox = new SkilllevelComboBox();
         removeButton = removeButton(removeButtonConsumer);
 
-        styleComboBox.setId("styleComboBox");
-        roleSelect.setId("roleSelect");
-        searchCriteriaSexComboBox.setId("searchCriteriaSexComboBox");
-        skilllevelMinComboBox.setId("skilllevelMinComboBox");
-        skilllevelMaxComboBox.setId("skilllevelMaxComboBox");
-        removeButton.setId("removeButton");
+        styleComboBox.setId(STYLE_COMBO_BOX_ID);
+        roleSelect.setId(ROLE_SELECT_ID);
+        searchCriteriaSexComboBox.setId(SEARCH_CRITERIA_SEX_COMBO_BOX_ID);
+        skilllevelMinComboBox.setId(SKILLLEVEL_MIN_COMBO_BOX_ID);
+        skilllevelMaxComboBox.setId(SKILLLEVEL_MAX_COMBO_BOX_ID);
+        removeButton.setId(REMOVE_BUTTON_IS);
 
         padding(false);
         margin(false);
