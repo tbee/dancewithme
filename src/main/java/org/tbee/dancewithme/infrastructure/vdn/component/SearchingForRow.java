@@ -4,7 +4,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import org.jspecify.annotations.NonNull;
 import org.tbee.dancewithme.domain.Dancestyle;
 import org.tbee.dancewithme.domain.repository.DancestyleRepository;
@@ -26,16 +25,16 @@ public class SearchingForRow extends HorizontalLayout {
         styleComboBox = new DancestyleComboBox(dancestyleRepository);
         roleSelect = new RoleSelect();
         searchCriteriaSexComboBox = new SearchCriteriaSexComboBox();
-        searchCriteriaSexComboBox.setId(SearchCriteriaSexComboBox.class.getSimpleName());
         skilllevelMinComboBox = new SkilllevelComboBox();
         skilllevelMaxComboBox = new SkilllevelComboBox();
         removeButton = removeButton(removeButtonConsumer);
 
-        styleComboBox.setId(DancestyleComboBox.class.getSimpleName());
-        roleSelect.setId(roleSelect.getClass().getSimpleName());
-        skilllevelMinComboBox.setId(SkilllevelComboBox.class.getSimpleName() + "Min");
-        skilllevelMaxComboBox.setId(SkilllevelComboBox.class.getSimpleName() + "Max");
-        removeButton.setId("RemoveButton");
+        styleComboBox.setId("styleComboBox");
+        roleSelect.setId("roleSelect");
+        searchCriteriaSexComboBox.setId("searchCriteriaSexComboBox");
+        skilllevelMinComboBox.setId("skilllevelMinComboBox");
+        skilllevelMaxComboBox.setId("skilllevelMaxComboBox");
+        removeButton.setId("removeButton");
 
         padding(false);
         margin(false);
