@@ -60,6 +60,7 @@ public class RegisterView extends DancewithmeAppLayout {
                 showException(ex);
             }
         });
+        registerButton.setId("registerButton");
         registerButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_LARGE);
 
         VerticalLayout content = new VerticalLayout(form, registerButton);
