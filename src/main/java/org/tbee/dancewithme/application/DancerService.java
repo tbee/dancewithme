@@ -45,7 +45,9 @@ public class DancerService {
 
         dancer.password(passwordEncoder.encode(rawPassword));
         dancer.privacyAgreementAcceptedAt(LocalDateTime.now());
+        System.out.println("!!!!!!! save!");
         Dancer saved = dancerRepository.save(dancer);
+        System.out.println("!!!!!!! saved!");
         emailConfirmationService.requestConfirmation(saved);
         return new Registration(saved, false);
     }

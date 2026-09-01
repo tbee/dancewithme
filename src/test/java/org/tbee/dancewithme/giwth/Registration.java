@@ -113,6 +113,7 @@ public class Registration {
             }
 
             sc.page.locator("#registerButton").click();
+            sc.waitUntil("dancer to be persisted", () -> sc.dancerRepository().findByEmail(email).isPresent());
         }
 
         @Override

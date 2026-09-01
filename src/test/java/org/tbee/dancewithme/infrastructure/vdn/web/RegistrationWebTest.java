@@ -3,6 +3,7 @@ package org.tbee.dancewithme.infrastructure.vdn.web;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.tbee.dancewithme.giwth.Mail;
 import org.tbee.dancewithme.giwth.Registration;
 import org.tbee.giwth.Scenario;
 
@@ -63,6 +64,10 @@ public class RegistrationWebTest extends WebTestBase {
                         .dancestyle("Ballroom").sex("Female").role("Follow").skilllevelMin(2).skilllevelMax(4)
                         .or()
                         .dancestyle("Latin").sex("Male").role("Lead").skilllevelMin(1).skilllevelMax(5))
+                .and(Mail.shouldHaveBeenSent()
+                        .to("john.doe@example.com")
+                        .subject("Confirm your 'Shall we Dance?' account")
+                        .textContaining("Your confirmation code is:"))
         ;
         //sleepForALongTime();
     }

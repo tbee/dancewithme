@@ -74,6 +74,7 @@ abstract public class InfraTestBase {
         // R is a static singleton bound to the last created Spring context; rebind it to this test's context
 //        beanFactory.getBean(nl.softworks.consilio.domain.repository.R.class).init();
         MailSenderStub.sentMimeMessages.clear();
+        MailSenderStub.sentSimpleMessages.clear();
         deleteAllData();
     }
 

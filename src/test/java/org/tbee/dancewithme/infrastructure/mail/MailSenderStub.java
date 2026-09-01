@@ -16,6 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class MailSenderStub implements JavaMailSender {
 
     public static final List<MimeMessage> sentMimeMessages = new CopyOnWriteArrayList<>();
+    public static final List<SimpleMailMessage> sentSimpleMessages = new CopyOnWriteArrayList<>();
 
     @Override
     public MimeMessage createMimeMessage() {
@@ -63,11 +64,11 @@ public class MailSenderStub implements JavaMailSender {
 
     @Override
     public void send(SimpleMailMessage simpleMessage) {
-        throw new UnsupportedOperationException("Not used by the application");
+        sentSimpleMessages.add(simpleMessage);
     }
 
     @Override
     public void send(SimpleMailMessage... simpleMessages) {
-        throw new UnsupportedOperationException("Not used by the application");
+        sentSimpleMessages.addAll(List.of(simpleMessages));
     }
 }
