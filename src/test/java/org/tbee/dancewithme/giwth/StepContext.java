@@ -88,24 +88,8 @@ public class StepContext {
                 .waitFor();
     }
 
-    public void waitForUrlContains(String substring) {
-        long startTime = System.currentTimeMillis();
-        while (!page.url().contains(substring)) {
-            if (System.currentTimeMillis() > startTime + 10000) {
-                throw new RuntimeException("Timeout waiting for url to contain: " + substring + " (current: " + page.url() + ")");
-            }
-            sleep(100);
-        }
-    }
-
-    public void waitUntil(String description, java.util.function.BooleanSupplier condition) {
-        long startTime = System.currentTimeMillis();
-        while (!condition.getAsBoolean()) {
-            if (System.currentTimeMillis() > startTime + 10000) {
-                throw new RuntimeException("Timeout waiting for: " + description);
-            }
-            sleep(100);
-        }
+    public void waitForUrlToContain(String substring) {
+        page.waitForURL(url -> url.contains(substring));
     }
 
     public void sleep(int ms) {
