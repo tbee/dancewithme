@@ -4,6 +4,8 @@ import com.microsoft.playwright.Locator;
 import org.tbee.dancewithme.infrastructure.vdn.component.CandoRow;
 import org.tbee.dancewithme.infrastructure.vdn.component.SearchingForRow;
 import org.tbee.giwth.When;
+import org.tbee.webstack.test.playwright.vdn.ComboBox;
+import org.tbee.webstack.test.playwright.vdn.Select;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,10 +135,10 @@ public class Registration {
                 sc.page.locator("#confirmPasswordField").locator("input").fill(confirmPassword);
             }
             if (city != null) {
-                selectComboBoxItem(sc, "#cityComboBox", city, true);
+                new ComboBox(sc.page.locator("#cityComboBox")).select(city, true);
             }
             if (sex != null) {
-                selectComboBoxItem(sc, "#sexComboBox", sex, true);
+                new ComboBox(sc.page.locator("#sexComboBox")).select(sex, true);
             }
             if (whoami != null) {
                 sc.page.locator("#whoamiField").locator("textarea").fill(whoami);
@@ -169,13 +171,13 @@ public class Registration {
                 sc.page.locator("#addDancestyleButton").click();
                 Locator row = sc.page.locator("#canDo" + index);
                 if (style.dancestyle != null) {
-                    selectComboBoxItem(sc, row.locator("#" + CandoRow.STYLE_COMBO_BOX_ID), style.dancestyle, true);
+                    new ComboBox(row.locator("#" + CandoRow.STYLE_COMBO_BOX_ID)).select(style.dancestyle, true);
                 }
                 if (style.role != null) {
-                    selectRoleItem(sc, row.locator("#" + CandoRow.ROLE_SELECT_ID), style.role);
+                    new Select(row.locator("#" + CandoRow.ROLE_SELECT_ID)).select(style.role);
                 }
                 if (style.skilllevel != null) {
-                    selectComboBoxItem(sc, row.locator("#" + CandoRow.SKILLLEVEL_COMBO_BOX_ID), style.skilllevel + " - ", false);
+                    new ComboBox(row.locator("#" + CandoRow.SKILLLEVEL_COMBO_BOX_ID)).select(style.skilllevel + " - ", false);
                 }
             }
 
@@ -185,42 +187,24 @@ public class Registration {
                 sc.page.locator("#addSearchingForButton").click();
                 Locator row = sc.page.locator("#searchingFor" + index);
                 if (style.dancestyle != null) {
-                    selectComboBoxItem(sc, row.locator("#" + SearchingForRow.STYLE_COMBO_BOX_ID), style.dancestyle, true);
+                    new ComboBox(row.locator("#" + SearchingForRow.STYLE_COMBO_BOX_ID)).select(style.dancestyle, true);
                 }
                 if (style.sex != null) {
-                    selectComboBoxItem(sc, row.locator("#" + SearchingForRow.SEARCH_CRITERIA_SEX_COMBO_BOX_ID), style.sex, true);
+                    new ComboBox(row.locator("#" + SearchingForRow.SEARCH_CRITERIA_SEX_COMBO_BOX_ID)).select(style.sex, true);
                 }
                 if (style.role != null) {
-                    selectRoleItem(sc, row.locator("#" + SearchingForRow.ROLE_SELECT_ID), style.role);
+                    new Select(row.locator("#" + SearchingForRow.ROLE_SELECT_ID)).select(style.role);
                 }
                 if (style.skilllevelMin != null) {
-                    selectComboBoxItem(sc, row.locator("#" + SearchingForRow.SKILLLEVEL_MIN_COMBO_BOX_ID), style.skilllevelMin + " - ", false);
+                    new ComboBox(row.locator("#" + SearchingForRow.SKILLLEVEL_MIN_COMBO_BOX_ID)).select(style.skilllevelMin + " - ", false);
                 }
                 if (style.skilllevelMax != null) {
-                    selectComboBoxItem(sc, row.locator("#" + SearchingForRow.SKILLLEVEL_MAX_COMBO_BOX_ID), style.skilllevelMax + " - ", false);
+                    new ComboBox(row.locator("#" + SearchingForRow.SKILLLEVEL_MAX_COMBO_BOX_ID)).select(style.skilllevelMax + " - ", false);
                 }
             }
 
             sc.page.locator("#registerButton").click();
             sc.waitForUrlToContain("/confirm");
-        }
-
-        private static void selectComboBoxItem(StepContext sc, String selector, String text, boolean exact) {
-            selectComboBoxItem(sc, sc.page.locator(selector), text, exact);
-        }
-
-        private static void selectComboBoxItem(StepContext sc, Locator comboBox, String text, boolean exact) {
-            comboBox.locator("#toggleButton").click();
-            comboBox.locator("vaadin-combo-box-item")
-                    .getByText(text, new Locator.GetByTextOptions().setExact(exact))
-                    .click();
-        }
-
-        private static void selectRoleItem(StepContext sc, Locator select, String text) {
-            select.locator("vaadin-select-value-button").click();
-            select.locator("vaadin-select-item")
-                    .getByText(text, new Locator.GetByTextOptions().setExact(true))
-                    .click();
         }
     }
 

@@ -17,8 +17,10 @@ import org.tbee.dancewithme.infrastructure.jpa.CustomRepositoryImpl;
 import java.util.Locale;
 
 // TODO:
+// Landing page
 // Do we want to rename: "Shall We Dance?", "It takes two!", "Floorcraft", "On The Floor", "Dance Connection", "Care To Dance", or just keep "Dance With Me?"
 // Implement ImageGallery
+// test and prevent javascript injection in test fields
 // Allow to change the emailaddress
 // i18n SmtpEmailService
 // Privacy / cookie policy text
